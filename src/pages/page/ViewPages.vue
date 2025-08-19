@@ -1,0 +1,40 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { useRestApi } from '../../lib/restapi.ts';
+import { IPage, IPages } from '../../entities/page/page.ts';
+import EntPagesList from '../../entities/page/EntPagesList.vue';
+
+
+const pages = ref<IPage[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
+
+const { get } = useRestApi();
+
+const fetchPages = async () => {
+  try {
+    loading.value = true;
+    const response = await get<IPages>('/pages');
+    if (response.data?.rows)
+      pages.value = response.data.rows;
+
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : (String(err) || 'Ошибка при загрузке страниц');
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchPages();
+});
+</script>
+
+<template>
+  <EntPagesList
+    :error="error"
+    :loading="loading"
+    :pages="pages"
+  />
+</template>
+
