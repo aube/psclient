@@ -1,17 +1,17 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useUserAPI } from '../api/rest/user.api';
+import { User } from '../types/User.types';
+import { useNotificationStore } from './notification';
 
-interface IUser {
-  id: number;
-  username: string;
-  email: string;
-}
+const { login } = useUserAPI()
+const notifications = useNotificationStore()
 
 export const useUserStore = defineStore('user', () => {
-  const user = ref(null as IUser | null)
+  const user = ref(null as User | null)
   const isAuthenticated = computed(() => user.value !== null)
 
-  function setUser(data: IUser) {
+  function setUser(data: User) {
     user.value = data
   }
 
@@ -25,5 +25,22 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
   }
 
-  return { isAuthenticated, setUser, currentUser, clearUser }
+  async function loginUser(formData: User) {
+    try {
+      const user = await login(formData)
+      setUser(user)
+    } catch (e) {
+      notifications.danger(e)
+    }
+  }
+
+  return {
+    isAuthenticated,
+    setUser,
+    currentUser,
+    clearUser,
+    loginUser,
+    // registerUser,
+  }
 })
+

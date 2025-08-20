@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { name, version } from '../../package.json'
 
-
 export const useGeneralStore = defineStore('general', () => {
 
   const MODE = import.meta.env.MODE;
@@ -20,16 +19,18 @@ export const useGeneralStore = defineStore('general', () => {
     isProd: PROD,
     isDev: DEV,
     isSSR: SSR,
+    isBrowser: typeof window !== 'undefined' && typeof document !== 'undefined',
     apiBaseURL: API_BASE_URL,
     navbarName: APP_NAVBAR_NAME || name,
     titleName: APP_TITLE_NAME || name,
     lang: APP_LANG || 'ru',
   }
-  
+
   if (app.isDev) {
+    // eslint-disable-next-line no-console
     console.log("app ==> ", app);
   }
-  
+
   return app
 
 })

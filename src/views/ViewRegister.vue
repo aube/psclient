@@ -1,11 +1,11 @@
 <template>
   <div>
-    <UserRegister @submit="loginUser" />
+    <UserRegisterForm @submit="loginUser" />
   </div>
 </template>
 
 <script setup>
-import UserRegister from '../entities/user/UserRegister.vue';
+import UserRegisterForm from '../entities/user/UserRegisterForm.vue';
 // import { useNotificationStore } from '@/stores/notification'
 import { useRestApi } from '../lib/restapi.js'
 import { useRouter } from 'vue-router'

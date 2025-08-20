@@ -48,6 +48,7 @@ const formFields = ref([
 const formData = ref({});
 
 const handleFieldChange = ({ field, value }) => {
+  // eslint-disable-next-line
   console.log(`Field ${field} changed to:`, value);
 };
 </script>

@@ -7,23 +7,33 @@ import type { ToastServiceMethods } from 'primevue/toastservice';
 
 import { useRestApi } from './lib/restapi';
 
-let toast: ToastServiceMethods
+
+
+import { useNotificationStore } from './stores/notification';
+const notifications = useNotificationStore()
+
+
+notifications.success("Это успех!", "УРА!")
+
+// let toast: ToastServiceMethods
 const isToastLoaded = ref(false)
 
+
+
 onMounted(() => {
-  toast = useToast();
+  // toast = useToast();
   isToastLoaded.value = true
   // setTimeout(save, 2000)
 })
 
-const save = () => {
-  toast.add({
-    severity:'success',
-    summary: 'Success',
-    detail: 'Data Saved',
-    life: 3000,
-  });
-};
+// const save = () => {
+//   toast.add({
+//     severity:'success',
+//     summary: 'Success',
+//     detail: 'Data Saved',
+//     life: 3000,
+//   });
+// };
 
 </script>
 
