@@ -1,24 +1,20 @@
 <template>
   <div>
-    <UserRegisterForm @submit="loginUser" />
+    <UserRegisterForm @submit="onSubmit" />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import UserRegisterForm from '../entities/user/UserRegisterForm.vue';
-// import { useNotificationStore } from '@/stores/notification'
-import { useRestApi } from '../lib/restapi.js'
-import { useRouter } from 'vue-router'
+import { User } from '../types/User.types';
 
-// const { showSuccess, showDanger } = useNotificationStore()
-const { post } = useRestApi()
+// import { useRouter } from 'vue-router'
+import { useUserStore } from '../stores/user';
 
-const registerUser = async (formData) => {
-  const response = await post('/api/v1/register', formData)
-  if (!response.error) {
-    showSuccess('Вы успешно зарегистрированы! Проверьте ваш email для подтверждения.')
-  } else {
-    showDanger('Ошибка регистрации. Попробуйте позже.')
-  }
+const { registerUser } = useUserStore()
+
+const onSubmit = async (formData: User) => {
+  await registerUser(formData)
 }
+
 </script>

@@ -1,10 +1,18 @@
 import fs from 'node:fs/promises'
 import express from 'express'
+import http from 'http'
+import dotenv from 'dotenv'
+import {readNodeCookie} from './src/lib/cookies.js'
+
+const isProduction = process.env.NODE_ENV === 'production'
+dotenv.config({ path: isProduction ?`.env` : `.env.local` })
+console.log("NODE_ENV", process.env.NODE_ENV) 
+console.log("VITE_API_BASE_URL", process.env.VITE_API_BASE_URL) 
 
 // Constants
-const isProduction = process.env.NODE_ENV === 'production'
 const port = process.env.PORT || 5173
 const base = process.env.BASE || '/'
+const API = process.env.VITE_API_BASE_URL
 
 // Cached production assets
 const templateHtml = isProduction
@@ -32,10 +40,21 @@ if (!isProduction) {
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
 
+
+
+
+async function getUser(req) {
+  const token = readNodeCookie(req.headers.cookie, "auth_token")
+  if (!token) return null
+  const user = await makeRequestWithAuth(API + "/api/v1/profile", token)
+  return user?.data
+}
+
 // Serve HTML
 app.use('*all', async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, '')
+    const user = await getUser(req)
 
     /** @type {string} */
     let template
@@ -51,13 +70,20 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const { stream } = await render(url)
+    const { stream } = await render(url, user)
+
+    const headAnchor = "<!--app-head-->"
+    const userScript = "<script>window.user=" +JSON.stringify(user)+ "</script>"
+    
+    template = template.replace(headAnchor, headAnchor + userScript)
 
     const [htmlStart, htmlEnd] = template.split('<!--app-html-->')
 
     res.status(200).set({ 'Content-Type': 'text/html' })
 
+    
     res.write(htmlStart)
+
     for await (const chunk of stream) {
       if (res.closed) break
       res.write(chunk)
@@ -83,3 +109,57 @@ app.use('*all', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 })
+
+
+
+
+function makeRequestWithAuth(url, authToken, method = 'GET', data = null) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    
+    const options = {
+      hostname: urlObj.hostname,
+      port: urlObj.port || 80,
+      path: urlObj.pathname + urlObj.search,
+      method: method,
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'Node.js/HTTPClient'
+      }
+    };
+
+    const req = http.request(options, (res) => {
+      let responseData = '';
+
+      res.on('data', (chunk) => {
+        responseData += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(responseData);
+          resolve({
+            statusCode: res.statusCode,
+            headers: res.headers,
+            data: parsedData
+          });
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+      const postData = JSON.stringify(data);
+      req.setHeader('Content-Length', Buffer.byteLength(postData));
+      req.write(postData);
+    }
+
+    req.end();
+  });
+}

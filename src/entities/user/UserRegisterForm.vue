@@ -38,7 +38,6 @@
         <ComControls
           v-model="formData"
           :fields="formFields"
-          @change="handleFieldChange"
         />
       </div>
       <Button
@@ -74,8 +73,25 @@ const email = generalStore.isDev ? 'qwe@qwe.qwe' : ''
 const password = generalStore.isDev ? 'password' : ''
 const password_confirmation = generalStore.isDev ? 'password' : ''
 
+const formFields = ref([
+  {
+    type: "input",
+    name: "username",
+    label: "Имя",
+  },
+  {
+    type: "password",
+    name: "password",
+    label: "Пароль",
+  },
+  {
+    type: "password",
+    name: "password_confirmation",
+    label: "Повторите Пароль",
+  },
+]);
 
-const form = reactive({
+const formData = reactive({
   username,
   email,
   password,
@@ -98,28 +114,28 @@ const validate = () => {
   Object.keys(errors).forEach(key => errors[key] = '')
 
   // Валидация
-  if (!form.username.trim()) {
+  if (!formData.username.trim()) {
     errors.username = 'Имя обязательно'
     isValid = false
   }
 
-  if (!form.email.trim()) {
+  if (!formData.email.trim()) {
     errors.email = 'Email обязателен'
     isValid = false
-  } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+  } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
     errors.email = 'Введите корректный email'
     isValid = false
   }
 
-  if (!form.password) {
+  if (!formData.password) {
     errors.password = 'Пароль обязателен'
     isValid = false
-  } else if (form.password.length < 6) {
+  } else if (formData.password.length < 6) {
     errors.password = 'Пароль должен быть не менее 6 символов'
     isValid = false
   }
 
-  if (form.password !== form.password_confirmation) {
+  if (formData.password !== formData.password_confirmation) {
     errors.password_confirmation = 'Пароли не совпадают'
     isValid = false
   }
@@ -133,37 +149,12 @@ const handleSubmit = async () => {
   isLoading.value = true
   try {
     emit('submit', {
-      username: form.username,
-      email: form.email,
-      password: form.password,
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
     })
   } finally {
     isLoading.value = false
   }
 }
-
-const formFields = ref([
-  {
-    type: "input",
-    name: "username",
-    label: "Имя",
-  },
-  {
-    type: "password",
-    name: "pass1",
-    label: "Пароль",
-  },
-  {
-    type: "password",
-    name: "pass2",
-    label: "Повторите Пароль",
-  },
-]);
-
-const formData = ref({});
-
-const handleFieldChange = ({ field, value }) => {
-  console.log(`Field ${field} changed to:`, value);
-};
-
 </script>

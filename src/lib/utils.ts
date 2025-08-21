@@ -5,3 +5,10 @@
 // export function cn(...inputs: ClassValue[]) {
 //   return twMerge(clsx(inputs))
 // }
+
+
+export function getWindowProperty<T = unknown>(key: string): T | undefined {
+  if (typeof window === 'undefined') return undefined
+
+  return (window as unknown as Record<string, T>)[key]
+}

@@ -1,5 +1,6 @@
 import { createSSRApp } from 'vue'
 import { createPinia } from 'pinia'
+// import { createAppPinia } from './stores'
 import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config';
@@ -13,6 +14,7 @@ import Aura from '@primeuix/themes/aura';
 export function createApp() {
   const app = createSSRApp(App)
   const pinia = createPinia()
+
   app.use(PrimeVue, {
     theme: {
       preset: Aura,
@@ -22,10 +24,12 @@ export function createApp() {
       },
     },
   });
+
   app.use(router)
   app.use(pinia)
   app.use(ToastService)
-  return { app, router }
+
+  return { app, router, pinia }
 }
 
 

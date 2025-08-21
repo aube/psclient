@@ -1,12 +1,18 @@
 import { renderToWebStream } from 'vue/server-renderer'
 import { createApp } from './main'
+import { User } from './types/User.types'
 
-export async function render(_url: string) {
+export async function render(_url: string, user: User | null) {
   const { app, router } = createApp()
+  let url = _url
 
   try {
-    await router.push(_url);
+    if (!user) {
+      url = '/login'
+    }
+    await router.push(url);
     await router.isReady();
+
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : String(err));
   }
