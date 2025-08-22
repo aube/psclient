@@ -3,23 +3,19 @@ import ComNavbar from './components/ComNavbar.vue';
 import Toast from 'primevue/toast';
 import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/user';
-import { getWindowProperty } from './lib/utils'
-
+import { User } from './types/User.types';
 
 
 import { useNotificationStore } from './stores/notification';
 const notifications = useNotificationStore()
 
 const userStore = useUserStore(notifications)
-const currentUser = getWindowProperty('user')
-
 const isToastLoaded = ref(false)
-
-
+const currentUser = ref<User | null>(null)
 
 onMounted(() => {
   isToastLoaded.value = true
-  // currentUser.value = userStore.currentUser()
+  currentUser.value = userStore.currentUser() as User
 })
 
 </script>

@@ -4,9 +4,6 @@ export const routes = [
     path: '/',
     name: 'home',
     component: (): Promise<typeof import('*.vue')> => import('../views/ViewIndex.vue') as Promise<typeof import('*.vue')>,
-    meta: {
-
-    },
   },
   {
     path: '/pages',
@@ -22,6 +19,9 @@ export const routes = [
     path: '/login',
     name: 'login',
     component: (): Promise<typeof import('*.vue')> => import('../views/ViewLogin.vue'),
+    meta: {
+      guestAccess: true,
+    },
   },
   // {
   //   path: '/logout',
@@ -32,16 +32,25 @@ export const routes = [
     path: '/register',
     name: 'register',
     component: (): Promise<typeof import('*.vue')> => import('../views/ViewRegister.vue'),
+    meta: {
+      guestAccess: true,
+    },
   },
   {
     path: '/403',
     name: 'error403',
     component: (): Promise<typeof import('*.vue')> => import('../views/errors/View403.vue'),
+    meta: {
+      guestAccess: true,
+    },
   },
   {
-    path: '/404',
+    path: '/:pathMatch(.*)*',
     name: 'error404',
     component: (): Promise<typeof import('*.vue')> => import('../views/errors/View404.vue'),
+    meta: {
+      guestAccess: true,
+    },
   },
   // {
   //   path: '/upload',

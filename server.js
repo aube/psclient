@@ -70,7 +70,7 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const { stream } = await render(url, user)
+    const { stream, statusCode } = await render(url)
 
     const headAnchor = "<!--app-head-->"
     const userScript = "<script>window.user=" +JSON.stringify(user)+ "</script>"
@@ -79,9 +79,8 @@ app.use('*all', async (req, res) => {
 
     const [htmlStart, htmlEnd] = template.split('<!--app-html-->')
 
-    res.status(200).set({ 'Content-Type': 'text/html' })
+    res.status(statusCode).set({ 'Content-Type': 'text/html' })
 
-    
     res.write(htmlStart)
 
     for await (const chunk of stream) {
@@ -95,7 +94,11 @@ app.use('*all', async (req, res) => {
     const statusCode = parseInt(e.message) || 0
     if (statusCode >= 400 && statusCode < 500) {
       console.log("HTTP Error", statusCode)
-      res.status(statusCode).end()
+      res.status(statusCode).set({ 'Content-Type': 'text/html' })
+
+      res.write(statusCode)
+      res.end()
+
       return
     }
 

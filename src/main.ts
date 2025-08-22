@@ -29,6 +29,10 @@ export function createApp() {
   app.use(pinia)
   app.use(ToastService)
 
+  // console.log(router)
+  // console.log("has login", router.hasRoute("login"))
+  // console.log("routes", router.getRoutes())
+
   return { app, router, pinia }
 }
 

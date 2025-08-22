@@ -13,7 +13,7 @@ const {
 } = useUserAPI()
 
 
-export const useUserStore = (notifications: ReturnType<typeof useNotificationStore>) => {
+export const useUserStore = (notifications: ReturnType<typeof useNotificationStore> | null) => {
   return defineStore('user', () => {
     const user = ref(null as User | null)
     const token = ref("")
@@ -68,6 +68,7 @@ export const useUserStore = (notifications: ReturnType<typeof useNotificationSto
 
     const SSRAuthResult = isBrowser ? window.user : null
     if (SSRAuthResult) {
+      // eslint-disable-next-line
       console.log("SSRAuthResult", SSRAuthResult)
       setUser(SSRAuthResult)
     }
