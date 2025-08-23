@@ -19,7 +19,7 @@ export const useUserStore = (notifications: ReturnType<typeof useNotificationSto
     const token = ref("")
     const isAuthenticated = computed(() => user.value !== null)
 
-    function setUser(data: User) {
+    function setUser(data: User | null) {
       user.value = data
     }
 
@@ -55,6 +55,10 @@ export const useUserStore = (notifications: ReturnType<typeof useNotificationSto
       }
     }
 
+    async function logoutUser() {
+      window.location.replace('/login?logout=1')
+    }
+
     async function registerUser(formData: User) {
       try {
         const user = await register(formData)
@@ -79,6 +83,7 @@ export const useUserStore = (notifications: ReturnType<typeof useNotificationSto
       currentUser,
       clearUser,
       loginUser,
+      logoutUser,
       registerUser,
     }
   })()

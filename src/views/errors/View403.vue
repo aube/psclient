@@ -5,9 +5,9 @@
       <Divider />
       <RouterLink
         class="text-primary font-medium ml-1 cursor-pointer hover:text-primary-emphasis"
-        to="/"
+        to="/login"
       >
-        На главную
+        Авторизация
       </RouterLink>
     </Panel>
   </div>

@@ -7,11 +7,10 @@
 <script setup lang="ts">
 import UserRegisterForm from '../entities/user/UserRegisterForm.vue';
 import { User } from '../types/User.types';
-
-// import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user';
 
-const { registerUser } = useUserStore()
+import { useNotificationStore } from '../stores/notification'
+const { registerUser } = useUserStore(useNotificationStore())
 
 const onSubmit = async (formData: User) => {
   await registerUser(formData)

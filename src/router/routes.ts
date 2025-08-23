@@ -11,7 +11,7 @@ export const routes = [
     component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
   },
   {
-    path: '/page/:id',
+    path: '/page/:id?',
     name: 'page',
     component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
   },
@@ -23,11 +23,6 @@ export const routes = [
       guestAccess: true,
     },
   },
-  // {
-  //   path: '/logout',
-  //   name: 'logout',
-  //   component: (): Promise<typeof import('*.vue')> => import('../views/PageLogout.vue'),
-  // },
   {
     path: '/register',
     name: 'register',

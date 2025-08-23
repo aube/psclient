@@ -45,6 +45,7 @@ if (!isProduction) {
 
 async function getUser(req) {
   const token = readNodeCookie(req.headers.cookie, "auth_token")
+  console.log("token", token)
   if (!token) return null
   const user = await makeRequestWithAuth(API + "/api/v1/profile", token)
   return user?.data
@@ -54,6 +55,11 @@ async function getUser(req) {
 app.use('*all', async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, '')
+    if (url.includes("logout")) {
+      res.clearCookie('auth_token');
+      res.redirect("/login")
+      return
+    }
     const user = await getUser(req)
 
     /** @type {string} */

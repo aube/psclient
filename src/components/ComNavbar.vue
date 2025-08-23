@@ -3,41 +3,44 @@
   <div class="card">
     <Menubar :model="items">
       <template #start>
-        <svg
-          class="h-8 w-8"
-          fill="none"
-          height="32"
-          viewBox="0 0 33 32"
-          width="33"
-          xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M7.09219 2.87829C5.94766 3.67858 4.9127 4.62478 4.01426 5.68992C7.6857 5.34906 12.3501 5.90564 17.7655 8.61335C23.5484 11.5047 28.205 11.6025 31.4458 10.9773C31.1517 10.087 30.7815 9.23135 30.343 8.41791C26.6332 8.80919 21.8772 8.29127 16.3345 5.51998C12.8148 3.76014 9.71221 3.03521 7.09219 2.87829ZM28.1759 5.33332C25.2462 2.06 20.9887 0 16.25 0C14.8584 0 13.5081 0.177686 12.2209 0.511584C13.9643 0.987269 15.8163 1.68319 17.7655 2.65781C21.8236 4.68682 25.3271 5.34013 28.1759 5.33332ZM32.1387 14.1025C28.2235 14.8756 22.817 14.7168 16.3345 11.4755C10.274 8.44527 5.45035 8.48343 2.19712 9.20639C2.0292 9.24367 1.86523 9.28287 1.70522 9.32367C1.2793 10.25 0.939308 11.2241 0.695362 12.2356C0.955909 12.166 1.22514 12.0998 1.50293 12.0381C5.44966 11.161 11.0261 11.1991 17.7655 14.5689C23.8261 17.5991 28.6497 17.561 31.9029 16.838C32.0144 16.8133 32.1242 16.7877 32.2322 16.7613C32.2441 16.509 32.25 16.2552 32.25 16C32.25 15.358 32.2122 14.7248 32.1387 14.1025ZM31.7098 20.1378C27.8326 20.8157 22.5836 20.5555 16.3345 17.431C10.274 14.4008 5.45035 14.439 2.19712 15.1619C1.475 15.3223 0.825392 15.5178 0.252344 15.7241C0.250782 15.8158 0.25 15.9078 0.25 16C0.25 24.8366 7.41344 32 16.25 32C23.6557 32 29.8862 26.9687 31.7098 20.1378Z"
-          fill="var(--p-primary-color)"
-        /></svg>
-
-        <svg
-          class="h-8"
-          fill="none"
-          height="40"
-          viewBox="0 0 35 40"
-          width="35"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M25.87 18.05L23.16 17.45L25.27 20.46V29.78L32.49 23.76V13.53L29.18 14.73L25.87 18.04V18.05ZM25.27 35.49L29.18 31.58V27.67L25.27 30.98V35.49ZM20.16 17.14H20.03H20.17H20.16ZM30.1 5.19L34.89 4.81L33.08 12.33L24.1 15.67L30.08 5.2L30.1 5.19ZM5.72 14.74L2.41 13.54V23.77L9.63 29.79V20.47L11.74 17.46L9.03 18.06L5.72 14.75V14.74ZM9.63 30.98L5.72 27.67V31.58L9.63 35.49V30.98ZM4.8 5.2L10.78 15.67L1.81 12.33L0 4.81L4.79 5.19L4.8 5.2ZM24.37 21.05V34.59L22.56 37.29L20.46 39.4H14.44L12.34 37.29L10.53 34.59V21.05L12.42 18.23L17.45 26.8L22.48 18.23L24.37 21.05ZM22.85 0L22.57 0.69L17.45 13.08L12.33 0.69L12.05 0H22.85Z"
-            fill="var(--p-primary-color)"
-          />
-          <path
-            d="M30.69 4.21L24.37 4.81L22.57 0.69L22.86 0H26.48L30.69 4.21ZM23.75 5.67L22.66 3.08L18.05 14.24V17.14H19.7H20.03H20.16H20.2L24.1 15.7L30.11 5.19L23.75 5.67ZM4.21002 4.21L10.53 4.81L12.33 0.69L12.05 0H8.43002L4.22002 4.21H4.21002ZM21.9 17.4L20.6 18.2H14.3L13 17.4L12.4 18.2L12.42 18.23L17.45 26.8L22.48 18.23L22.5 18.2L21.9 17.4ZM4.79002 5.19L10.8 15.7L14.7 17.14H14.74H15.2H16.85V14.24L12.24 3.09L11.15 5.68L4.79002 5.2V5.19Z"
-            fill="var(--p-text-color)"
-          />
-        </svg>
+        <RouterLink to="/">
+          <svg
+            id="com-navbar_logo"
+            fill="none"
+            height="32"
+            viewBox="0 0 33 32"
+            width="33"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M7.882 24.213q-1.673 0-2.574-.772-.869-.772-.869-1.737 0-.836.612-1.448.61-.61 1.801-.61.418 0 .965.096l.869.096q-.032-.836-.386-1.576-.322-.74-.837-1.415-.514-.708-.965-1.223-.997 1.898-1.994 3.153-.965 1.254-2.123 2.38-.58.58-1.223.58-.514 0-.836-.355Q0 20.996 0 20.45q0-.643.45-1.19l.419-.515q1.769-2.187 2.67-3.602.547-.933 1.287-2.477.74-1.577 1.447-3.25Q6.884 8 8.814 8q.901 0 1.255.161.354.16.354.515 0 .193-.129.61-.128.42-.354.837-.579 1.158-.579 1.963 0 .482.322 1.061.354.58 1.062 1.448 1.029 1.35 1.544 2.316.546.933.546 2.059 0 .321-.064.9 1.576-.61 3.7-3.249.386-.45.868-.45.418 0 .643.386.258.386.258 1.062 0 1.222-.611 1.994-1.609 1.994-3.089 2.734-1.447.708-3.602.772-1.287 1.094-3.056 1.094z"
+              fill="#0b74ce"
+              style="stroke-width:.446786"
+            />
+            <path
+              d="M21.641 24.213q-1.673 0-2.573-.772-.869-.772-.869-1.737 0-.836.611-1.448.612-.61 1.802-.61.418 0 .965.096l.868.096q-.032-.836-.386-1.576-.321-.74-.836-1.415-.515-.708-.965-1.223-.997 1.898-1.994 3.153-.966 1.254-2.124 2.38-.579.58-1.222.58-.515 0-.836-.355-.322-.386-.322-.933 0-.643.45-1.19l.418-.515q1.77-2.187 2.67-3.602.547-.933 1.287-2.477.74-1.577 1.448-3.25Q20.644 8 22.574 8q.9 0 1.255.161.354.16.354.515 0 .193-.13.61-.128.42-.353.837-.579 1.158-.579 1.963 0 .482.322 1.061.354.58 1.061 1.448 1.03 1.35 1.544 2.316.547.933.547 2.059 0 .321-.064.9 1.576-.61 3.7-3.249.385-.45.868-.45.418 0 .643.386.258.386.258 1.062 0 1.222-.612 1.994-1.608 1.995-3.088 2.734-1.447.708-3.603.772-1.287 1.094-3.056 1.094z"
+              fill="#0093e9"
+              style="stroke-width:.446786"
+            />
+          </svg>
+        </RouterLink>
       </template>
-      <template #item="{ item, props, hasSubmenu, root }">
+      <template
+        #item="{
+          item,
+          props,
+          hasSubmenu,
+          root
+        }"
+      >
         <a
           class="flex items-center"
           v-bind="props.action"
         >
+          <span
+            v-if="item.icon"
+            :class="item.icon"
+          />
           <span>{{ item.label }}</span>
           <Badge
             v-if="item.badge"
@@ -62,18 +65,13 @@
             type="text"
           />
           <Button
-            aria-label="Light mode"
-            icon="pi pi-moon"
-            rounded
-            severity="secondary"
-            @click="darkToggle"
-          />
-          <Button
-            aria-label="Palette togle"
-            icon="pi pi-palette"
-            rounded
-            severity="secondary"
-            @click="paletteToggle"
+            v-for="btn, idx in rightButtons"
+            :key="idx"
+            :aria-label="btn.ariaLabel"
+            :icon="btn.icon"
+            :rounded="btn.rounded"
+            :severity="btn.severity"
+            @click="btn.click"
           />
         </div>
       </template>
@@ -94,58 +92,55 @@ import {
 
 const router = useRouter()
 
-const items = ref([
-  {
-    label: 'Home',
-    icon: 'pi pi-home',
-    command: () => router.push("/"),
-  },
-  {
-    label: 'Login',
-    icon: 'pi pi-user',
-    command: () => router.push("/login"),
-  },
-  {
-    label: 'Register',
-    icon: 'pi pi-user',
-    command: () => router.push("/register"),
-  },
-  {
-    label: 'Page',
-    icon: 'pi pi-user',
-    command: () => router.push("/page"),
-  },
+const menuSite = [
   {
     label: 'Pages',
-    icon: 'pi pi-user',
+    icon: 'pi pi-sitemap',
     command: () => router.push("/pages"),
   },
   {
-    label: 'Projects',
-    icon: 'pi pi-search',
-    badge: 3,
-    items: [
-      {
-        label: 'Core',
-        icon: 'pi pi-bolt',
-        shortcut: '⌘+S',
-      },
-      {
-        label: 'Blocks',
-        icon: 'pi pi-server',
-        shortcut: '⌘+B',
-      },
-      {
-        separator: true,
-      },
-      {
-        label: 'UI Kit',
-        icon: 'pi pi-pencil',
-        shortcut: '⌘+U',
-      },
-    ],
+    label: 'Users',
+    icon: 'pi pi-user',
+    command: () => router.push("/users"),
   },
-]);
+  {
+    label: 'Images',
+    icon: 'pi pi-image',
+    command: () => router.push("/images"),
+  },
+  {
+    label: 'Settings',
+    icon: 'pi pi-cog',
+    command: () => router.push("/settings"),
+  },
+  // {
+  //   label: 'Projects',
+  //   icon: 'pi pi-search',
+  //   badge: 3,
+  //   items: [
+  //     {
+  //       label: 'Core',
+  //       icon: 'pi pi-bolt',
+  //       shortcut: '⌘+S',
+  //     },
+  //     {
+  //       label: 'Blocks',
+  //       icon: 'pi pi-server',
+  //       shortcut: '⌘+B',
+  //     },
+  //     {
+  //       separator: true,
+  //     },
+  //     {
+  //       label: 'UI Kit',
+  //       icon: 'pi pi-pencil',
+  //       shortcut: '⌘+U',
+  //     },
+  //   ],
+  // },
+]
+
+const items = ref(menuSite);
 
 
 function darkToggle(e) {
@@ -178,4 +173,38 @@ const paletteToggle = () => {
   const values = getNextColorPalette();
   updatePrimaryPalette(values);
 }
+
+const rightButtons = ref([
+  {
+    ariaLabel: "Light mode",
+    icon: "pi pi-moon",
+    rounded: true,
+    severity: "secondary",
+    click: darkToggle,
+  },
+  {
+    ariaLabel: "Palette togle",
+    icon: "pi pi-palette",
+    rounded: true,
+    severity: "secondary",
+    click: paletteToggle,
+  },
+  {
+    ariaLabel: "Profile",
+    icon: "pi pi-user",
+    rounded: true,
+    severity: "secondary",
+    click: () => router.push('/profile'),
+  },
+])
+
 </script>
+
+<style>
+/* #com-navbar_logo path{
+  fill: var(--p-primary-active-color)!important;
+}
+#com-navbar_logo path+path{
+  fill: var(--p-primary-color)!important;
+} */
+</style>

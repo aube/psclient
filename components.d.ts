@@ -14,6 +14,7 @@ declare module 'vue' {
     ComControls: typeof import('./src/components/ComControls.vue')['default']
     ComForm: typeof import('./src/components/ComForm.vue')['default']
     ComNavbar: typeof import('./src/components/ComNavbar.vue')['default']
+    ComRouteTreeNode: typeof import('./src/components/ComRouteTreeNode.vue')['default']
     Divider: typeof import('primevue/divider')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
     InputText: typeof import('primevue/inputtext')['default']
@@ -22,6 +23,7 @@ declare module 'vue' {
     Password: typeof import('primevue/password')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    RouteTreeNode: typeof import('./src/components/RouteTreeNode.vue')['default']
     Textarea: typeof import('primevue/textarea')['default']
   }
 }

@@ -5,7 +5,6 @@ import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/user';
 import { User } from './types/User.types';
 
-
 import { useNotificationStore } from './stores/notification';
 const notifications = useNotificationStore()
 
@@ -22,16 +21,16 @@ onMounted(() => {
 
 <template>
   <main>
-    <ComNavbar class="mb-3" />
+    <ComNavbar
+      v-if="userStore.isAuthenticated"
+      class="mb-3"
+    />
     <RouterView />
     {{ currentUser }}
+
     <Toast v-if="isToastLoaded" />
   </main>
 </template>
 
-<style scoped>
 
-
-</style>
-
-
+<style scoped></style>

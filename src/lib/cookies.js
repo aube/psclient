@@ -19,10 +19,8 @@ export const setCookie = (name, value, options = {}) => {
     secure = location.protocol === 'https:'
   } = options;
 
-console.log("options", options)
-
   const maxAgeSeconds = expirationHours * 60 * 60;
-  const expires = new Date();
+  const expires = expirationHours ? new Date() : new Date(0);
   expires.setTime(expires.getTime() + maxAgeSeconds * 1000);
 
   let cookieString = `${name}=${encodeURIComponent(value)}; `;
@@ -51,32 +49,9 @@ console.log("options", options)
     cookieString += 'HttpOnly; ';
   }
 
+  console.log(cookieString)
   document.cookie = cookieString;
 }
-
-
-
-/**
- * Удаляет JWT cookie
- * @param {string} name - Название cookie
- * @param {string} domain - Домен
- * @returns {Promise} Promise с информацией об удаленной cookie
- */
-export const removeCookie = async (name, url, path) => {
-  try {
-    const cookieDetails = {
-      name: name,
-      url: url || `${location.protocol}//${location.hostname}`,
-      path: path || "/",
-    };
-
-    const result = await browser.cookies.remove(cookieDetails);
-    return result;
-  } catch (error) {
-    throw error;
-  }
-}
-
 
 /**
  * Читает cookie на бэке
