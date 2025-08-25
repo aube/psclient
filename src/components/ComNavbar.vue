@@ -1,11 +1,14 @@
 
 <template>
-  <div class="card">
+  <div
+    id="com-navbar"
+    class="card"
+  >
     <Menubar :model="items">
       <template #start>
         <RouterLink to="/">
           <svg
-            id="com-navbar_logo"
+            class="mr-3 logo"
             fill="none"
             height="32"
             viewBox="0 0 33 32"
@@ -36,6 +39,7 @@
         <a
           class="flex items-center"
           v-bind="props.action"
+          :class="item.active ? 'active': ''"
         >
           <span
             v-if="item.icon"
@@ -81,66 +85,56 @@
 
 <script setup>
 
-import { ref } from "vue";
-import { useRouter } from "vue-router"
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router"
 
 import {
   updatePrimaryPalette,
   palette,
 } from '@primeuix/themes';
 
-
+const route = useRoute()
 const router = useRouter()
 
-const menuSite = [
+
+const menu = [
   {
     label: 'Pages',
     icon: 'pi pi-sitemap',
-    command: () => router.push("/pages"),
+    link: "",
   },
   {
     label: 'Users',
     icon: 'pi pi-user',
-    command: () => router.push("/users"),
+    link: "users",
   },
   {
     label: 'Images',
     icon: 'pi pi-image',
-    command: () => router.push("/images"),
+    link: "images",
   },
   {
     label: 'Settings',
     icon: 'pi pi-cog',
-    command: () => router.push("/settings"),
+    link: "settings",
   },
-  // {
-  //   label: 'Projects',
-  //   icon: 'pi pi-search',
-  //   badge: 3,
-  //   items: [
-  //     {
-  //       label: 'Core',
-  //       icon: 'pi pi-bolt',
-  //       shortcut: '⌘+S',
-  //     },
-  //     {
-  //       label: 'Blocks',
-  //       icon: 'pi pi-server',
-  //       shortcut: '⌘+B',
-  //     },
-  //     {
-  //       separator: true,
-  //     },
-  //     {
-  //       label: 'UI Kit',
-  //       icon: 'pi pi-pencil',
-  //       shortcut: '⌘+U',
-  //     },
-  //   ],
-  // },
 ]
 
-const items = ref(menuSite);
+
+const items = computed(() => {
+  if (!route.params.siteName) {
+    return []
+  }
+  const linkPrefixe = "/site/" + route.params.siteName
+  return menu.map(item => {
+    const link = item.link ? "/" + item.link : ""
+    return {
+      ...item,
+      active: route.fullPath === linkPrefixe + link,
+      command: () => router.push(linkPrefixe + link),
+    }
+  })
+})
 
 
 function darkToggle(e) {
@@ -201,10 +195,16 @@ const rightButtons = ref([
 </script>
 
 <style>
-/* #com-navbar_logo path{
+/* #com-navbar .logo path{
   fill: var(--p-primary-active-color)!important;
 }
-#com-navbar_logo path+path{
+#com-navbar .logo path+path{
   fill: var(--p-primary-color)!important;
 } */
+
+#com-navbar {
+  .p-menubar-item-link.active {
+    color: var(--p-button-link-color)
+  }
+}
 </style>

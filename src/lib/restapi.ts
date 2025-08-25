@@ -66,6 +66,6 @@ export function useRestApi(baseURL: string = API_BASE_URL) {
     post: <T>(endpoint: string, body: unknown) => request<T>(endpoint, "POST", body),
     put: <T>(endpoint: string, body: unknown) => request<T>(endpoint, "PUT", body),
     patch: <T>(endpoint: string, body: unknown) => request<T>(endpoint, "PATCH", body),
-    delete: <T>(endpoint: string) => request<T>(endpoint, "DELETE"),
+    del: <T>(endpoint: string) => request<T>(endpoint, "DELETE"),
   };
 }

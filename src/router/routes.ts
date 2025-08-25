@@ -6,14 +6,34 @@ export const routes = [
     component: (): Promise<typeof import('*.vue')> => import('../views/ViewIndex.vue') as Promise<typeof import('*.vue')>,
   },
   {
-    path: '/pages',
-    name: 'pages',
-    component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
-  },
-  {
-    path: '/page/:id?',
-    name: 'page',
-    component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+    path: '/site/:siteName',
+    children: [
+      {
+        path: '',
+        name: 'pages',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
+      },
+      {
+        path: 'page/:id?',
+        name: 'page',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+      },
+      {
+        path: 'settings',
+        name: 'settings',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+      },
+      {
+        path: 'images',
+        name: 'images',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+      },
+    ],
   },
   {
     path: '/login',

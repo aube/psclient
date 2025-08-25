@@ -26,7 +26,6 @@ onMounted(() => {
       class="mb-3"
     />
     <RouterView />
-    {{ currentUser }}
 
     <Toast v-if="isToastLoaded" />
   </main>
