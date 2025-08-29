@@ -18,7 +18,7 @@
         class="w-full py-2 rounded-lg flex justify-center items-center gap-2"
         icon="pi pi-user"
         label="Пока-пока"
-        @click="handleSubmit"
+        @click="onExitClick"
       >
         <template #icon>
           <i class="pi pi-user text-base! leading-normal!" />
@@ -36,10 +36,8 @@ defineOptions({
 
 const emit = defineEmits(['submit'])
 
-
-const handleSubmit = async () => {
+const onExitClick = async () => {
   emit('submit')
 }
-
 
 </script>

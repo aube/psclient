@@ -12,3 +12,9 @@ export function getWindowProperty<T = unknown>(key: string): T | undefined {
 
   return (window as unknown as Record<string, T>)[key]
 }
+
+
+export const regs = {
+  domain: /^[a-zA-Z0-9]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  domainPart: /^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$/,
+}

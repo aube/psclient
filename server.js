@@ -40,12 +40,11 @@ if (!isProduction) {
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
 
+async function getToken(req) {
+  return readNodeCookie(req.headers.cookie, "auth_token")
+}
 
-
-
-async function getUser(req) {
-  const token = readNodeCookie(req.headers.cookie, "auth_token")
-  console.log("token", token)
+async function getUser(token) {
   if (!token) return null
   const user = await makeRequestWithAuth(API + "/api/v1/profile", token)
   return user?.data
@@ -60,7 +59,12 @@ app.use('*all', async (req, res) => {
       res.redirect("/login")
       return
     }
-    const user = await getUser(req)
+
+    const token = await getToken(req)
+    const user = await getUser(token)
+    // if (user) {
+    //   user.token = token
+    // }
 
     /** @type {string} */
     let template
@@ -78,10 +82,11 @@ app.use('*all', async (req, res) => {
 
     const { stream, statusCode } = await render(url)
 
-    const headAnchor = "<!--app-head-->"
-    const userScript = "<script>window.user=" +JSON.stringify(user)+ "</script>"
-    
-    template = template.replace(headAnchor, headAnchor + userScript)
+    if (user) {
+      const headAnchor = "<!--app-head-->"
+      const userScript = "<script>window.user=" +JSON.stringify(user)+ "</script>"
+      template = template.replace(headAnchor, headAnchor + userScript)
+    }
 
     const [htmlStart, htmlEnd] = template.split('<!--app-html-->')
 

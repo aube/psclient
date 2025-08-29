@@ -1,4 +1,6 @@
 import { ref } from "vue";
+import { readFrontCookie } from './cookies.ts'
+
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -23,7 +25,7 @@ export function useRestApi(baseURL: string = API_BASE_URL) {
     const isFormdata = body && body instanceof FormData;
 
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${readFrontCookie("auth_token")}`,
     };
     if (!isFormdata) {
       headers["Content-Type"] = "application/json";

@@ -14,22 +14,35 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-6 w-full">
-        <ComControls
-          v-model="formData"
-          :fields="formFields"
-        />
-      </div>
-      <Button
-        class="w-full py-2 rounded-lg flex justify-center items-center gap-2"
-        icon="pi pi-user"
-        label="Регистрация"
-        @click="handleSubmit"
+
+      <Form
+        v-if="formData"
+        class="flex flex-col gap-4"
+        :initial-value="formData"
+        :validate-on-blur="true"
+        :validate-on-mount="false"
+        :validate-on-submit="true"
+        :validate-on-value-update="true"
+        @submit="onFormSubmit"
       >
-        <template #icon>
-          <i class="pi pi-user text-base! leading-normal!" />
-        </template>
-      </Button>
+        <div class="flex flex-col gap-6 w-full">
+          <ComControls
+            :data="formData"
+            :fields="formFields"
+          />
+        </div>
+        <Button
+          class="w-full py-2 rounded-lg flex justify-center items-center gap-2"
+          icon="pi pi-user"
+          label="Регистрация"
+          type="submit"
+        >
+          <template #icon>
+            <i class="pi pi-user text-base! leading-normal!" />
+          </template>
+        </Button>
+      </Form>
+
       <div class="text-center w-full">
         <span class="text-surface-700 dark:text-surface-200 leading-normal">Уже есть аккаунт?</span>
         <RouterLink
@@ -132,15 +145,15 @@ const validate = () => {
   return isValid
 }
 
-const handleSubmit = async () => {
+const onFormSubmit = async ({ values }) => {
   if (!validate()) return
 
   isLoading.value = true
   try {
     emit('submit', {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
+      username: values.username,
+      email: values.email,
+      password: values.password,
     })
   } finally {
     isLoading.value = false

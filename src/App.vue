@@ -11,10 +11,10 @@ const notifications = useNotificationStore()
 const userStore = useUserStore(notifications)
 const isToastLoaded = ref(false)
 const currentUser = ref<User | null>(null)
+currentUser.value = userStore.currentUser() as User
 
 onMounted(() => {
   isToastLoaded.value = true
-  currentUser.value = userStore.currentUser() as User
 })
 
 </script>
@@ -25,6 +25,7 @@ onMounted(() => {
       v-if="userStore.isAuthenticated"
       class="mb-3"
     />
+
     <RouterView />
 
     <Toast v-if="isToastLoaded" />

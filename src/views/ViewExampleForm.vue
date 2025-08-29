@@ -43,6 +43,23 @@ const formFields = ref([
       { name: 'Paris', code: 'PRS' },
     ],
   },
+  {
+    type: "textarea",
+    name: "description",
+    label: "Описание",
+  },
+  {
+    type: "autocomplete",
+    name: "city",
+    label: "Город",
+    options: [
+      { name: 'New York', code: 'NY' },
+      { name: 'Rome', code: 'RM' },
+      { name: 'London', code: 'LDN' },
+      { name: 'Istanbul', code: 'IST' },
+      { name: 'Paris', code: 'PRS' },
+    ],
+  },
 ]);
 
 const formData = ref({});

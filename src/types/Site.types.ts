@@ -10,10 +10,11 @@ export interface Site {
   created_at: Date;
   updated_at: Date;
   deleted: boolean;
+  icon?: string;
 }
 
-export interface CreateSite extends Omit<Site, 'id' | 'created_at' | 'updated_at'> {
-  id?: number;
-  created_at?: Date;
-  updated_at?: Date;
+export interface SiteNew {
+  name: string;
 }
+
+export type Sites = Site[]

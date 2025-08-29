@@ -1,7 +1,6 @@
-import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useSiteAPI } from '../api/rest/site.api';
-import { Site } from '../types/Site.types';
+import { Site, SiteNew } from '../types/Site.types';
 import { useNotificationStore } from './notification';
 
 
@@ -11,87 +10,81 @@ const {
   update,
   remove,
   list,
+  exists,
 } = useSiteAPI()
 
 
 export const useSitesStore = (notifications: ReturnType<typeof useNotificationStore> | null) => {
   return defineStore('sites', () => {
-    const site = ref(null as Site | null)
-    const sites = ref([] as Site[])
 
-    function setSite(data: Site | null) {
-      site.value = data
-    }
-
-    function setSites(data: Site[]) {
-      sites.value = data
-    }
-
-    function currentSite() {
-      return {
-        ...site.value,
-      }
-    }
-
-    async function selectSite(id: number) {
+    async function getSite(name: string): Promise<Site | null> {
       try {
-        const site = await read(id)
-        setSite(site)
+        const site = await read(name)
+        return site
       } catch (e) {
         notifications?.danger(e)
+        return null
       }
     }
 
-    async function updateSite(formData: Site) {
+    async function siteExists(name: string): Promise<boolean> {
+      const nameBusy = await exists(name)
+      return nameBusy
+    }
+
+    async function updateSite(formData: Site): Promise<Site | null> {
       try {
-        const user = await update(formData)
-        setSite(user)
+        const site = await update(formData)
         notifications?.success("Изменения сохранены")
+        return site
       } catch (e) {
         notifications?.danger(e)
+        return null
       }
     }
 
-    async function createSite(formData: Site) {
+    async function createSite(formData: SiteNew): Promise<Site | null> {
       try {
-        const user = await create(formData)
-        setSite(user)
+        const site = await create(formData)
         notifications?.success("Сайт создан")
+        return site
       } catch (e) {
         notifications?.danger(e)
+        return null
       }
     }
 
-    async function deleteSite(id: number) {
+    async function deleteSite(id: number): Promise<boolean> {
       try {
         const result = await remove(id)
         if (result) {
-          setSite(null)
           notifications?.success("Сайт перенесен в корзину")
         } else {
           notifications?.danger("Что-то пошло не так")
         }
+        return result
       } catch (e) {
         notifications?.danger(e)
+        return false
       }
     }
 
     async function listSites() {
       try {
         const sites = await list()
-        setSites(sites)
+        return sites
       } catch (e) {
         notifications?.danger(e)
       }
     }
 
     return {
-      currentSite,
-      selectSite,
+      getSite,
       updateSite,
       deleteSite,
       createSite,
       listSites,
+      siteExists,
     }
   })()
 }

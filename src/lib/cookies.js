@@ -49,7 +49,6 @@ export const setCookie = (name, value, options = {}) => {
     cookieString += 'HttpOnly; ';
   }
 
-  console.log(cookieString)
   document.cookie = cookieString;
 }
 
@@ -74,3 +73,8 @@ export function readNodeCookie(cookieHeader, cookieName) {
   
   return cookieValue;
 }
+
+
+// export function readFrontCookie(cookieName) {
+//   return document.cookie.match('(^|;)\\s*' + cookieName + '\\s*=\\s*([^;]+)')?.pop() || ''
+// }

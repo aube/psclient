@@ -6,6 +6,11 @@ export const routes = [
     component: (): Promise<typeof import('*.vue')> => import('../views/ViewIndex.vue') as Promise<typeof import('*.vue')>,
   },
   {
+    path: '/site/new',
+    name: 'siteNew',
+    component: (): Promise<typeof import('*.vue')> => import('../views/site/ViewSiteNew.vue'),
+  },
+  {
     path: '/site/:siteName',
     children: [
       {
@@ -14,14 +19,14 @@ export const routes = [
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
       },
       {
-        path: 'page/:id?',
+        path: 'page/:pageID?',
         name: 'page',
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
       },
       {
         path: 'settings',
         name: 'settings',
-        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+        component: (): Promise<typeof import('*.vue')> => import('../views/site/ViewSiteSettings.vue'),
       },
       {
         path: 'images',
