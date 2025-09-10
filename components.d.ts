@@ -17,6 +17,7 @@ declare module 'vue' {
     ComControlsErrors: typeof import('./src/components/ComControlsErrors.vue')['default']
     ComForm: typeof import('./src/components/ComForm/ComForm.vue')['default']
     ComFormErrors: typeof import('./src/components/ComForm/ComFormErrors.vue')['default']
+    ComLogo: typeof import('./src/components/ComLogo.vue')['default']
     ComNavbar: typeof import('./src/components/ComNavbar.vue')['default']
     ComRouteTreeNode: typeof import('./src/components/ComRouteTreeNode.vue')['default']
     Divider: typeof import('primevue/divider')['default']

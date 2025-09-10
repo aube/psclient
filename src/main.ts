@@ -5,19 +5,34 @@ import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 
+const MyPreset = definePreset(Aura, {
+  semantic: {
+    primary: {
+      50: '{sky.50}',
+      100: '{sky.100}',
+      200: '{sky.200}',
+      300: '{sky.300}',
+      400: '{sky.400}',
+      500: '{sky.500}',
+      600: '{sky.600}',
+      700: '{sky.700}',
+      800: '{sky.800}',
+      900: '{sky.900}',
+      950: '{sky.950}',
+    },
+  },
+});
 
-// SSR requires a fresh app instance per request, therefore we export a function
-// that creates a fresh app instance. If using Vuex, we'd also be creating a
-// fresh store here.
 export function createApp() {
   const app = createSSRApp(App)
   const pinia = createPinia()
 
   app.use(PrimeVue, {
     theme: {
-      preset: Aura,
+      preset: MyPreset,
       options: {
         darkModeSelector: '.p-dark',
         cssLayer: false,
@@ -28,10 +43,6 @@ export function createApp() {
   app.use(router)
   app.use(pinia)
   app.use(ToastService)
-
-  // console.log(router)
-  // console.log("has login", router.hasRoute("login"))
-  // console.log("routes", router.getRoutes())
 
   return { app, router, pinia }
 }
