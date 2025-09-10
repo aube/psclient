@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRestApi } from '../../lib/restapi.ts';
 import { IPage } from '../../entities/page/page.ts';
-import EntPageForm from '../../entities/page/EntPageForm.vue';
+import PageForm from '../../entities/page/PageForm.vue';
 
 import { useRoute } from 'vue-router'
 
@@ -18,9 +18,9 @@ const fetchPages = async () => {
   try {
     loading.value = true;
     const response = await get<IPage>('/page?id=' + route.params.id);
-    if (response.data) 
-        page.value = response.data;
-    
+    if (response.data)
+      page.value = response.data;
+
   } catch (err) {
     error.value = 'Ошибка при загрузке страницы';
     console.error(err);
@@ -35,9 +35,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <EntPageForm
-    :page="page"
-    :loading="loading"
+  <PageForm
     :error="error"
+    :loading="loading"
+    :page="page"
   />
 </template>

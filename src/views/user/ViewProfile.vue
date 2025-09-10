@@ -22,7 +22,9 @@ const onLogout = async () => {
 </script>
 
 <template>
-  <div class="p-3 flex flex-col gap-4 w-full sm:w-156">
+  <div
+    class="p-3 flex flex-col gap-4 w-full sm:w-156"
+  >
     <UserProfileForm
       @submit="onSubmit"
     />

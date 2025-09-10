@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useRestApi } from '../../lib/restapi.ts';
 import { IPage, IPages } from '../../entities/page/page.ts';
-import EntPagesList from '../../entities/page/EntPagesList.vue';
+import PagesList from '../../entities/page/PagesList.vue';
 
 
 const pages = ref<IPage[]>([]);
@@ -31,7 +31,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <EntPagesList
+  <PagesList
     :error="error"
     :loading="loading"
     :pages="pages"

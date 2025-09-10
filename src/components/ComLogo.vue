@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
 
 const { size = "32", width = "", height = "" } = defineProps<{
   size?: string

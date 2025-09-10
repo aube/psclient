@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-import EntSitesList from '../entities/site/EntSitesList.vue'
+import SitesList from '../entities/site/SitesList.vue'
 
 import { useSitesStore } from '../stores/sites';
 import { useNotificationStore } from '../stores/notification'
@@ -19,10 +19,9 @@ onMounted(async () => {
 
 <template>
   <div
-    id="view-index"
-    class="grid gap-4"
+    class="grid gap-4 px-3"
   >
-    <EntSitesList :items="sites" />
+    <SitesList :items="sites" />
 
     <RouterLink to="/site/new">
       <Button
@@ -37,11 +36,3 @@ onMounted(async () => {
     </RouterLink>
   </div>
 </template>
-
-<style>
-#view-index {
-  .p-panel-content {
-    padding-bottom: 0px;
-  }
-}
-</style>

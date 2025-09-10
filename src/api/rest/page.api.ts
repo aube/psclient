@@ -38,8 +38,8 @@ export const usePageAPI = () => {
     return response.data
   }
 
-  const exists = async (name: string): Promise<boolean> => {
-    const response = await get<Page>('/api/v1/page/' + name)
+  const exists = async (name: string, parent_id: number): Promise<boolean> => {
+    const response = await get<Page>('/api/v1/page/exists?parent_id=' + parent_id + '&name=' + name)
     if (!response.data) {
       return false
     }

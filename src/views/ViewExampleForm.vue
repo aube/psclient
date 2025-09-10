@@ -1,16 +1,3 @@
-<template>
-  <div>
-    <Panel>
-      <ComControls
-        v-model="formData"
-        :fields="formFields"
-        @change="handleFieldChange"
-      />
-    </Panel>
-    <pre>{{ formData }}</pre>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue';
 import ComControls from '../components/ComControls.vue';
@@ -69,3 +56,16 @@ const handleFieldChange = ({ field, value }) => {
   console.log(`Field ${field} changed to:`, value);
 };
 </script>
+
+<template>
+  <div>
+    <Panel>
+      <ComControls
+        v-model="formData"
+        :fields="formFields"
+        @change="handleFieldChange"
+      />
+    </Panel>
+    <pre>{{ formData }}</pre>
+  </div>
+</template>

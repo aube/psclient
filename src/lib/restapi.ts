@@ -15,6 +15,7 @@ export interface ApiResponse<T> {
 const globalHeaders : Record<string, string|number|boolean> = {}
 
 const setHeader = (k: string, v: string|number|boolean) => {
+  console.log("setHeader", k, v)
   globalHeaders[k] = v
 }
 
@@ -23,6 +24,8 @@ const delHeader = (k: string) => {
 }
 
 export function useRestApi(baseURL: string = API_BASE_URL) {
+
+  console.log("globalHeaders", globalHeaders)
   const loading = ref(false);
 
   async function request<T>(

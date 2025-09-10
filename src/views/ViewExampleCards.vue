@@ -1,3 +1,15 @@
+<script setup>
+import { ref } from 'vue';
+import ComControls from '../components/ComControls.vue';
+
+const formData = ref({});
+
+const handleFieldChange = ({ field, value }) => {
+  // eslint-disable-next-line
+  console.log(`Field ${field} changed to:`, value);
+};
+</script>
+
 <template>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
     <Card
@@ -40,15 +52,3 @@
     </Card>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import ComControls from '../components/ComControls.vue';
-
-const formData = ref({});
-
-const handleFieldChange = ({ field, value }) => {
-  // eslint-disable-next-line
-  console.log(`Field ${field} changed to:`, value);
-};
-</script>
