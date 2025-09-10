@@ -19,9 +19,14 @@ export const routes = [
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
       },
       {
-        path: 'page/:pageID?',
+        path: 'page/:pageID',
         name: 'page',
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+      },
+      {
+        path: 'page/new',
+        name: 'pageNew',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPageNew.vue'),
       },
       {
         path: 'settings',

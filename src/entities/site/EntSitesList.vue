@@ -1,3 +1,12 @@
+<script setup lang="ts">
+import { Site } from '../../types/Site.types'
+
+const props = defineProps<{
+  items: Site[]
+}>()
+
+</script>
+
 <template>
   <Panel
     v-for="site in props.items"
@@ -72,16 +81,6 @@
     </RouterLink>
   </Panel>
 </template>
-
-<script setup lang="ts">
-import { Site } from '../../types/Site.types'
-
-const props = defineProps<{
-  items: Site[]
-}>()
-
-</script>
-
 
 <style>
 #view-index {

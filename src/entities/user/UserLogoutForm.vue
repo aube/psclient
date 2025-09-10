@@ -1,3 +1,17 @@
+<script setup>
+
+defineOptions({
+  name: 'FormLogout',
+})
+
+const emit = defineEmits(['submit'])
+
+const onExitClick = async () => {
+  emit('submit')
+}
+
+</script>
+
 <template>
   <div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-20 lg:px-80">
     <div class="bg-surface-0 dark:bg-surface-900 p-8 pt-4 md:p-12 md:pt-6 shadow-sm rounded-2xl w-full max-w-sm mx-auto flex flex-col gap-8">
@@ -27,17 +41,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-
-defineOptions({
-  name: 'FormLogout',
-})
-
-const emit = defineEmits(['submit'])
-
-const onExitClick = async () => {
-  emit('submit')
-}
-
-</script>

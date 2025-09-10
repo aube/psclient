@@ -1,3 +1,76 @@
+<script setup>
+import { ref, reactive, watch, nextTick } from 'vue';
+import ComControlErrors from './ComControlsErrors.vue'
+
+const props = defineProps({
+  fields: {
+    type: Array,
+    required: true,
+    validator: (value) => {
+      return value.every(field =>
+        field.type && field.name && field.label
+      );
+    },
+  },
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+  errors: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
+const emit = defineEmits(['change']);
+
+// Инициализация formData
+const formData = reactive({});
+const initialValues = reactive({});
+const autoCompleteOptions = ref([]);
+const autoCompleteOptionsCopy = [];
+
+// Инициализируем formData на основе props.fields
+const initializeFormData = () => {
+  props.fields.forEach(field => {
+    if (!(field.name in formData)) {
+      formData[field.name] = props.data[field.name] || '';
+      initialValues[field.name] = props.data[field.name] || '';
+
+      if (field.type === "autocomplete") {
+        autoCompleteOptionsCopy[field.name] = field.options.map(i => ({ ...i, normalizedName: i.name.toLowerCase() }));
+        autoCompleteOptions.value[field.name] = [...field.options];
+      }
+    }
+  });
+};
+
+const autoCompleteFilter = (name) => {
+  const data = formData[name] || ""
+  autoCompleteOptions.value[name] = autoCompleteOptionsCopy[name].filter(i => i.normalizedName.includes(data.toLowerCase()))
+};
+
+// Если data изменился извне, обновляем formData
+watch(() => props.data, () => {
+  initializeFormData()
+}, { deep: true });
+
+// Инициализация при монтировании
+initializeFormData();
+
+const handleChange = async (name, value) => {
+  await nextTick()
+  // Обновляем локальное состояние
+  formData[name] = value;
+
+  // Эмитим событие change
+  emit('change', {
+    field: name,
+    value,
+  });
+};
+</script>
+
 <template>
   <div class="com-form">
     <div
@@ -110,79 +183,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, reactive, watch, nextTick } from 'vue';
-import ComControlErrors from './ComControlsErrors.vue'
-
-const props = defineProps({
-  fields: {
-    type: Array,
-    required: true,
-    validator: (value) => {
-      return value.every(field =>
-        field.type && field.name && field.label
-      );
-    },
-  },
-  data: {
-    type: Object,
-    default: () => ({}),
-  },
-  errors: {
-    type: Object,
-    default: () => ({}),
-  },
-});
-
-const emit = defineEmits(['change']);
-
-// Инициализация formData
-const formData = reactive({});
-const initialValues = reactive({});
-const autoCompleteOptions = ref([]);
-const autoCompleteOptionsCopy = [];
-
-// Инициализируем formData на основе props.fields
-const initializeFormData = () => {
-  props.fields.forEach(field => {
-    if (!(field.name in formData)) {
-      formData[field.name] = props.data[field.name] || '';
-      initialValues[field.name] = props.data[field.name] || '';
-
-      if (field.type === "autocomplete") {
-        autoCompleteOptionsCopy[field.name] = field.options.map(i => ({ ...i, normalizedName: i.name.toLowerCase() }));
-        autoCompleteOptions.value[field.name] = [...field.options];
-      }
-    }
-  });
-};
-
-const autoCompleteFilter = (name) => {
-  const data = formData[name] || ""
-  autoCompleteOptions.value[name] = autoCompleteOptionsCopy[name].filter(i => i.normalizedName.includes(data.toLowerCase()))
-};
-
-// Если data изменился извне, обновляем formData
-watch(() => props.data, () => {
-  initializeFormData()
-}, { deep: true });
-
-// Инициализация при монтировании
-initializeFormData();
-
-const handleChange = async (name, value) => {
-  await nextTick()
-  // Обновляем локальное состояние
-  formData[name] = value;
-
-  // Эмитим событие change
-  emit('change', {
-    field: name,
-    value,
-  });
-};
-</script>
 
 <style scoped>
 .com-form {

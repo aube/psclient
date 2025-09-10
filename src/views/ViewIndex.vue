@@ -1,3 +1,22 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+
+import EntSitesList from '../entities/site/EntSitesList.vue'
+
+import { useSitesStore } from '../stores/sites';
+import { useNotificationStore } from '../stores/notification'
+const { listSites } = useSitesStore(useNotificationStore())
+
+const sites = ref([])
+
+onMounted(async () => {
+  const t = await listSites()
+  sites.value = t.rows
+})
+
+</script>
+
+
 <template>
   <div
     id="view-index"
@@ -18,25 +37,6 @@
     </RouterLink>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-
-import EntSitesList from '../entities/site/EntSitesList.vue'
-
-import { useSitesStore } from '../stores/sites';
-import { useNotificationStore } from '../stores/notification'
-const { listSites } = useSitesStore(useNotificationStore())
-
-const sites = ref([])
-
-onMounted(async () => {
-  const t = await listSites()
-  sites.value = t.rows
-})
-
-</script>
-
 
 <style>
 #view-index {

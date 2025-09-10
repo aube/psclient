@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import EntPagesListItem from './EntPagesListItem.vue';
+import { IPage } from './page.ts';
+
+defineProps<{
+  pages: Array<IPage>;
+  loading?: boolean;
+  error?: string | null;
+}>();
+</script>
+
 <template>
   <div class="pages-list">
     <div
@@ -27,17 +38,6 @@
     </template>
   </div>
 </template>
-
-<script setup lang="ts">
-import EntPagesListItem from './EntPagesListItem.vue';
-import { IPage } from './page.ts';
-
-defineProps<{
-  pages: Array<IPage>;
-  loading?: boolean;
-  error?: string | null;
-}>();
-</script>
 
 <style scoped>
 .pages-list {

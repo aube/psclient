@@ -1,28 +1,3 @@
-<template>
-  <div class="p-3">
-    <Form
-      v-if="formData"
-      class="flex flex-col gap-4 w-full sm:w-156"
-      :validate-on-blur="true"
-      :validate-on-mount="false"
-      :validate-on-submit="true"
-      :validate-on-value-update="true"
-      @submit="onFormSubmit"
-    >
-      <ComControls
-        :data="formData"
-        :errors="formErrors"
-        :fields="formFields"
-      />
-      <Button
-        icon="pi pi-check"
-        label="Сохранить сайт"
-        type="submit"
-      />
-    </Form>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -148,6 +123,29 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
 watch(() => props.site, (newValue) => {
   formData.value = newValue ? { ...newValue } : null;
 }, { deep: true });
-
-
 </script>
+
+<template>
+  <div class="p-3">
+    <Form
+      v-if="formData"
+      class="flex flex-col gap-4 w-full sm:w-156"
+      :validate-on-blur="true"
+      :validate-on-mount="false"
+      :validate-on-submit="true"
+      :validate-on-value-update="true"
+      @submit="onFormSubmit"
+    >
+      <ComControls
+        :data="formData"
+        :errors="formErrors"
+        :fields="formFields"
+      />
+      <Button
+        icon="pi pi-check"
+        label="Сохранить сайт"
+        type="submit"
+      />
+    </Form>
+  </div>
+</template>

@@ -1,15 +1,3 @@
-<template>
-  <div
-    id="view-index"
-    class="grid gap-4"
-  >
-    <EntSiteNewForm
-      :site="{}"
-      @submit="onSubmit"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 // import { ref, onMounted } from 'vue';
 
@@ -47,6 +35,17 @@ const onSubmit = async (formData: SiteNew) => {
 
 </script>
 
+<template>
+  <div
+    id="view-index"
+    class="grid gap-4"
+  >
+    <EntSiteNewForm
+      :site="{}"
+      @submit="onSubmit"
+    />
+  </div>
+</template>
 
 <style>
 #view-index {

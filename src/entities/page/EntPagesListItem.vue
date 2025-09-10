@@ -1,4 +1,44 @@
 
+<script setup>
+import { onMounted, ref } from 'vue';
+
+import Panel from 'primevue/panel';
+import Button from 'primevue/button';
+import Avatar from 'primevue/avatar';
+import Menu from 'primevue/menu';
+
+const menu = ref(null);
+const isToastLoaded = ref(false)
+
+onMounted(() => {
+  isToastLoaded.value = true
+})
+
+const items = ref([
+  {
+    label: 'Refresh',
+    icon: 'pi pi-refresh',
+  },
+  {
+    label: 'Search',
+    icon: 'pi pi-search',
+  },
+  {
+    separator: true,
+  },
+  {
+    label: 'Delete',
+    icon: 'pi pi-times',
+  },
+]);
+
+const toggle = (event) => {
+  menu.value.toggle(event);
+};
+
+</script>
+
+
 <template>
   <div class="card">
     <Panel toggleable>
@@ -51,42 +91,3 @@
     </Panel>
   </div>
 </template>
-
-<script setup>
-import { onMounted, ref } from 'vue';
-
-import Panel from 'primevue/panel';
-import Button from 'primevue/button';
-import Avatar from 'primevue/avatar';
-import Menu from 'primevue/menu';
-
-const menu = ref(null);
-const isToastLoaded = ref(false)
-
-onMounted(() => {
-  isToastLoaded.value = true
-})
-
-const items = ref([
-  {
-    label: 'Refresh',
-    icon: 'pi pi-refresh',
-  },
-  {
-    label: 'Search',
-    icon: 'pi pi-search',
-  },
-  {
-    separator: true,
-  },
-  {
-    label: 'Delete',
-    icon: 'pi pi-times',
-  },
-]);
-
-const toggle = (event) => {
-  menu.value.toggle(event);
-};
-
-</script>

@@ -1,16 +1,3 @@
-<template>
-  <div>
-    <UserLoginForm
-      v-if="!isAuthenticated"
-      @submit="onSubmit"
-    />
-    <UserLogoutForm
-      v-else
-      @submit="onLogout"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 import UserLoginForm from '../entities/user/UserLoginForm.vue';
 import UserLogoutForm from '../entities/user/UserLogoutForm.vue';
@@ -35,5 +22,17 @@ const onSubmit = async (formData: User) => {
 const onLogout = async () => {
   logoutUser()
 }
-
 </script>
+
+<template>
+  <div>
+    <UserLoginForm
+      v-if="!isAuthenticated"
+      @submit="onSubmit"
+    />
+    <UserLogoutForm
+      v-else
+      @submit="onLogout"
+    />
+  </div>
+</template>
