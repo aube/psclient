@@ -80,7 +80,7 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const { stream, statusCode } = await render(url)
+    const { stream, statusCode } = await render(url, user || null)
 
     if (user) {
       const headAnchor = "<!--app-head-->"

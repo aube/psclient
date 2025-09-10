@@ -19,7 +19,11 @@ import { useRouter } from 'vue-router'
 
 import { useUserStore } from '../stores/user';
 import { useNotificationStore } from '../stores/notification'
-const { loginUser, logoutUser, isAuthenticated } = useUserStore(useNotificationStore())
+const {
+  loginUser,
+  logoutUser,
+  isAuthenticated,
+} = useUserStore(useNotificationStore())
 
 const router = useRouter()
 

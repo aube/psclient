@@ -3,4 +3,7 @@ import { createApp } from './main'
 
 const { app } = createApp()
 
-app.mount('#app')
+// timeout for hydration warnings prevent
+setTimeout(() => {
+  app.mount('#app')
+}, 100)

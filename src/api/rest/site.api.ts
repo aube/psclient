@@ -2,9 +2,12 @@
 import { useRestApi } from '../../lib/restapi.js'
 import { Site, SiteNew } from '../../types/Site.types.js'
 
-const { get, put, post, del } = useRestApi()
+const { get, put, post, del, setHeader } = useRestApi()
 
 export const useSiteAPI = () => {
+  const setCurrentID = (id: number): void => {
+    setHeader('x-site-id', id)
+  }
 
   const create = async (formData: SiteNew): Promise<Site> => {
     const response = await post<Site>('/api/v1/site', formData)
@@ -39,9 +42,12 @@ export const useSiteAPI = () => {
     return response.data
   }
 
-  const exists = async (name: string): Promise<boolean> => {
+  const exists = async (name: string, id: number): Promise<boolean> => {
     const response = await get<Site>('/api/v1/site/' + name)
     if (!response.data) {
+      return false
+    }
+    if (id && id == response.data.id) {
       return false
     }
     return true
@@ -55,18 +61,27 @@ export const useSiteAPI = () => {
     return true
   }
 
-  const list = async (): Promise<Site[]> => {
-    const response = await get<Site[]>('/api/v1/sites')
+  const list = async (page: number, size: number): Promise<Site[]> => {
+    const params: Record<string, string> = {}
+    if (page > 0) {
+      params['page'] = page.toString()
+    }
+    if (size > 0) {
+      params['size'] = size.toString()
+    }
+    const queryString = new URLSearchParams(params).toString()
+    const response = await get<Site[]>('/api/v1/sites' + (queryString ? `?${queryString}` : ''))
     if (!response.data) {
       if (response.error)
         throw Error(response.error)
 
-      throw Error("no resoponse data")
+      throw Error("no response data")
     }
     return response.data
   }
 
   return {
+    setCurrentID,
     create,
     read,
     update,

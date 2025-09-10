@@ -5,6 +5,9 @@ import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/user';
 import { User } from './types/User.types';
 
+import { useGeneralStore } from './stores/general.js'
+useGeneralStore()
+
 import { useNotificationStore } from './stores/notification';
 const notifications = useNotificationStore()
 

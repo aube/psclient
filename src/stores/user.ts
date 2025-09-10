@@ -12,8 +12,13 @@ const {
   register,
 } = useUserAPI()
 
+let notifications: ReturnType<typeof useNotificationStore> | null
 
-export const useUserStore = (notifications: ReturnType<typeof useNotificationStore> | null) => {
+export const useUserStore = (ntf: ReturnType<typeof useNotificationStore> | null) => {
+  if (ntf) {
+    notifications = ntf
+  }
+
   return defineStore('user', () => {
     const user = ref(null as User | null)
     const token = ref("")
@@ -69,11 +74,10 @@ export const useUserStore = (notifications: ReturnType<typeof useNotificationSto
       }
     }
 
-
+    // TODO: User hydration
     const SSRAuthResult = isBrowser ? window.user : null
     if (SSRAuthResult) {
-      // eslint-disable-next-line
-      console.log("SSRAuthResult", SSRAuthResult)
+      // console.log("SSRAuthResult", currentUser(), SSRAuthResult) // eslint-disable-line
       setUser(SSRAuthResult)
     }
 

@@ -75,21 +75,40 @@ const email = generalStore.isDev ? 'qwe@qwe.qwe' : ''
 const password = generalStore.isDev ? 'password' : ''
 const password_confirmation = generalStore.isDev ? 'password' : ''
 
+// import { zodResolver } from '@hookform/resolvers/zod'
+// import { z } from 'zod'
+
+// const formSchema = z.object({
+//   username: z.string().min(1, 'Имя обязательно'),
+//   email: z.string().email('Неверный формат эл.почты').min(1, 'Email обязателен'),
+//   password: z.string().min(1, 'Пароль обязателен'),
+//   password_confirmation: z.string().min(1, 'Подтверждение пароля обязательно'),
+// })
+
 const formFields = ref([
   {
     type: "input",
     name: "username",
     label: "Имя",
+    // resolver: zodResolver(formSchema),
+  },
+  {
+    type: "input",
+    name: "email",
+    label: "Email",
+    // resolver: zodResolver(formSchema),
   },
   {
     type: "password",
     name: "password",
     label: "Пароль",
+    // resolver: zodResolver(formSchema),
   },
   {
     type: "password",
     name: "password_confirmation",
     label: "Повторите пароль",
+    // resolver: zodResolver(formSchema),
   },
 ]);
 

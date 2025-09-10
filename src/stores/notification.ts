@@ -8,7 +8,7 @@ const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefine
 
 interface Notification {
     id: number
-    type: 'success' | 'danger' | 'warn' | 'info' | 'secondary' | 'contrast'
+    type: 'success' | 'error' | 'warn' | 'info' | 'secondary' | 'contrast'
     message: string
     timeout: number
     title?: string
@@ -90,11 +90,11 @@ export const useNotificationStore = defineStore('notification', {
 
     danger(message:string | Error | unknown, title?: string, timeout?:number) {
       const messageString = message instanceof Error ? message.message : String(message)
-      const type = 'danger'
+      const type = 'error'
       return this.add({
+        type,
         message: messageString,
         title: title || type,
-        type: 'danger',
         timeout,
       })
     },
@@ -103,9 +103,9 @@ export const useNotificationStore = defineStore('notification', {
       const messageString = message instanceof Error ? message.message : String(message)
       const type = 'warn'
       return this.add({
+        type,
         message: messageString,
         title: title || type,
-        type: 'warn',
         timeout,
       })
     },
@@ -113,9 +113,9 @@ export const useNotificationStore = defineStore('notification', {
     info(message:string, title?: string, timeout?:number) {
       const type = 'info'
       return this.add({
+        type,
         message,
         title: title || type,
-        type: 'info',
         timeout,
       })
     },

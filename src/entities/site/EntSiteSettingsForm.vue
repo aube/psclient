@@ -38,7 +38,7 @@ const { siteExists } = useSitesStore(useNotificationStore())
 const isLoading = ref(false)
 
 const props = defineProps<{
-  site: Site
+  site: Site | null
 }>()
 
 const emits = defineEmits(['submit'])
@@ -57,7 +57,7 @@ const formFields = ref([
       z.string()
         .min(4, { message: 'Минимальная длина 4 символа' })
         .max(32, { message: 'Максимальная длина 32 символа' })
-        .refine((value:string) => regs.domainPart.test(value), {
+        .refine(value => regs.domainPart.test(value), {
           message: 'Только латинские символы и числа',
         })
     ),
@@ -67,20 +67,23 @@ const formFields = ref([
     name: "domain",
     label: "Домен",
     help: "Регистрация домена описана в инструкции: /help/domains",
-    resolver: formData.value?.domain ? zodResolver(
+    resolver: zodResolver(
       z.string()
-        .min(4, { message: 'Минимальная длина 4 символа' })
-        .max(64, { message: 'Максимальная длина 32 символа' })
-        .refine((value:string) => regs.domain.test(value), {
+        .optional()
+        .refine(value => !value || regs.domain.test(value), {
           message: 'Имя домена не корректно',
         })
-    ) : null,
+    ),
   },
   {
     type: "input",
     name: "title",
     label: "Заголовок сайта",
     help: "",
+    resolver: zodResolver(
+      z.string()
+        .min(3, { message: 'Минимальная длина 3 символа' })
+    ),
   },
   {
     type: "textarea",
@@ -109,8 +112,8 @@ const formFields = ref([
 ]);
 
 
-const checkNameExists = async (name: string) => {
-  const a = await siteExists(name)
+const checkNameExists = async (name: string, id: number = 0) => {
+  const a = await siteExists(name, id)
   return Boolean(a)
 }
 
@@ -118,11 +121,10 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
   if (!valid) {
     return
   }
-
   const name = values.name
   if (!name) return
 
-  const nameIsBusy = await checkNameExists(name)
+  const nameIsBusy = await checkNameExists(name, props.site?.id)
 
   if (nameIsBusy) {
     formErrors.value = {
@@ -133,15 +135,18 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
   }
 
   try {
-    emits('submit', values as Site)
+    emits('submit', {
+      ...values,
+      id: props.site?.id,
+    } as Site)
   } finally {
     isLoading.value = false
   }
 }
 
 // Если props.site изменился извне, обновляем formData
-watch(() => props.site, (newValue: Site) => {
-  formData.value = { ...newValue };
+watch(() => props.site, (newValue) => {
+  formData.value = newValue ? { ...newValue } : null;
 }, { deep: true });
 
 

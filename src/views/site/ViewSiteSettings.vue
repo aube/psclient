@@ -23,11 +23,11 @@ import { useNotificationStore } from '../../stores/notification'
 const { getSite, updateSite } = useSitesStore(useNotificationStore())
 
 const route = useRoute()
-const router = useRouter()
+// const router = useRouter()
 
 const onSubmit = async (formData: Site) => {
   await updateSite(formData)
-  router.push('/')
+  // router.go(0)
 }
 
 // const onLogout = async () => {
@@ -39,7 +39,7 @@ const onSubmit = async (formData: Site) => {
 // import { useNotificationStore } from '../../stores/notification'
 // const { listSites } = useSitesStore(useNotificationStore())
 
-const site = ref()
+const site = ref<Site | null>(null)
 
 onMounted(async () => {
   const name = route.params.siteName

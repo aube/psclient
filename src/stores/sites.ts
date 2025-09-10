@@ -11,6 +11,7 @@ const {
   remove,
   list,
   exists,
+  setCurrentID,
 } = useSiteAPI()
 
 
@@ -20,6 +21,7 @@ export const useSitesStore = (notifications: ReturnType<typeof useNotificationSt
     async function getSite(name: string): Promise<Site | null> {
       try {
         const site = await read(name)
+        setCurrentID(site.id)
         return site
       } catch (e) {
         notifications?.danger(e)
@@ -27,8 +29,8 @@ export const useSitesStore = (notifications: ReturnType<typeof useNotificationSt
       }
     }
 
-    async function siteExists(name: string): Promise<boolean> {
-      const nameBusy = await exists(name)
+    async function siteExists(name: string, id: number = 0): Promise<boolean> {
+      const nameBusy = await exists(name, id)
       return nameBusy
     }
 

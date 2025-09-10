@@ -26,9 +26,9 @@ export const useGeneralStore = defineStore('general', () => {
     lang: APP_LANG || 'ru',
   }
 
-  if (app.isDev) {
+  if (app.isDev && app.isBrowser) {
     // eslint-disable-next-line no-console
-    console.log("app ==> ", app);
+    console.log("app settings", app);
   }
 
   return app

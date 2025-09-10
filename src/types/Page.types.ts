@@ -15,13 +15,13 @@ export interface Page {
   deleted: boolean;
 }
 
-export interface CreatePage extends Omit<Page, 'id' | 'created_at' | 'updated_at'> {
+export interface PageNew extends Omit<Page, 'id' | 'created_at' | 'updated_at'> {
   id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-export interface UpdatePage extends Partial<Omit<Page, 'id' | 'site_id'>> {
+export interface PageUpdate extends Partial<Omit<Page, 'id' | 'site_id'>> {
   id: number;
   site_id: number;
 }

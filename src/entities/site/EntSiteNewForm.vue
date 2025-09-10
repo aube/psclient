@@ -68,12 +68,12 @@ const checkNameExists = async (name: string) => {
   return Boolean(a)
 }
 
-const onFormSubmit = async ({ valid }: {valid:boolean}) => {
+const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<string, any>}) => {
   if (!valid) {
     return
   }
 
-  const name = formData.value?.name
+  const name = values?.name
   if (!name) return
 
   const nameIsBusy = await checkNameExists(name)
@@ -87,7 +87,7 @@ const onFormSubmit = async ({ valid }: {valid:boolean}) => {
   }
 
   try {
-    emits('submit', formData.value as SiteNew)
+    emits('submit', values as SiteNew)
   } finally {
     isLoading.value = false
   }
