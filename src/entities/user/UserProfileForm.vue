@@ -1,30 +1,41 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import ComControls from '../../components/ComControls.vue';
-import getLoginFields from './login.fields.ts'
 import { useGeneralStore } from '../../stores/general.js'
+import ComControls from '../../components/ComControls.vue';
+import getProfileFields from './profile.fields.ts'
 
 const generalStore = useGeneralStore()
 
 defineOptions({
-  name: 'FormLogin',
+  name: 'FormRegister',
 })
 
 const emit = defineEmits(['submit'])
 
 const username = generalStore.isDev ? 'qweqweqwe' : ''
-const password = generalStore.isDev ? 'password' : ''
 const email = generalStore.isDev ? 'qwe@qwe.qwe' : ''
+const password = generalStore.isDev ? 'password' : ''
+const password_confirmation = generalStore.isDev ? 'password' : ''
 
 const formData = reactive({
   username,
-  password,
   email,
+  password,
+  password_confirmation,
 })
+
+const formFields = ref(getProfileFields(formData));
 
 const isLoading = ref(false)
 
-const formFields = ref(getLoginFields());
+const onFormChange = async ({ field, value }: {field: string, value: string}) => {
+  if (field === 'password') {
+    formData.password = value
+  }
+  if (field === 'password_confirmation') {
+    formData.password_confirmation = value
+  }
+}
 
 const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<string, any>}) => {
   if (!valid) {
@@ -33,7 +44,11 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
 
   isLoading.value = true
   try {
-    emit('submit', values)
+    emit('submit', {
+      username: values.username,
+      email: values.email,
+      password: values.password,
+    })
   } finally {
     isLoading.value = false
   }
@@ -43,7 +58,7 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
 <template>
   <Form
     v-if="formData"
-    class="flex flex-col gap-4"
+    class="flex flex-col gap-6"
     :initial-value="formData"
     :validate-on-blur="true"
     :validate-on-mount="false"
@@ -51,16 +66,15 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
     :validate-on-value-update="true"
     @submit="onFormSubmit"
   >
-    <div class="flex flex-col gap-6 w-full">
-      <ComControls
-        :data="formData"
-        :fields="formFields"
-      />
-    </div>
+    <ComControls
+      :data="formData"
+      :fields="formFields"
+      @change="onFormChange"
+    />
+
     <Button
-      class="w-full py-2 rounded-lg flex justify-center items-center gap-2"
       icon="pi pi-user"
-      label="Вход"
+      label="Сохранить"
       type="submit"
     >
       <template #icon>

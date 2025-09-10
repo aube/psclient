@@ -1,7 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useGeneralStore } from '../../stores/general.js'
 import ComControls from '../../components/ComControls.vue';
+
+import getRegisterFields from './register.fields.ts'
+
 
 const generalStore = useGeneralStore()
 
@@ -11,48 +14,10 @@ defineOptions({
 
 const emit = defineEmits(['submit'])
 
-
 const username = generalStore.isDev ? 'qweqweqwe' : ''
 const email = generalStore.isDev ? 'qwe@qwe.qwe' : ''
 const password = generalStore.isDev ? 'password' : ''
 const password_confirmation = generalStore.isDev ? 'password' : ''
-
-// import { zodResolver } from '@hookform/resolvers/zod'
-// import { z } from 'zod'
-
-// const formSchema = z.object({
-//   username: z.string().min(1, 'Имя обязательно'),
-//   email: z.string().email('Неверный формат эл.почты').min(1, 'Email обязателен'),
-//   password: z.string().min(1, 'Пароль обязателен'),
-//   password_confirmation: z.string().min(1, 'Подтверждение пароля обязательно'),
-// })
-
-const formFields = ref([
-  {
-    type: "input",
-    name: "username",
-    label: "Имя",
-    // resolver: zodResolver(formSchema),
-  },
-  {
-    type: "input",
-    name: "email",
-    label: "Email",
-    // resolver: zodResolver(formSchema),
-  },
-  {
-    type: "password",
-    name: "password",
-    label: "Пароль",
-    // resolver: zodResolver(formSchema),
-  },
-  {
-    type: "password",
-    name: "password_confirmation",
-    label: "Повторите пароль",
-    // resolver: zodResolver(formSchema),
-  },
-]);
 
 const formData = reactive({
   username,
@@ -61,53 +26,23 @@ const formData = reactive({
   password_confirmation,
 })
 
-const errors = reactive({
-  username: '',
-  email: '',
-  password: '',
-  password_confirmation: '',
-})
+const formFields = ref(getRegisterFields(formData));
 
 const isLoading = ref(false)
 
-const validate = () => {
-  let isValid = true
-
-  // Сброс ошибок
-  Object.keys(errors).forEach(key => errors[key] = '')
-
-  // Валидация
-  if (!formData.username.trim()) {
-    errors.username = 'Имя обязательно'
-    isValid = false
+const onFormChange = async ({ field, value }: {field: string, value: string}) => {
+  if (field === 'password') {
+    formData.password = value
   }
-
-  if (!formData.email.trim()) {
-    errors.email = 'Email обязателен'
-    isValid = false
-  } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-    errors.email = 'Введите корректный email'
-    isValid = false
+  if (field === 'password_confirmation') {
+    formData.password_confirmation = value
   }
-
-  if (!formData.password) {
-    errors.password = 'Пароль обязателен'
-    isValid = false
-  } else if (formData.password.length < 6) {
-    errors.password = 'Пароль должен быть не менее 6 символов'
-    isValid = false
-  }
-
-  if (formData.password !== formData.password_confirmation) {
-    errors.password_confirmation = 'Пароли не совпадают'
-    isValid = false
-  }
-
-  return isValid
 }
 
-const onFormSubmit = async ({ values }) => {
-  if (!validate()) return
+const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<string, any>}) => {
+  if (!valid) {
+    return
+  }
 
   isLoading.value = true
   try {
@@ -122,61 +57,33 @@ const onFormSubmit = async ({ values }) => {
 }
 </script>
 
-
 <template>
-  <div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-20 lg:px-80">
-    <div class="bg-surface-0 dark:bg-surface-900 p-8 pt-4 md:p-12 md:pt-6 shadow-sm rounded-2xl w-full max-w-sm mx-auto flex flex-col gap-8">
-      <div class="flex flex-col items-center gap-4">
-        <div class="flex items-center gap-4">
-          <img
-            src="/ss-logo.svg"
-            width="155px"
-          >
-        </div>
-        <div class="flex flex-col items-center gap-2 w-full">
-          <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
-            Регистрация
-          </div>
-        </div>
-      </div>
-
-      <Form
-        v-if="formData"
-        class="flex flex-col gap-4"
-        :initial-value="formData"
-        :validate-on-blur="true"
-        :validate-on-mount="false"
-        :validate-on-submit="true"
-        :validate-on-value-update="true"
-        @submit="onFormSubmit"
-      >
-        <div class="flex flex-col gap-6 w-full">
-          <ComControls
-            :data="formData"
-            :fields="formFields"
-          />
-        </div>
-        <Button
-          class="w-full py-2 rounded-lg flex justify-center items-center gap-2"
-          icon="pi pi-user"
-          label="Регистрация"
-          type="submit"
-        >
-          <template #icon>
-            <i class="pi pi-user text-base! leading-normal!" />
-          </template>
-        </Button>
-      </Form>
-
-      <div class="text-center w-full">
-        <span class="text-surface-700 dark:text-surface-200 leading-normal">Уже есть аккаунт?</span>
-        <RouterLink
-          class="text-primary font-medium ml-1 cursor-pointer hover:text-primary-emphasis"
-          to="/login"
-        >
-          Вход в систему
-        </RouterLink>
-      </div>
+  <Form
+    v-if="formData"
+    class="flex flex-col gap-4"
+    :initial-value="formData"
+    :validate-on-blur="true"
+    :validate-on-mount="false"
+    :validate-on-submit="true"
+    :validate-on-value-update="true"
+    @submit="onFormSubmit"
+  >
+    <div class="flex flex-col gap-6 w-full">
+      <ComControls
+        :data="formData"
+        :fields="formFields"
+        @change="onFormChange"
+      />
     </div>
-  </div>
+    <Button
+      class="w-full py-2 rounded-lg flex justify-center items-center gap-2"
+      icon="pi pi-user"
+      label="Регистрация"
+      type="submit"
+    >
+      <template #icon>
+        <i class="pi pi-user text-base! leading-normal!" />
+      </template>
+    </Button>
+  </Form>
 </template>

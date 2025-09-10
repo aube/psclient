@@ -15,6 +15,7 @@ export function getWindowProperty<T = unknown>(key: string): T | undefined {
 
 
 export const regs = {
-  domain: /^[a-zA-Z0-9]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  username: /^[a-zA-Z]+[a-zA-Z0-9-]+$/,
+  domain: /^[a-zA-Z0-9]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/,
   domainPart: /^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$/,
 }

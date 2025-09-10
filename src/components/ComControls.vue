@@ -137,7 +137,7 @@ const handleChange = async (name, value) => {
           :feedback="false"
           fluid
           :invalid="Boolean(errors[field.name])"
-          name="password"
+          :name="field.name"
           toggle-mask
           @update:model-value="handleChange(field.name, $event)"
         />

@@ -3,9 +3,9 @@
     id="com-logo"
     class="mr-3 logo"
     fill="none"
-    height="32"
-    viewBox="0 0 33 32"
-    width="33"
+    :height="height || size"
+    viewBox="0 0 32 32"
+    :width="width || size"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
@@ -20,6 +20,18 @@
     />
   </svg>
 </template>
+
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+const { size = "32", width = "", height = "" } = defineProps<{
+  size?: string
+  width?: string
+  height?: string
+}>()
+
+
+</script>
 
 <style>
 #com-logo path{

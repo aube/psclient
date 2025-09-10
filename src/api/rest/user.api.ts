@@ -2,7 +2,7 @@
 import { useRestApi } from '../../lib/restapi.js'
 import { User } from '../../types/User.types.js'
 
-const { get, post } = useRestApi()
+const { get, post, put } = useRestApi()
 
 export const useUserAPI = () => {
 
@@ -39,9 +39,21 @@ export const useUserAPI = () => {
     return response.data
   }
 
+  const update = async (formData: User): Promise<User> => {
+    const response = await put<User>('/api/v1/user', formData)
+    if (!response.data) {
+      if (response.error)
+        throw Error(response.error)
+
+      throw Error("no resoponse data")
+    }
+    return response.data
+  }
+
   return {
     login,
     register,
     profile,
+    update,
   }
 }

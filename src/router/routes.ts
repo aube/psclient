@@ -46,6 +46,14 @@ export const routes = [
     ],
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: (): Promise<typeof import('*.vue')> => import('../views/user/ViewProfile.vue'),
+    meta: {
+      guestAccess: false,
+    },
+  },
+  {
     path: '/login',
     name: 'login',
     component: (): Promise<typeof import('*.vue')> => import('../views/ViewLogin.vue'),

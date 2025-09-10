@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import EntSiteSettingsForm from '../../entities/site/EntSiteSettingsForm.vue'
 
 import { Site } from '../../types/Site.types.ts';
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import { useSitesStore } from '../../stores/sites';
 import { useNotificationStore } from '../../stores/notification'
@@ -38,7 +38,7 @@ onMounted(async () => {
 <template>
   <div
     id="view-index"
-    class="grid gap-4"
+    class="grid gap-4 p-3"
   >
     <EntSiteSettingsForm
       :site="site"

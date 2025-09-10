@@ -38,7 +38,7 @@ const onSubmit = async (formData: SiteNew) => {
 <template>
   <div
     id="view-index"
-    class="grid gap-4"
+    class="grid gap-4 p-3"
   >
     <EntSiteNewForm
       :site="{}"
