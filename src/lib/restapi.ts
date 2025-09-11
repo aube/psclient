@@ -14,18 +14,17 @@ export interface ApiResponse<T> {
 
 const globalHeaders : Record<string, string|number|boolean> = {}
 
-const setHeader = (k: string, v: string|number|boolean) => {
-  console.log("setHeader", k, v)
-  globalHeaders[k] = v
-}
-
-const delHeader = (k: string) => {
-  delete globalHeaders[k]
-}
 
 export function useRestApi(baseURL: string = API_BASE_URL) {
 
-  console.log("globalHeaders", globalHeaders)
+  const setHeader = (k: string, v: string|number|boolean) => {
+    globalHeaders[k] = v
+  }
+
+  const delHeader = (k: string) => {
+    delete globalHeaders[k]
+  }
+
   const loading = ref(false);
 
   async function request<T>(
@@ -33,12 +32,13 @@ export function useRestApi(baseURL: string = API_BASE_URL) {
     method: HttpMethod = "GET",
     body?: unknown
   ): Promise<ApiResponse<T>> {
+
     loading.value = true;
     const isFormdata = body && body instanceof FormData;
 
     const headers: Record<string, string> = {
-      ...globalHeaders,
       Authorization: `Bearer ${readFrontCookie("auth_token")}`,
+      ...globalHeaders,
     };
     if (!isFormdata) {
       headers["Content-Type"] = "application/json";

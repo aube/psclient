@@ -2,19 +2,18 @@
 import ComNavbar from './components/ComNavbar.vue';
 import Toast from 'primevue/toast';
 import { onMounted, ref } from 'vue';
-import { useUserStore } from './stores/user';
 import { User } from './types/User.types';
-
+import { useUserStore } from './stores/user';
 import { useGeneralStore } from './stores/general.js'
-useGeneralStore()
-
 import { useNotificationStore } from './stores/notification';
-const notifications = useNotificationStore()
 
-const userStore = useUserStore(notifications)
+useGeneralStore()
+const notifications = useNotificationStore()
+const { isAuthenticated, currentUser } = useUserStore(notifications)
+
 const isToastLoaded = ref(false)
-const currentUser = ref<User | null>(null)
-currentUser.value = userStore.currentUser() as User
+const iAm = ref<User | null>(null)
+iAm.value = currentUser() as User
 
 onMounted(() => {
   isToastLoaded.value = true
@@ -25,7 +24,7 @@ onMounted(() => {
 <template>
   <main>
     <ComNavbar
-      v-if="userStore.isAuthenticated"
+      v-if="isAuthenticated"
       class="mb-3"
     />
 

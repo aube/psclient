@@ -15,6 +15,7 @@
     "@primevue/forms": "^4.3.7",
     "@tailwindcss/vite": "^4.1.12",
     "compression": "^1.8.1",
+    "devalue": "^5.3.2",
     "express": "^5.1.0",
     "pinia": "^3.0.3",
     "primeicons": "^7.0.0",

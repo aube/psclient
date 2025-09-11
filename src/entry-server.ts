@@ -1,13 +1,24 @@
 import { renderToWebStream } from 'vue/server-renderer'
 import { createApp } from './main'
 import { useUserStore } from './stores/user'
+import { useSitesStore } from './stores/sites'
+import { useRestApi } from './lib/restapi'
 import { User } from './types/User.types'
+import * as devalue from 'devalue';
 
-export async function render(_url: string, user: User | null) {
-  const { app, router } = createApp()
+
+
+export async function render(_url: string, user: User | null, token: string) {
+  const { app, router, pinia } = createApp()
 
   const { setUser } = useUserStore(null)
+  const { setHeader } = useRestApi()
+  const { fetchSites } = useSitesStore(null)
+
+  setHeader("Authorization", `Bearer ${token}`)
+
   setUser(user)
+  await fetchSites()
 
   try {
     await router.push('/' + _url);
@@ -35,6 +46,7 @@ export async function render(_url: string, user: User | null) {
   // components that have been instantiated during this render call.
   const ctx = {}
   const stream = renderToWebStream(app, ctx)
+  const serializedState = devalue.uneval(pinia.state.value);
 
-  return { stream, statusCode }
+  return { stream, statusCode, serializedState }
 }

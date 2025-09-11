@@ -54,8 +54,8 @@ export const setCookie = (name, value, options = {}) => {
 
 /**
  * Читает cookie на бэке
- * @param {string} cookieName - Название cookie
  * @param {string} cookieHeader - req.headers.cookie
+ * @param {string} cookieName - Название cookie
  * @returns {string} JWT токен или "" если не найдено
  */
 
@@ -73,8 +73,3 @@ export function readNodeCookie(cookieHeader, cookieName) {
   
   return cookieValue;
 }
-
-
-// export function readFrontCookie(cookieName) {
-//   return document.cookie.match('(^|;)\\s*' + cookieName + '\\s*=\\s*([^;]+)')?.pop() || ''
-// }

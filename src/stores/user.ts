@@ -1,12 +1,10 @@
-import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useUserAPI } from '../api/rest/user.api';
 import { User } from '../types/User.types';
 import { useNotificationStore } from './notification';
-// @ts-expect-error - hasn't d.ts, but i tak soidet
-import { setCookie } from '../lib/cookies.js'
+import { setCookie } from '../lib/cookies.node.js'
 
-const isBrowser = typeof window !== "undefined"
+
 const {
   login,
   register,
@@ -19,76 +17,67 @@ export const useUserStore = (ntf: ReturnType<typeof useNotificationStore> | null
     notifications = ntf
   }
 
-  return defineStore('user', () => {
-    const user = ref(null as User | null)
-    const token = ref("")
-    const isAuthenticated = computed(() => user.value !== null)
+  return (defineStore('user', {
 
-    function setUser(data: User | null) {
-      user.value = data
-    }
+    state: () => ({
+      user: null as User | null,
+      token: '',
+    }),
 
-    function setToken(data: string) {
-      token.value = data
-      setCookie('auth_token', data, {
-        expirationHours: 1,
-        httpOnly: false,
-      })
-    }
+    getters: {
+      isAuthenticated: (state) => Boolean(state.user?.id),
+    },
 
-    function currentUser() {
-      return {
-        ...user.value,
-      }
-    }
+    actions: {
+      setUser(data: User | null) {
+        this.user = data
+      },
 
-    function clearUser() {
-      user.value = null
-    }
+      setToken(data: string) {
+        this.token = data
+        setCookie('auth_token', data, {
+          expirationHours: 1,
+          httpOnly: false,
+        })
+      },
 
-    async function loginUser(formData: User) {
-      try {
-        const user = await login(formData)
-        if (user.token) {
-          setToken(user.token)
-          delete user.token
+      currentUser() {
+        return {
+          ...this.user,
         }
-        setUser(user)
-        notifications?.success("Авторизация успешна", "Привет, " + user.username)
-      } catch (e) {
-        notifications?.danger(e)
-      }
-    }
+      },
 
-    async function logoutUser() {
-      window.location.replace('/login?logout=1')
-    }
+      clearUser() {
+        this.user = null
+      },
 
-    async function registerUser(formData: User) {
-      try {
-        const user = await register(formData)
-        setUser(user)
-        notifications?.success("Регистрация успешна", "Привет, " + user.username)
-      } catch (e) {
-        notifications?.danger(e)
-      }
-    }
+      async loginUser(formData: User) {
+        try {
+          const user = await login(formData)
+          if (user.token) {
+            this.setToken(user.token)
+            delete user.token
+          }
+          this.setUser(user)
+          notifications?.success("Авторизация успешна", "Привет, " + user.username)
+        } catch (e) {
+          notifications?.danger(e)
+        }
+      },
 
-    // TODO: User hydration
-    const SSRAuthResult = isBrowser ? window.user : null
-    if (SSRAuthResult) {
-      // console.log("SSRAuthResult", currentUser(), SSRAuthResult) // eslint-disable-line
-      setUser(SSRAuthResult)
-    }
+      async logoutUser() {
+        window.location.replace('/login?logout=1')
+      },
 
-    return {
-      isAuthenticated,
-      setUser,
-      currentUser,
-      clearUser,
-      loginUser,
-      logoutUser,
-      registerUser,
-    }
-  })()
+      async registerUser(formData: User) {
+        try {
+          const user = await register(formData)
+          this.setUser(user)
+          notifications?.success("Регистрация успешна", "Привет, " + user.username)
+        } catch (e) {
+          notifications?.danger(e)
+        }
+      },
+    },
+  }))()
 }

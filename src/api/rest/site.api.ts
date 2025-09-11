@@ -1,6 +1,6 @@
 
 import { useRestApi } from '../../lib/restapi.js'
-import { Site, SiteNew } from '../../types/Site.types.js'
+import { Site, SiteNew, SitesList } from '../../types/Site.types.js'
 
 const { get, put, post, del, setHeader } = useRestApi()
 
@@ -61,7 +61,7 @@ export const useSiteAPI = () => {
     return true
   }
 
-  const list = async (page: number, size: number): Promise<Site[]> => {
+  const list = async (page: number = 0, size: number = 100): Promise<SitesList> => {
     const params: Record<string, string> = {}
     if (page > 0) {
       params['page'] = page.toString()
@@ -69,8 +69,9 @@ export const useSiteAPI = () => {
     if (size > 0) {
       params['size'] = size.toString()
     }
+
     const queryString = new URLSearchParams(params).toString()
-    const response = await get<Site[]>('/api/v1/sites' + (queryString ? `?${queryString}` : ''))
+    const response = await get<SitesList>('/api/v1/sites' + (queryString ? `?${queryString}` : ''))
     if (!response.data) {
       if (response.error)
         throw Error(response.error)

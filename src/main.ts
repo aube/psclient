@@ -46,6 +46,11 @@ export function createApp() {
     },
   });
 
+  // Retrieve and hydrate Pinia state
+  if (typeof window !== 'undefined' && window.__PINIA_STATE__) {
+      pinia.state.value = window.__PINIA_STATE__;
+  }
+
   app.use(router)
   app.use(pinia)
   app.use(ToastService)

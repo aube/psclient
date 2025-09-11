@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import express from 'express'
 import http from 'http'
 import dotenv from 'dotenv'
-import {readNodeCookie} from './src/lib/cookies.js'
+import {readNodeCookie} from './src/lib/cookies.node.js'
 
 const isProduction = process.env.NODE_ENV === 'production'
 dotenv.config({ path: isProduction ?`.env` : `.env.local` })
@@ -50,6 +50,7 @@ async function getUser(token) {
   return user?.data
 }
 
+
 // Serve HTML
 app.use('*all', async (req, res) => {
   try {
@@ -80,11 +81,11 @@ app.use('*all', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const { stream, statusCode } = await render(url, user || null)
-
+    const { stream, statusCode, serializedState } = await render(url, user || null, token || '')
+  
     if (user) {
       const headAnchor = "<!--app-head-->"
-      const userScript = "<script>window.user=" +JSON.stringify(user)+ "</script>"
+      const userScript = `<script>window.__PINIA_STATE__ = ${serializedState}</script>`
       template = template.replace(headAnchor, headAnchor + userScript)
     }
 

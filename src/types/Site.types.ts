@@ -18,3 +18,12 @@ export interface SiteNew {
 }
 
 export type Sites = Site[]
+
+export interface SitesList {
+  rows: Sites,
+  pagination: {
+    size: number;
+    page: number;
+    total: number;
+  },
+}
