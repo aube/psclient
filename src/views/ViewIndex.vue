@@ -1,21 +1,18 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-
-import SitesList from '../entities/site/SitesList.vue'
-
 import { useSitesStore } from '../stores/sites';
 import { useNotificationStore } from '../stores/notification'
-const { listSites } = useSitesStore(useNotificationStore())
+import SitesList from '../entities/site/SitesList.vue'
+
+const sitesStore = useSitesStore(useNotificationStore())
 
 const sites = ref([])
 
 onMounted(async () => {
-  const t = await listSites()
+  const t = await sitesStore.listSites()
   sites.value = t.rows
 })
-
 </script>
-
 
 <template>
   <div

@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import UserProfileForm from '../../entities/user/UserProfileForm.vue';
-import UserLogoutForm from '../../entities/user/UserLogoutForm.vue';
 import { User } from '../../types/User.types';
-
 import { useUserStore } from '../../stores/user';
 import { useNotificationStore } from '../../stores/notification'
-const {
-  // updateUser,
-  logoutUser,
-} = useUserStore(useNotificationStore())
+import UserProfileForm from '../../entities/user/UserProfileForm.vue';
+import UserLogoutForm from '../../entities/user/UserLogoutForm.vue';
 
+const userStore = useUserStore(useNotificationStore())
 
 const onSubmit = async (formData: User) => {
   // await updateUser(formData)
@@ -17,7 +13,7 @@ const onSubmit = async (formData: User) => {
 }
 
 const onLogout = async () => {
-  logoutUser()
+  userStore.logoutUser()
 }
 </script>
 

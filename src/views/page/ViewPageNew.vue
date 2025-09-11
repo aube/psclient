@@ -5,12 +5,12 @@ import { useNotificationStore } from '../../stores/notification'
 import { useRouter } from 'vue-router'
 import PageNewForm from '../../entities/page/PageNewForm.vue';
 
-const { createPage } = usePagesStore(useNotificationStore())
+const pagesStore = usePagesStore(useNotificationStore())
 
 const router = useRouter()
 
 const onSubmit = async (formData: PageNew) => {
-  const result = await createPage(formData)
+  const result = await pagesStore.createPage(formData)
   router.push({
     name: "page",
     params: {
@@ -18,7 +18,6 @@ const onSubmit = async (formData: PageNew) => {
     }}
   )
 }
-
 </script>
 
 <template>

@@ -9,11 +9,11 @@ import { useNotificationStore } from './stores/notification';
 
 useGeneralStore()
 const notifications = useNotificationStore()
-const { isAuthenticated, currentUser } = useUserStore(notifications)
+const userStore = useUserStore(notifications)
 
 const isToastLoaded = ref(false)
 const iAm = ref<User | null>(null)
-iAm.value = currentUser() as User
+iAm.value = userStore.currentUser() as User
 
 onMounted(() => {
   isToastLoaded.value = true
@@ -24,7 +24,7 @@ onMounted(() => {
 <template>
   <main>
     <ComNavbar
-      v-if="isAuthenticated"
+      v-if="userStore.isAuthenticated"
       class="mb-3"
     />
 

@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import UserLoginForm from '../entities/user/UserLoginForm.vue';
-import UserLogoutForm from '../entities/user/UserLogoutForm.vue';
 import { User } from '../types/User.types';
 import { useRouter } from 'vue-router'
-
+import { useSitesStore } from '../stores/sites';
 import { useUserStore } from '../stores/user';
 import { useNotificationStore } from '../stores/notification'
-const {
-  loginUser,
-  logoutUser,
-  isAuthenticated,
-} = useUserStore(useNotificationStore())
+import UserLoginForm from '../entities/user/UserLoginForm.vue';
+import UserLogoutForm from '../entities/user/UserLogoutForm.vue';
+
+const userStore = useUserStore(useNotificationStore())
+const sitesStore = useSitesStore(useNotificationStore())
 
 const router = useRouter()
 
 const onSubmit = async (formData: User) => {
-  await loginUser(formData)
-  router.push('/')
+  const success = await userStore.loginUser(formData)
+  if (success) {
+    await sitesStore.fetchSites()
+    router.push('/')
+  }
 }
 
 const onLogout = async () => {
-  logoutUser()
+  userStore.logoutUser()
 }
 </script>
 
@@ -34,7 +35,7 @@ const onLogout = async () => {
           />
         </div>
 
-        <template v-if="!isAuthenticated">
+        <template v-if="!userStore.isAuthenticated">
           <div class="flex flex-col items-center gap-2 w-full">
             <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
               Вход в систему

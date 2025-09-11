@@ -1,27 +1,22 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import ComControls from '../../components/ComControls.vue';
-
 import { PageNew } from '../../types/Page.types';
 import { usePagesStore } from '../../stores/pages.ts';
 import { useNotificationStore } from '../../stores/notification'
-
 import getPageNewFields from './page-new.fields'
-
-const { pageExists } = usePagesStore(useNotificationStore())
-
-const isLoading = ref(false)
 
 const emits = defineEmits(['submit'])
 
+const pagesStore = usePagesStore(useNotificationStore())
+
+const isLoading = ref(false)
 const formFields = ref(getPageNewFields());
-
 const formData = ref<PageNew>();
-
 const formErrors = ref({})
 
 const checkNameExists = async (name: string) => {
-  const a = await pageExists(name)
+  const a = await pagesStore.pageExists(name)
   return Boolean(a)
 }
 

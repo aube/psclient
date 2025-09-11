@@ -1,32 +1,25 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import ComControls from '../../components/ComControls.vue';
-
 import { Site } from '../../types/Site.types';
 import { useSitesStore } from '../../stores/sites';
 import { useNotificationStore } from '../../stores/notification'
-
 import getSiteSettingsFields from './site-settings.fields'
 
-const { siteExists } = useSitesStore(useNotificationStore())
-
-const isLoading = ref(false)
-
+const emits = defineEmits(['submit'])
 const props = defineProps<{
   site: Site | null
 }>()
 
-const emits = defineEmits(['submit'])
+const sitesStore = useSitesStore(useNotificationStore())
 
+const isLoading = ref(false)
 const formData = ref<Site|null>(null);
-
 const formErrors = ref({})
-
 const formFields = ref(getSiteSettingsFields());
 
-
 const checkNameExists = async (name: string, id: number = 0) => {
-  const a = await siteExists(name, id)
+  const a = await sitesStore.siteExists(name, id)
   return Boolean(a)
 }
 

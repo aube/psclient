@@ -10,15 +10,15 @@ import * as devalue from 'devalue';
 
 export async function render(_url: string, user: User | null, token: string) {
   const { app, router, pinia } = createApp()
-
-  const { setUser } = useUserStore(null)
   const { setHeader } = useRestApi()
-  const { fetchSites } = useSitesStore(null)
+
+  const userStore = useUserStore(null)
+  const sitesStore = useSitesStore(null)
 
   setHeader("Authorization", `Bearer ${token}`)
 
-  setUser(user)
-  await fetchSites()
+  userStore.setUser(user)
+  await sitesStore.fetchSites()
 
   try {
     await router.push('/' + _url);

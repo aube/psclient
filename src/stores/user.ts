@@ -51,7 +51,7 @@ export const useUserStore = (ntf: ReturnType<typeof useNotificationStore> | null
         this.user = null
       },
 
-      async loginUser(formData: User) {
+      async loginUser(formData: User): Promise<boolean> {
         try {
           const user = await login(formData)
           if (user.token) {
@@ -60,23 +60,27 @@ export const useUserStore = (ntf: ReturnType<typeof useNotificationStore> | null
           }
           this.setUser(user)
           notifications?.success("Авторизация успешна", "Привет, " + user.username)
+          return true
         } catch (e) {
           notifications?.danger(e)
         }
+        return false
       },
 
       async logoutUser() {
         window.location.replace('/login?logout=1')
       },
 
-      async registerUser(formData: User) {
+      async registerUser(formData: User): Promise<boolean> {
         try {
           const user = await register(formData)
           this.setUser(user)
           notifications?.success("Регистрация успешна", "Привет, " + user.username)
+          return true
         } catch (e) {
           notifications?.danger(e)
         }
+        return false
       },
     },
   }))()
