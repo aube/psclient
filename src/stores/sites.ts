@@ -90,6 +90,5 @@ export const useSitesStore = (notifications: ReturnType<typeof useNotificationSt
         }
       },
     },
-  })
-  )()
+  }))()
 }

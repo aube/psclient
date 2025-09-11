@@ -25,3 +25,13 @@ export interface PageUpdate extends Partial<Omit<Page, 'id' | 'site_id'>> {
   id: number;
   site_id: number;
 }
+
+export interface PagesList {
+  rows: Page[],
+  pagination: {
+    size: number;
+    page: number;
+    total: number;
+  },
+}
+
