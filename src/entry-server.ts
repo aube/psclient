@@ -12,8 +12,8 @@ export async function render(_url: string, user: User | null, token: string) {
   const { app, router, pinia } = createApp()
   const { setHeader } = useRestApi()
 
-  const userStore = useUserStore(null)
-  const sitesStore = useSitesStore(null)
+  const userStore = useUserStore()
+  const sitesStore = useSitesStore()
 
   setHeader("Authorization", `Bearer ${token}`)
 

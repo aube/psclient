@@ -15,6 +15,12 @@ export default () => [
         .refine(value => regs.domainPart.test(value), {
           message: 'Только латинские символы и числа',
         })
+        .refine((value:string) => !value || regs.alphadigits.test(value[0]), {
+          message: 'Первый знак только латинские символы и числа',
+        })
+        .refine((value:string) => !value || regs.alphadigits.test(value.slice(-1)), {
+          message: 'Последний знак только латинские символы и числа',
+        })
     ),
   },
   {

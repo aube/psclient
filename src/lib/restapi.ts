@@ -14,16 +14,24 @@ export interface ApiResponse<T> {
 
 const globalHeaders : Record<string, string|number|boolean> = {}
 
+const setHeader = (k: string, v: string|number|boolean) => {
+  globalHeaders[k] = v
+}
+
+const delHeader = (k: string) => {
+  delete globalHeaders[k]
+}
+
+export function setActiveSiteID(id: number) {
+  if (id > 0) {
+    setHeader('x-site-id', id)
+  } else {
+    delHeader('x-site-id')
+  }
+}
 
 export function useRestApi(baseURL: string = API_BASE_URL) {
 
-  const setHeader = (k: string, v: string|number|boolean) => {
-    globalHeaders[k] = v
-  }
-
-  const delHeader = (k: string) => {
-    delete globalHeaders[k]
-  }
 
   const loading = ref(false);
 

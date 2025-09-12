@@ -5,7 +5,7 @@ import { useNotificationStore } from '../../stores/notification'
 import UserProfileForm from '../../entities/user/UserProfileForm.vue';
 import UserLogoutForm from '../../entities/user/UserLogoutForm.vue';
 
-const userStore = useUserStore(useNotificationStore())
+const userStore = useUserStore()
 
 const onSubmit = async (formData: User) => {
   // await updateUser(formData)

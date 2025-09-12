@@ -3,12 +3,11 @@ import { ref } from 'vue';
 import ComControls from '../../components/ComControls.vue';
 import { SiteNew } from '../../types/Site.types';
 import { useSitesStore } from '../../stores/sites';
-import { useNotificationStore } from '../../stores/notification'
 import getSiteNewFields from './site-new.fields'
 
 const emits = defineEmits(['submit'])
 
-const sitesStore = useSitesStore(useNotificationStore())
+const sitesStore = useSitesStore()
 
 const isLoading = ref(false)
 const formFields = ref(getSiteNewFields());

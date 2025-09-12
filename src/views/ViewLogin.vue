@@ -3,12 +3,11 @@ import { User } from '../types/User.types';
 import { useRouter } from 'vue-router'
 import { useSitesStore } from '../stores/sites';
 import { useUserStore } from '../stores/user';
-import { useNotificationStore } from '../stores/notification'
 import UserLoginForm from '../entities/user/UserLoginForm.vue';
 import UserLogoutForm from '../entities/user/UserLogoutForm.vue';
 
-const userStore = useUserStore(useNotificationStore())
-const sitesStore = useSitesStore(useNotificationStore())
+const userStore = useUserStore()
+const sitesStore = useSitesStore()
 
 const router = useRouter()
 

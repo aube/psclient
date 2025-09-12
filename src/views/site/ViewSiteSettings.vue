@@ -3,10 +3,9 @@ import { ref, onMounted } from 'vue';
 import { Site } from '../../types/Site.types.ts';
 import { useRoute } from 'vue-router'
 import { useSitesStore } from '../../stores/sites';
-import { useNotificationStore } from '../../stores/notification'
 import SiteSettingsForm from '../../entities/site/SiteSettingsForm.vue'
 
-const sitesStore = useSitesStore(useNotificationStore())
+const sitesStore = useSitesStore()
 
 const route = useRoute()
 

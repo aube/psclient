@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { PageNew } from '../../types/Page.types.ts';
 import { usePagesStore } from '../../stores/pages';
-import { useNotificationStore } from '../../stores/notification'
 import { useRouter } from 'vue-router'
 import PageNewForm from '../../entities/page/PageNewForm.vue';
 
-const pagesStore = usePagesStore(useNotificationStore())
+const pagesStore = usePagesStore()
 
 const router = useRouter()
 

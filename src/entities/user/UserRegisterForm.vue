@@ -5,7 +5,6 @@ import ComControls from '../../components/ComControls.vue';
 
 import getRegisterFields from './register.fields.ts'
 
-
 const generalStore = useGeneralStore()
 
 defineOptions({

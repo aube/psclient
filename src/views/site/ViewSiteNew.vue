@@ -2,16 +2,18 @@
 import { SiteNew } from '../../types/Site.types.ts';
 import { useRouter } from 'vue-router'
 import { useSitesStore } from '../../stores/sites';
-import { useNotificationStore } from '../../stores/notification'
 import SiteNewForm from '../../entities/site/SiteNewForm.vue'
 
-const sitesStore = useSitesStore(useNotificationStore())
+const sitesStore = useSitesStore()
 
 const router = useRouter()
 
 const onSubmit = async (formData: SiteNew) => {
-  await sitesStore.createSite(formData)
-  router.push('/')
+  const success = await sitesStore.createSite(formData)
+  if (success) {
+    await sitesStore.fetchSites()
+    router.push('/')
+  }
 }
 
 </script>

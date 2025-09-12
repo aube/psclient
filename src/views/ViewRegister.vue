@@ -1,14 +1,20 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import { User } from '../types/User.types';
 import { useUserStore } from '../stores/user';
-import { useNotificationStore } from '../stores/notification'
 import UserRegisterForm from '../entities/user/UserRegisterForm.vue';
 
-const userStore = useUserStore(useNotificationStore())
+const userStore = useUserStore()
+
+const router = useRouter()
 
 const onSubmit = async (formData: User) => {
-  await userStore.registerUser(formData)
+  const success = await userStore.registerUser(formData)
+  if (success) {
+    router.push('/')
+  }
 }
+
 </script>
 
 <template>

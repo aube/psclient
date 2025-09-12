@@ -1,10 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useSitesStore } from '../stores/sites';
-import { useNotificationStore } from '../stores/notification'
 import SitesList from '../entities/site/SitesList.vue'
 
-const sitesStore = useSitesStore(useNotificationStore())
+const sitesStore = useSitesStore()
 
 const sites = ref([])
 
@@ -19,6 +18,7 @@ onMounted(async () => {
     class="grid gap-4 px-3"
   >
     <SitesList :items="sites" />
+    <pre>{{ sites }}</pre>
 
     <RouterLink to="/site/new">
       <Button

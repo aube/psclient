@@ -1,10 +1,9 @@
-import { defineStore } from 'pinia'
+import { defineStore, getActivePinia } from 'pinia'
 
 // @ts-expect-error - hasn't d.ts, but i tak soidet
 import toasteventbus from 'primevue/toasteventbus'
 
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined'
-
 
 interface Notification {
     id: number
@@ -18,6 +17,7 @@ interface Notification {
 type AddNotification = Omit<Notification, 'id' | 'timeout'> & {
   timeout?: number;
 };
+
 
 export const useNotificationStore = defineStore('notification', {
   state: () => ({
@@ -127,3 +127,21 @@ export const useNotificationStore = defineStore('notification', {
     },
   },
 })
+
+// load notifications inside other stores depends on SSR and app initial state
+export function loadNotifications() {
+  if (!isBrowser) {
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve) => {
+    function initNotifications() {
+      if (!getActivePinia()) {
+        setTimeout(initNotifications, 100)
+        return
+      }
+      resolve(useNotificationStore())
+    }
+    initNotifications()
+  })
+}

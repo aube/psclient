@@ -5,11 +5,9 @@ import { onMounted, ref } from 'vue';
 import { User } from './types/User.types';
 import { useUserStore } from './stores/user';
 import { useGeneralStore } from './stores/general.js'
-import { useNotificationStore } from './stores/notification';
 
 useGeneralStore()
-const notifications = useNotificationStore()
-const userStore = useUserStore(notifications)
+const userStore = useUserStore()
 
 const isToastLoaded = ref(false)
 const iAm = ref<User | null>(null)
