@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { Page } from '../../types/Page.types'
+import { Page , Pagination } from '../../types'
 
-const props = defineProps<{
-  items: Page[]
+const { items = [], pagination = {}} = defineProps<{
+  items?: Page[]
+  pagination?: Pagination
 }>()
 
 </script>
 
 <template>
   <Panel
-    v-for="page in props.items"
+    v-for="page in items"
     :key="page.id"
     toggleable
   >
@@ -79,6 +80,7 @@ const props = defineProps<{
         <div />
       </div>
     </RouterLink>
+    <pre>{{ pagination }}</pre>
   </Panel>
 </template>
 

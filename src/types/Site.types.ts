@@ -1,3 +1,5 @@
+import { Pagination } from './Pagination.types'
+
 export interface Site {
   id: number;
   name: string;
@@ -21,9 +23,5 @@ export type Sites = Site[]
 
 export interface SitesList {
   rows: Sites,
-  pagination: {
-    size: number;
-    page: number;
-    total: number;
-  },
+  pagination: Pagination,
 }

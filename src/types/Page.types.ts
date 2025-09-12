@@ -1,7 +1,10 @@
+import { Pagination } from './Pagination.types'
+
 export interface Page {
   id: number;
   site_id: number;
   name: string;
+  icon: string;
   meta: string;
   title: string;
   category: string;
@@ -28,10 +31,6 @@ export interface PageUpdate extends Partial<Omit<Page, 'id' | 'site_id'>> {
 
 export interface PagesList {
   rows: Page[],
-  pagination: {
-    size: number;
-    page: number;
-    total: number;
-  },
+  pagination: Pagination,
 }
 

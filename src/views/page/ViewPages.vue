@@ -1,40 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useRestApi } from '../../lib/restapi.ts';
-import { IPage, IPages } from '../../entities/page/page.ts';
+import { PagesList as IPL } from '../../types/Page.types.ts';
+import { usePagesStore } from '../../stores/pages';
+import { onMounted,ref, reactive } from 'vue';
 import PagesList from '../../entities/page/PagesList.vue';
 
+const pagesStore = usePagesStore()
+const pages = ref()
+pages.value = pagesStore.fetchPages();
 
-const pages = ref<IPage[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
-
-const { get } = useRestApi();
-
-const fetchPages = async () => {
-  try {
-    loading.value = true;
-    const response = await get<IPages>('/pages');
-    if (response.data?.rows)
-      pages.value = response.data.rows;
-
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : (String(err) || 'Ошибка при загрузке страниц');
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(() => {
-  fetchPages();
-});
 </script>
 
 <template>
   <PagesList
-    :error="error"
-    :loading="loading"
-    :pages="pages"
+    :items="pages?.rows"
+    :pagination="pages?.pagination"
   />
 
   <RouterLink :to="{name:'pageNew'}">
