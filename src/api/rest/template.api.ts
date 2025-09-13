@@ -1,5 +1,5 @@
 import { useRestApi } from '../../lib/restapi.js'
-import { Template, TemplateNew } from '../../types/Template.types.js'
+import { Template, TemplateNew } from '../../types'
 
 const { get, put, post, del } = useRestApi()
 

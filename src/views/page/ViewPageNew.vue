@@ -24,7 +24,6 @@ const onSubmit = async (formData: PageNew) => {
     class="grid gap-4 p-3"
   >
     <PageNewForm
-      :page="{}"
       @submit="onSubmit"
     />
   </div>

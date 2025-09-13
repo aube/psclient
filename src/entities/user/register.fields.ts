@@ -31,7 +31,7 @@ export default (formData : Record<string,string>) => [
     label: "Пароль",
     resolver: zodResolver(
       z.string()
-        .min(4, { message: 'Минимальная длина 4 символа' })
+        .min(4, { message: 'Минимальная длина 6 символов' })
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
   },

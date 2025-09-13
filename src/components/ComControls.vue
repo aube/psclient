@@ -94,6 +94,7 @@ const handleChange = async (name, value) => {
           :aria-describedby="field.name + '-help'"
           :auto-resize="true"
           class="w-full"
+          :disabled="field.disabled"
           :invalid="Boolean(errors[field.name])"
           rows="5"
           @update:model-value="handleChange(field.name, $event)"
@@ -105,6 +106,7 @@ const handleChange = async (name, value) => {
           :id="field.name"
           v-model="formData[field.name]"
           class="w-full"
+          :disabled="field.disabled"
           :invalid="Boolean(errors[field.name])"
           option-label="name"
           option-value="code"
@@ -119,6 +121,7 @@ const handleChange = async (name, value) => {
           :id="field.name"
           v-model="formData[field.name]"
           class="w-full"
+          :disabled="field.disabled"
           dropdown
           :invalid="Boolean(errors[field.name])"
           option-label="name"
@@ -134,6 +137,7 @@ const handleChange = async (name, value) => {
           v-else-if="field.type === 'password'"
           :id="field.name"
           v-model="formData[field.name]"
+          :disabled="field.disabled"
           :feedback="false"
           fluid
           :invalid="Boolean(errors[field.name])"
@@ -148,6 +152,7 @@ const handleChange = async (name, value) => {
             :id="field.name"
             v-model="formData[field.name]"
             class="w-full"
+            :disabled="field.disabled"
             :invalid="Boolean(errors[field.name])"
             @update:model-value="handleChange(field.name, $event)"
           />

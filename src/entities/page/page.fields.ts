@@ -26,26 +26,6 @@ export default () => [
   },
   {
     type: "input",
-    name: "name",
-    label: "Имя страницы",
-    help: "Внимание! Имя страницы устанавливается только при её создании",
-    resolver: zodResolver(
-      z.string()
-        .min(1, { message: 'Минимальная длина 1 символ' })
-        .max(256, { message: 'Максимальная длина 256 символа' })
-        .refine((value:string) => regs.pagename.test(value), {
-          message: 'Латинские символы, числа, дефис и нижн.подчеркивание',
-        })
-        .refine((value:string) => !value || regs.alphadigits.test(value[0]), {
-          message: 'Первый знак только латинские символы и числа',
-        })
-        .refine((value:string) => !value || regs.alphadigits.test(value.slice(-1)), {
-          message: 'Последний знак только латинские символы и числа',
-        })
-    ),
-  },
-  {
-    type: "input",
     name: "menu",
     label: "Название в меню",
     help: "Текст ссылки на страницу",

@@ -1,5 +1,5 @@
 import { useRestApi } from '../../lib/restapi.js'
-import { Page, PageNew, PagesList } from '../../types/Page.types.js'
+import { Page, PageNew, Pages, Pagination } from '../../types'
 
 const { get, put, post, del } = useRestApi()
 
@@ -65,8 +65,8 @@ export const usePageAPI = () => {
     return true
   }
 
-  const list = async (): Promise<PagesList> => {
-    const response = await get<PagesList>('/api/v1/pages')
+  const list = async (): Promise<{rows:Pages; pagination:Pagination}> => {
+    const response = await get<{rows:Pages; pagination:Pagination}>('/api/v1/pages')
     if (!response.data) {
       if (response.error)
         throw Error(response.error)

@@ -1,5 +1,3 @@
-import { Pagination } from './Pagination.types'
-
 export interface Page {
   id: number;
   site_id: number;
@@ -29,8 +27,4 @@ export interface PageUpdate extends Partial<Omit<Page, 'id' | 'site_id'>> {
   site_id: number;
 }
 
-export interface PagesList {
-  rows: Page[],
-  pagination: Pagination,
-}
-
+export type Pages = Page[]

@@ -7,6 +7,7 @@ import { setCookie } from '../lib/cookies.node.js'
 const {
   login,
   register,
+  update,
 } = useUserAPI()
 
 let notifications: ReturnType<typeof useNotificationStore>
@@ -37,7 +38,10 @@ export const useUserStore = defineStore('user', {
       })
     },
 
-    currentUser() {
+    currentUser(): User | null {
+      if (!this.user) {
+        return null
+      }
       return {
         ...this.user,
       }
@@ -77,6 +81,18 @@ export const useUserStore = defineStore('user', {
         notifications?.danger(e)
       }
       return false
+    },
+
+    async updateUser(formData: User): Promise<User | null> {
+      try {
+        const user = await update(formData)
+        this.setUser(user)
+        notifications?.success("Данные сохранены")
+        return user
+      } catch (e) {
+        notifications?.danger(e)
+      }
+      return null
     },
   },
 })

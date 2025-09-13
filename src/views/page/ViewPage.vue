@@ -1,43 +1,34 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRestApi } from '../../lib/restapi.ts';
-import { IPage } from '../../entities/page/page.ts';
+import { Page } from '../../types/Page.types.ts';
+import { usePagesStore } from '../../stores/pages';
+import { useRouter, useRoute } from 'vue-router'
 import PageForm from '../../entities/page/PageForm.vue';
 
-import { useRoute } from 'vue-router'
+const pagesStore = usePagesStore()
 
+const router = useRouter()
 const route = useRoute()
 
-const page = ref<IPage|null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
+const page = await pagesStore.getPage(route.params.pageID as string)
 
-const { get } = useRestApi();
-
-const fetchPages = async () => {
-  try {
-    loading.value = true;
-    const response = await get<IPage>('/page?id=' + route.params.id);
-    if (response.data)
-      page.value = response.data;
-
-  } catch (err) {
-    error.value = 'Ошибка при загрузке страницы';
-    console.error(err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(() => {
-  fetchPages();
-});
+const onSubmit = async (formData: Page) => {
+  const result = await pagesStore.updatePage(formData)
+  router.push({
+    name: "page",
+    params: {
+      pageID: result?.id,
+    }}
+  )
+}
 </script>
 
 <template>
-  <PageForm
-    :error="error"
-    :loading="loading"
-    :page="page"
-  />
+  <div
+    class="grid gap-4 p-3"
+  >
+    <PageForm
+      :page="page"
+      @submit="onSubmit"
+    />
+  </div>
 </template>

@@ -12,6 +12,8 @@ export async function render(_url: string, user: User | null, token: string) {
   const { app, router, pinia } = createApp()
   const { setHeader } = useRestApi()
 
+  // console.log("user", user)
+
   const userStore = useUserStore()
   const sitesStore = useSitesStore()
 

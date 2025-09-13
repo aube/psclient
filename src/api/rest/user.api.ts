@@ -1,6 +1,6 @@
 
 import { useRestApi } from '../../lib/restapi.js'
-import { User } from '../../types/User.types.js'
+import { User } from '../../types'
 
 const { get, post, put } = useRestApi()
 

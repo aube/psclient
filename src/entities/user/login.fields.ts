@@ -9,7 +9,6 @@ export default () => [
     label: "Имя",
     resolver: zodResolver(
       z.string()
-        .min(4, { message: 'Минимальная длина 4 символа' })
         .max(32, { message: 'Максимальная длина 32 символа' })
         .refine((value:string) => regs.username.test(value), {
           message: 'Только латинские символы и числа',
@@ -22,7 +21,6 @@ export default () => [
     label: "Пароль",
     resolver: zodResolver(
       z.string()
-        .min(4, { message: 'Минимальная длина 4 символа' })
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
   },

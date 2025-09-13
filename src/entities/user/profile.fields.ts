@@ -2,7 +2,7 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 import { regs } from '../../lib/utils'
 
-export default (formData : Record<string,string>) => [
+export default (formData : Record<string,string|number>) => [
   {
     type: "input",
     name: "username",
@@ -28,10 +28,10 @@ export default (formData : Record<string,string>) => [
   {
     type: "password",
     name: "password",
-    label: "Пароль",
+    label: "Новый пароль",
     resolver: zodResolver(
       z.string()
-        .min(4, { message: 'Минимальная длина 4 символа' })
+        .min(4, { message: 'Минимальная длина 6 символов' })
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
   },

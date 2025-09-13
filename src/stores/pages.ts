@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { usePageAPI } from '../api/rest/page.api';
-import { Page, PageNew, PagesList } from '../types/Page.types';
+import { Page, Pages, PageNew, Pagination } from '../types';
 import { useNotificationStore, loadNotifications } from './notification';
 
 
@@ -22,21 +22,29 @@ loadNotifications().then(ntf => {
 export const usePagesStore = defineStore('pages', {
 
   state: () => ({
-    pages: {} as PagesList,
+    pages: [] as Pages,
+    pagination: {} as Pagination | null,
   }),
 
   actions: {
-    async fetchPages() {
+    async fetchPages(): Promise<Pages> {
       try {
-        this.pages = await list()
-        return this.pages
+        const { rows, pagination } = await list()
+        this.pages = rows
+        this.pagination = pagination
       } catch (e) {
         notifications?.danger(e)
+        this.pages = []
+        this.pagination = null
       }
+      return this.pages
     },
 
     async listPages() {
-      return this.pages
+      return {
+        pages: this.pages,
+        pagination: this.pagination,
+      }
     },
 
     async getPage(name: string): Promise<Page | null> {

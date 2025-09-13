@@ -1,27 +1,20 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useGeneralStore } from '../../stores/general.js'
 import ComControls from '../../components/ComControls.vue';
 import getProfileFields from './profile.fields.ts'
-
-const generalStore = useGeneralStore()
+import { User } from '../../types'
 
 defineOptions({
-  name: 'FormRegister',
+  name: 'FormUserSettings',
 })
 
 const emit = defineEmits(['submit'])
-
-const username = generalStore.isDev ? 'qweqweqwe' : ''
-const email = generalStore.isDev ? 'qwe@qwe.qwe' : ''
-const password = generalStore.isDev ? 'password' : ''
-const password_confirmation = generalStore.isDev ? 'password' : ''
+const { user } = defineProps<{
+  user: User
+}>()
 
 const formData = reactive({
-  username,
-  email,
-  password,
-  password_confirmation,
+  ...user,
 })
 
 const formFields = ref(getProfileFields(formData));

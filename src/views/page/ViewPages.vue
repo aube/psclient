@@ -1,21 +1,29 @@
 <script setup lang="ts">
-import { PagesList as IPL } from '../../types/Page.types.ts';
 import { usePagesStore } from '../../stores/pages';
-import { onMounted,ref, reactive } from 'vue';
+import { onMounted,ref } from 'vue';
 import PagesList from '../../entities/page/PagesList.vue';
 
 const pagesStore = usePagesStore()
 const pages = ref()
-pages.value = pagesStore.fetchPages();
+const pagination = ref()
+
+onMounted(async () => {
+  await pagesStore.fetchPages();
+  pages.value = pagesStore.pages;
+  pagination.value = pagesStore.pagination;
+})
 
 </script>
 
 <template>
-  <PagesList
-    :items="pages?.rows"
-    :pagination="pages?.pagination"
-  />
-
+  <div
+    class="p-3"
+  >
+    <PagesList
+      :items="pages"
+      :pagination="pagination"
+    />
+  </div>
   <RouterLink :to="{name:'pageNew'}">
     <Button
       aria-label="Search"

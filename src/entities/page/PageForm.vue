@@ -1,23 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ComControls from '../../components/ComControls.vue';
-import { PageNew } from '../../types/Page.types';
-import { usePagesStore } from '../../stores/pages.ts';
-import getPageNewFields from './page-new.fields'
+import { Page } from '../../types/Page.types';
+import getPageFields from './page.fields'
 
 const emits = defineEmits(['submit'])
 
-const pagesStore = usePagesStore()
+const { page } = defineProps<{
+  page: Page
+}>()
 
 const isLoading = ref(false)
-const formFields = ref(getPageNewFields());
-const formData = ref<PageNew>();
-const formErrors = ref({})
+const formFields = ref(getPageFields());
+const formData = ref<Page>();
 
-const checkNameExists = async (name: string) => {
-  const a = await pagesStore.pageExists(name)
-  return Boolean(a)
-}
 
 const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<string, any>}) => {
   if (!valid) {
@@ -27,25 +23,21 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
   const name = values?.name
   if (!name) return
 
-  const nameIsBusy = await checkNameExists(name)
-
-  if (nameIsBusy) {
-    formErrors.value = {
-      ...formErrors.value,
-      name:['Такое имя уже используется'],
-    }
-    return
-  }
-
   try {
-    emits('submit', values as PageNew)
+    emits('submit', values as Page)
   } finally {
     isLoading.value = false
   }
 }
+
+watch(() => page, () => {
+  formData.value = page
+}, { deep: true });
+
 </script>
 
 <template>
+  {{ page }}
   <Form
     class="flex flex-col gap-4 w-full sm:w-156"
     :validate-on-blur="true"
@@ -54,7 +46,6 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
   >
     <ComControls
       v-model="formData"
-      :errors="formErrors"
       :fields="formFields"
     />
 
