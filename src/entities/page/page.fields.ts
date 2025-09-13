@@ -1,6 +1,5 @@
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
-import { regs } from '../../lib/utils'
 
 export default () => [
   {

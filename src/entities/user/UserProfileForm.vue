@@ -66,7 +66,7 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
     />
 
     <Button
-      icon="pi pi-user"
+      icon="pi pi-check"
       label="Сохранить"
       type="submit"
     >

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import ComControls from '../../components/ComControls.vue';
 import { Page } from '../../types/Page.types';
 import getPageFields from './page.fields'
@@ -12,32 +12,26 @@ const { page } = defineProps<{
 
 const isLoading = ref(false)
 const formFields = ref(getPageFields());
-const formData = ref<Page>();
-
 
 const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<string, any>}) => {
   if (!valid) {
     return
   }
 
-  const name = values?.name
-  if (!name) return
+  const data = {
+    ...values,
+    id: page.id,
+  }
 
   try {
-    emits('submit', values as Page)
+    emits('submit', data as Page)
   } finally {
     isLoading.value = false
   }
 }
-
-watch(() => page, () => {
-  formData.value = page
-}, { deep: true });
-
 </script>
 
 <template>
-  {{ page }}
   <Form
     class="flex flex-col gap-4 w-full sm:w-156"
     :validate-on-blur="true"
@@ -45,13 +39,13 @@ watch(() => page, () => {
     @submit="onFormSubmit"
   >
     <ComControls
-      v-model="formData"
+      :data="page"
       :fields="formFields"
     />
 
     <Button
-      icon="pi pi-plus"
-      label="Создать страницу"
+      icon="pi pi-check"
+      label="Сохранить страницу"
       type="submit"
     />
   </Form>
