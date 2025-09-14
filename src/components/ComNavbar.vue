@@ -17,15 +17,36 @@ const menu = [
     icon: 'pi pi-sitemap',
     link: "",
   },
+  // {
+  //   label: 'Users',
+  //   icon: 'pi pi-user',
+  //   link: "users",
+  // },
+  // {
+  //   label: 'Clients',
+  //   icon: 'pi pi-users',
+  //   link: "users",
+  // },
   {
-    label: 'Users',
-    icon: 'pi pi-user',
-    link: "users",
+    label: 'Uploads',
+    icon: 'pi pi-cloud-upload',
+    items: [
+      {
+        label: 'Images',
+        icon: 'pi pi-image',
+        link: "images",
+      },
+      {
+        label: 'Files',
+        icon: 'pi pi-file',
+        link: "files",
+      },
+    ],
   },
   {
-    label: 'Images',
-    icon: 'pi pi-image',
-    link: "images",
+    label: 'Templates',
+    icon: 'pi pi-code',
+    link: "templates",
   },
   {
     label: 'Settings',
@@ -40,14 +61,27 @@ const items = computed(() => {
     return []
   }
   const linkPrefixe = "/site/" + route.params.siteName
-  return menu.map(item => {
-    const link = item.link ? "/" + item.link : ""
+
+  function getMenuItem(item) {
+    let link
+    let active = null
+    let command = null
+
+    if (item.link != undefined) {
+      link = item.link ? "/" + item.link : ""
+      active = route.fullPath === linkPrefixe + link
+      command = () => router.push(linkPrefixe + link)
+    }
+
     return {
       ...item,
-      active: route.fullPath === linkPrefixe + link,
-      command: () => router.push(linkPrefixe + link),
+      items: item.items ? item.items.map(getMenuItem) : null,
+      active,
+      command,
     }
-  })
+  }
+
+  return menu.map(getMenuItem)
 })
 
 

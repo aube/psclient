@@ -20,6 +20,7 @@ onMounted(async () => {
     class="p-3"
   >
     <PagesList
+      v-if="pages"
       :items="pages"
       :pagination="pagination"
     />

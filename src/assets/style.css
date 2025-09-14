@@ -4,3 +4,16 @@
 @custom-variant dark (&:where(.p-dark, .p-dark *));
 
 
+.ps-card {
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  padding: .2rem 1rem;
+}
+
+.p-menubar {
+  border: none !important;
+  border-bottom: 1px solid var(--p-content-border-color) !important;
+  border-radius: 0 !important;
+}

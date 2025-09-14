@@ -1,8 +1,7 @@
 <script setup>
-import { ref, onMounted, compile } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useSitesStore } from '../stores/sites';
 import SitesList from '../entities/site/SitesList.vue'
-import { createApp, onUnmounted } from 'vue'
 
 const sitesStore = useSitesStore()
 
@@ -13,58 +12,6 @@ onMounted(async () => {
   sites.value = t.rows
 })
 
-const container = ref(null)
-let app = null
-
-const compileAndMount = async (template, props = {}) => {
-  if (app) {
-    app.unmount()
-  }
-
-  try {
-    // Компиляция шаблона с помощью Vue compile функции
-    const render = compile(template)
-
-    const component = {
-      // props: Object.keys(props),
-      data() {
-        return { ...props }
-      },
-      methods: {
-        handleClick() {
-          console.log('Button clicked!')
-        },
-      },
-      render,
-    }
-
-    app = createApp(component, props)
-    app.mount(container.value)
-  } catch (error) {
-    console.error('Compilation error:', error)
-  }
-}
-
-onMounted(() => {
-  const template = `
-    <div class="card">
-      <h2>{{ title }}</h2>
-      <p>{{ content }}</p>
-      <button @click="handleClick">Action</button>
-    </div>
-  `
-
-  compileAndMount(template, {
-    title: 'Динамический заголовок',
-    content: 'Динамическое содержимое',
-  })
-})
-
-onUnmounted(() => {
-  if (app) {
-    app.unmount()
-  }
-})
 </script>
 
 <template>
