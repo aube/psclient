@@ -27,9 +27,9 @@ export const usePagesStore = defineStore('pages', {
   }),
 
   actions: {
-    async fetchPages(): Promise<Pages> {
+    async fetchPages(parentID:number = 0): Promise<Pages> {
       try {
-        const { rows, pagination } = await list()
+        const { rows, pagination } = await list(parentID)
         this.pages = rows
         this.pagination = pagination
       } catch (e) {

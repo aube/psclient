@@ -1,27 +1,16 @@
 <script setup lang="ts">
 import { usePagesStore } from '../../stores/pages';
-import { onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router'
+import { onMounted,ref } from 'vue';
 import PagesList from '../../entities/page/PagesList.vue';
 
 const pagesStore = usePagesStore()
-const route = useRoute()
-
 const pages = ref()
 const pagination = ref()
 
-const fetchPages = async () => {
-  await pagesStore.fetchPages(Number(route.params.parentID));
+onMounted(async () => {
+  await pagesStore.fetchPages();
   pages.value = pagesStore.pages;
   pagination.value = pagesStore.pagination;
-}
-
-onMounted(async () => {
-  fetchPages()
-})
-
-watch(() => route.params.parentID, () => {
-  fetchPages()
 })
 
 </script>
@@ -36,7 +25,7 @@ watch(() => route.params.parentID, () => {
       :pagination="pagination"
     />
   </div>
-  <RouterLink :to="{name:'pageNew', params: {parentID: route.params.parentID}}">
+  <RouterLink :to="{name:'pageNew'}">
     <Button
       aria-label="Search"
       rounded

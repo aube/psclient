@@ -15,7 +15,7 @@ const menu = [
   {
     label: 'Pages',
     icon: 'pi pi-sitemap',
-    link: "",
+    link: "pages",
   },
   // {
   //   label: 'Users',
@@ -188,11 +188,11 @@ const rightButtons = ref([
       </template>
       <template #end>
         <div class="flex items-center gap-2">
-          <InputText
+          <!-- <InputText
             class="w-32 sm:w-auto"
             placeholder="Search"
             type="text"
-          />
+          /> -->
           <Button
             v-for="btn, idx in rightButtons"
             :key="idx"

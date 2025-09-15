@@ -14,7 +14,7 @@ export const routes = [
     path: '/site/:siteName',
     children: [
       {
-        path: '',
+        path: 'pages/:parentID?',
         name: 'pages',
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
       },
@@ -24,8 +24,23 @@ export const routes = [
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
       },
       {
-        path: 'page/new',
+        path: 'page/new/:parentID?',
         name: 'pageNew',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPageNew.vue'),
+      },
+      {
+        path: 'templates',
+        name: 'templates',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
+      },
+      {
+        path: 'templates/:templateID',
+        name: 'template',
+        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+      },
+      {
+        path: 'templates/new',
+        name: 'templateNew',
         component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPageNew.vue'),
       },
       {

@@ -65,8 +65,8 @@ export const usePageAPI = () => {
     return true
   }
 
-  const list = async (): Promise<{rows:Pages; pagination:Pagination}> => {
-    const response = await get<{rows:Pages; pagination:Pagination}>('/api/v1/pages')
+  const list = async (parentID: number = 0): Promise<{rows:Pages; pagination:Pagination}> => {
+    const response = await get<{rows:Pages; pagination:Pagination}>('/api/v1/pages/' + parentID)
     if (!response.data) {
       if (response.error)
         throw Error(response.error)

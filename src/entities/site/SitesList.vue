@@ -14,7 +14,7 @@ const props = defineProps<{
     toggleable
   >
     <template #header>
-      <RouterLink :to="'/site/' + site.name">
+      <RouterLink :to="'/site/' + site.name + '/pages'">
         <div class="flex items-center gap-2">
           <Avatar
             :image="site.icon"
@@ -31,7 +31,7 @@ const props = defineProps<{
         </div> -->
     </template>
     <template #icons>
-      <RouterLink :to="'/site/' + site.name">
+      <RouterLink :to="'/site/' + site.name + '/pages'">
         <Button
           icon="pi pi-sitemap"
           rounded
@@ -65,7 +65,7 @@ const props = defineProps<{
         />
       </RouterLink>
     </template>
-    <RouterLink :to="'/site/' + site.name">
+    <RouterLink :to="'/site/' + site.name + '/pages'">
       <div class="grid sm:grid-cols-2 md:grid-cols-3">
         <div class="grid grid-cols-2">
           <span>Страниц</span>
