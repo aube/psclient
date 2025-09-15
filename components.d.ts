@@ -13,6 +13,7 @@ declare module 'vue' {
     Badge: typeof import('primevue/badge')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
+    Column: typeof import('primevue/column')['default']
     ComControls: typeof import('./src/components/ComControls.vue')['default']
     ComControlsErrors: typeof import('./src/components/ComControlsErrors.vue')['default']
     ComForm: typeof import('./src/components/ComForm/ComForm.vue')['default']
@@ -20,6 +21,8 @@ declare module 'vue' {
     ComLogo: typeof import('./src/components/ComLogo.vue')['default']
     ComNavbar: typeof import('./src/components/ComNavbar.vue')['default']
     ComRouteTreeNode: typeof import('./src/components/ComRouteTreeNode.vue')['default']
+    DataTable: typeof import('primevue/datatable')['default']
+    Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
     FileUpload: typeof import('primevue/fileupload')['default']
@@ -36,6 +39,7 @@ declare module 'vue' {
     Password: typeof import('primevue/password')['default']
     Popover: typeof import('primevue/popover')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
+    Rating: typeof import('primevue/rating')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     RouteTreeNode: typeof import('./src/components/RouteTreeNode.vue')['default']
@@ -44,6 +48,7 @@ declare module 'vue' {
     TabPanel: typeof import('primevue/tabpanel')['default']
     TabPanels: typeof import('primevue/tabpanels')['default']
     Tabs: typeof import('primevue/tabs')['default']
+    Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
   }
 }

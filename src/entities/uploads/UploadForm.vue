@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRestApi } from '../../lib/restapi'
+import { Upload } from '../../types'
+import Button from 'primevue/button'
 
 interface UploadStatus {
   type: 'success' | 'error' | ''
@@ -106,6 +108,58 @@ const addFiles = (files: File[]) => {
   }
 }
 
+const uploadFiles = async () => {
+  if (selectedFiles.value.length === 0) return
+
+  uploading.value = true
+  uploadStatus.value = null
+
+  try {
+    // Create a FormData object for each file
+    const uploadPromises = selectedFiles.value.map(async (file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('name', file.name)
+      formData.append('size', file.size.toString())
+      formData.append('content_type', file.type)
+
+      // You may need to adjust these fields based on your API requirements
+      formData.append('category', 'file')
+      formData.append('description', '')
+
+      const response = await post<Upload>('/api/v1/upload', formData)
+      return response
+    })
+
+    const results = await Promise.all(uploadPromises)
+
+    // Check if all uploads were successful
+    const allSuccessful = results.every(result => result.data !== null && result.error === null)
+
+    if (allSuccessful) {
+      uploadStatus.value = {
+        type: 'success',
+        message: 'Файлы успешно загружены!',
+      }
+      selectedFiles.value = []
+    } else {
+      throw new Error('Ошибка загрузки некоторых файлов')
+    }
+  } catch (error) {
+    uploadStatus.value = {
+      type: 'error',
+      message: error instanceof Error ? error.message : 'Произошла ошибка при загрузке файлов',
+    }
+  } finally {
+    uploading.value = false
+
+    // Clear status message after 5 seconds
+    setTimeout(() => {
+      uploadStatus.value = null
+    }, 5000)
+  }
+}
+
 </script>
 
 <template>
@@ -134,6 +188,27 @@ const addFiles = (files: File[]) => {
         type="file"
         @change="handleFileSelect"
       >
+    </div>
+
+    <div
+      v-if="selectedFiles.length > 0"
+      class="upload-actions"
+    >
+      <Button
+        class="upload-btn"
+        :disabled="uploading"
+        label="Загрузить файлы"
+        :loading="uploading"
+        @click="uploadFiles"
+      />
+    </div>
+
+    <div
+      v-if="uploadStatus"
+      class="upload-status"
+      :class="uploadStatus.type"
+    >
+      {{ uploadStatus.message }}
     </div>
   </div>
 </template>
@@ -185,6 +260,42 @@ const addFiles = (files: File[]) => {
 
 .hidden-file-input {
   display: none;
+}
+
+.upload-actions {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.upload-btn {
+  background: var(--p-primary-color) !important;
+  border: none !important;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+.upload-btn:disabled {
+  background: var(--p-surface-400) !important;
+}
+
+.upload-status {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.upload-status.success {
+  background-color: var(--p-green-100);
+  color: var(--p-green-700);
+  border: 1px solid var(--p-green-200);
+}
+
+.upload-status.error {
+  background-color: var(--p-red-100);
+  color: var(--p-red-700);
+  border: 1px solid var(--p-red-200);
 }
 
 </style>

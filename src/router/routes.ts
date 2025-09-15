@@ -59,7 +59,7 @@ export const routes = [
           {
             path: 'images',
             name: 'images',
-            component: (): Promise<typeof import('*.vue')> => import('../views/uploads/UploadFile.vue'),
+            component: (): Promise<typeof import('*.vue')> => import('../views/uploads/UploadImage.vue'),
           },
         ],
       },
