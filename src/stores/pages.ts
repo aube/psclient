@@ -76,7 +76,7 @@ export const usePagesStore = defineStore('pages', {
     async createPage(formData: PageNew): Promise<Page | null> {
       try {
         const page = await create(formData)
-        notifications?.success("Сайт создан")
+        notifications?.success("Страница создана")
         return page
       } catch (e) {
         notifications?.danger(e)
@@ -88,9 +88,9 @@ export const usePagesStore = defineStore('pages', {
       try {
         const result = await remove(id)
         if (result) {
-          notifications?.success("Сайт перенесен в корзину")
+          notifications?.success("Страница удалена")
         } else {
-          notifications?.danger("Что-то пошло не так")
+          notifications?.danger("При удалении произошла ошибка")
         }
         return result
       } catch (e) {

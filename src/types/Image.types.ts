@@ -1,8 +1,7 @@
 export interface Image {
-  id: number;
+  uuid: string;
   site_id: number;
   user_id: number;
-  uuid: string;
   name: string;
   category: string;
   size: string;
@@ -13,8 +12,8 @@ export interface Image {
   deleted: boolean;
 }
 
-export interface ImageNew extends Omit<Image, 'id' | 'created_at' | 'updated_at'> {
-  id?: number;
+export interface ImageNew extends Omit<Image, 'uuid' | 'created_at' | 'updated_at'> {
+  uuid?: number;
   created_at?: Date;
   updated_at?: Date;
 }

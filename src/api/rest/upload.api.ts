@@ -1,9 +1,9 @@
 import { useRestApi } from '../../lib/restapi.js'
-import { Upload, UploadNew, Uploads, Pagination } from '../../types'
+import { Upload, UploadNew, Uploads, Pagination } from '../../types/index.js'
 
 const { get, put, post, del } = useRestApi()
 
-export const useUploadsAPI = () => {
+export const useUploadAPI = () => {
 
   const create = async (formData: UploadNew): Promise<Upload> => {
     const response = await post<Upload>('/api/v1/upload', formData)
@@ -47,8 +47,8 @@ export const useUploadsAPI = () => {
   }
 
 
-  const list = async (parentID: number = 0): Promise<{rows:Uploads; pagination:Pagination}> => {
-    const response = await get<{rows:Uploads; pagination:Pagination}>('/api/v1/uploads/' + parentID)
+  const list = async (): Promise<{rows:Uploads; pagination:Pagination}> => {
+    const response = await get<{rows:Uploads; pagination:Pagination}>('/api/v1/uploads')
     if (!response.data) {
       if (response.error)
         throw Error(response.error)

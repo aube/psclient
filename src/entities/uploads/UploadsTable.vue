@@ -17,33 +17,55 @@
         </div>
       </template>
       <Column
-        field="id"
-        header="ID"
-      />
+        field="file"
+        header="File"
+      >
+        <template #body="slotProps">
+          <div>
+            {{ slotProps.data.name }}
+          </div>
+          <div>
+            {{ slotProps.data.url }}
+          </div>
+          <div>
+            {{ slotProps.data.uuid }}
+          </div>
+        </template>
+      </Column>
       <Column
-        field="name"
-        header="Name"
-      />
+        field="params"
+        h1eader="File"
+      >
+        <template #body="slotProps">
+          <div>
+            {{ slotProps.data.size }}
+          </div>
+          <div>
+            {{ slotProps.data.category }}
+          </div>
+          <div>
+            {{ slotProps.data.content_type }}
+          </div>
+        </template>
+      </Column>
       <Column
-        field="category"
-        header="Category"
-      />
-      <Column
-        field="size"
-        header="Size"
-      />
-      <Column
-        field="content_type"
-        header="Content Type"
-      />
-      <Column
+        field="description"
+        header="Description"
+      >
+        <template #body="slotProps">
+          <div>
+            {{ slotProps.data.description }}
+          </div>
+        </template>
+      </Column>
+      <!-- <Column
         field="created_at"
         header="Created At"
       >
         <template #body="slotProps">
           {{ formatDate(slotProps.data.created_at) }}
         </template>
-      </Column>
+      </Column> -->
       <template #footer>
         In total there are {{ uploads ? uploads.length : 0 }} uploads.
       </template>
