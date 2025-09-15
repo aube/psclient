@@ -68,14 +68,14 @@ watch(() => items, () => {
           </div>
         </RouterLink>
         <div>
-          <Button
+          <!-- <Button
             icon="pi pi-code"
             rounded
             severity="secondary"
             size="small"
             type="button"
             @click="toggle($event, page)"
-          />
+          /> -->
 
           <Button
             icon="pi pi-chevron-right"

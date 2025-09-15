@@ -34,12 +34,12 @@ const menu = [
       {
         label: 'Images',
         icon: 'pi pi-image',
-        link: "images",
+        link: "uploads/images",
       },
       {
         label: 'Files',
         icon: 'pi pi-file',
-        link: "files",
+        link: "uploads/files",
       },
     ],
   },

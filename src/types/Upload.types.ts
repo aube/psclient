@@ -1,4 +1,4 @@
-export interface Image {
+export interface Upload {
   id: number;
   site_id: number;
   user_id: number;
@@ -13,11 +13,11 @@ export interface Image {
   deleted: boolean;
 }
 
-export interface ImageNew extends Omit<Image, 'id' | 'created_at' | 'updated_at'> {
+export interface UploadNew extends Omit<Upload, 'id' | 'created_at' | 'updated_at'> {
   id?: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-export type Images = Image[]
+export type Uploads = Upload[]
 
