@@ -9,6 +9,8 @@ interface UploadStatus {
   message: string
 }
 
+const emits = defineEmits(['uploaded'])
+
 const isDragOver = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 const selectedFiles = ref<File[]>([])
@@ -142,6 +144,7 @@ const uploadFiles = async () => {
         message: 'Файлы успешно загружены!',
       }
       selectedFiles.value = []
+      emits('uploaded')
     } else {
       throw new Error('Ошибка загрузки некоторых файлов')
     }
