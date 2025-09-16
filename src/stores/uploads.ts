@@ -6,7 +6,7 @@ import { useNotificationStore, loadNotifications } from './notification';
 
 const {
   create,
-  read,
+  downloadFile,
   update,
   remove,
   list,
@@ -46,10 +46,9 @@ export const useUploadsStore = defineStore('uploads', {
       }
     },
 
-    async getUpload(name: string): Promise<Upload | null> {
+    async download(uuid: string, name: string) {
       try {
-        const upload = await read(name)
-        return upload
+        await downloadFile(uuid, name)
       } catch (e) {
         notifications?.danger(e)
         return null

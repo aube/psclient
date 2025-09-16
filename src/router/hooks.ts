@@ -44,6 +44,10 @@ export const activeSiteSelector = async (
   const siteName = to.params?.siteName as string
   if (siteName) {
     const site = sitesStore.getSiteByName(siteName)
+    if (site) {
+      sitesStore.currentSite = site
+    }
+
     setActiveSiteID(Number(site?.id))
   }
 

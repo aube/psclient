@@ -96,21 +96,3 @@ export const useUserStore = defineStore('user', {
     },
   },
 })
-
-// load store inside depends on SSR and app initial state
-// export function loadUserStore(onlyClient = false) {
-//   if (onlyClient && !isBrowser) {
-//     return Promise.resolve()
-//   }
-
-//   return new Promise((resolve) => {
-//     function initStore() {
-//       if (!getActivePinia()) {
-//         setTimeout(initStore, 100)
-//         return
-//       }
-//       resolve(useUserStore())
-//     }
-//     initStore()
-//   })
-// }

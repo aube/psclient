@@ -21,6 +21,7 @@ export const useSitesStore = defineStore('sites', {
 
   state: () => ({
     sites: {} as SitesList,
+    currentSite: {} as Site,
   }),
 
   actions: {

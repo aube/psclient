@@ -85,7 +85,7 @@ const handleChange = async (name, value) => {
         :name="field.name"
         :resolver="field.resolver"
       >
-        <label :for="field.name">{{ field.label }}: {{ initialValues[field.name] }}</label>
+        <label :for="field.name">{{ field.label }}</label>
         <!-- Textarea -->
         <Textarea
           v-if="field.type === 'textarea'"

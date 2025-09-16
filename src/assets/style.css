@@ -17,3 +17,38 @@
   border-bottom: 1px solid var(--p-content-border-color) !important;
   border-radius: 0 !important;
 }
+
+i:not(.pi) {
+    background-color: var(--p-content-border-color);
+    border-radius: 6px;
+    color: var(--mark-text);
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-style: normal;
+    font-weight: 600;
+    padding-block: 2px;
+    padding-inline: 6px;
+    position: relative;
+    scroll-margin-top: 6.5rem;
+    white-space: nowrap;
+}
+
+.doc-table th {
+  border-bottom: 1px solid var(--border-color);
+  padding-block: .5rem;
+  padding-inline: 1rem;
+  text-align: start;
+  text-transform: capitalize;
+}
+.doc-table tbody td {
+    border-bottom: 1px solid var(--border-color);
+    line-height: 1;
+    padding-block: .2rem;
+    padding-inline: 1rem;
+    scroll-margin-top: 6.5rem;
+    white-space: pre-line;
+}
+
+.doc-table tr th:first-child,
+.doc-table tr td:first-child {
+  padding-inline: 0rem !important;
+}

@@ -30,8 +30,39 @@ export function setActiveSiteID(id: number) {
   }
 }
 
-export function useRestApi(baseURL: string = API_BASE_URL) {
 
+function getHeaders(isFormdata: boolean): Record<string, string> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${readFrontCookie("auth_token")}`,
+    ...globalHeaders,
+  };
+  if (!isFormdata) {
+    headers["Content-Type"] = "application/json";
+  }
+  return headers
+}
+
+export async function restApiDownload(
+  fileUrl: string,
+  filename: string,
+  baseURL: string = API_BASE_URL,
+) {
+  const response = await fetch(`${baseURL}${fileUrl}`,{
+    headers: getHeaders(false),
+  });
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+export function useRestApi(baseURL: string = API_BASE_URL) {
 
   const loading = ref(false);
 
@@ -42,20 +73,12 @@ export function useRestApi(baseURL: string = API_BASE_URL) {
   ): Promise<ApiResponse<T>> {
 
     loading.value = true;
-    const isFormdata = body && body instanceof FormData;
-
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${readFrontCookie("auth_token")}`,
-      ...globalHeaders,
-    };
-    if (!isFormdata) {
-      headers["Content-Type"] = "application/json";
-    }
+    const isFormdata = Boolean(body && body instanceof FormData);
 
     try {
       const response = await fetch(`${baseURL}${endpoint}`, {
         method,
-        headers,
+        headers: getHeaders(isFormdata),
         body: body
           ? isFormdata
             ? (body as globalThis.BodyInit)
@@ -94,5 +117,6 @@ export function useRestApi(baseURL: string = API_BASE_URL) {
     put: <T>(endpoint: string, body: unknown) => request<T>(endpoint, "PUT", body),
     patch: <T>(endpoint: string, body: unknown) => request<T>(endpoint, "PATCH", body),
     del: <T>(endpoint: string) => request<T>(endpoint, "DELETE"),
+    download: restApiDownload,
   };
 }

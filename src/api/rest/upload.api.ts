@@ -1,7 +1,7 @@
 import { useRestApi } from '../../lib/restapi.js'
 import { Upload, UploadNew, Uploads, Pagination } from '../../types/index.js'
 
-const { get, put, post, del } = useRestApi()
+const { get, put, post, del, download } = useRestApi()
 
 export const useUploadAPI = () => {
 
@@ -27,15 +27,8 @@ export const useUploadAPI = () => {
     return response.data
   }
 
-  const read = async (name: string): Promise<Upload> => {
-    const response = await get<Upload>('/api/v1/upload/' + name)
-    if (!response.data) {
-      if (response.error)
-        throw Error(response.error)
-
-      throw Error("no resoponse data")
-    }
-    return response.data
+  const downloadFile = async (uuid: string, filename: string) => {
+    await download('/api/v1/upload?uuid=' + uuid, filename)
   }
 
   const remove = async (id: number): Promise<boolean> => {
@@ -60,7 +53,7 @@ export const useUploadAPI = () => {
 
   return {
     create,
-    read,
+    downloadFile,
     update,
     remove,
     list,

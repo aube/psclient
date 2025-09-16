@@ -1,9 +1,58 @@
+
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { Upload } from '../../types';
+import { useUploadsStore } from '../../stores/uploads'
+import { useGeneralStore } from '../../stores/general'
+
+const generalStore = useGeneralStore()
+const uplodsStore = useUploadsStore()
+
+const { uploads } = defineProps<{
+  uploads: Upload[];
+  loading: boolean;
+}>();
+
+const emits = defineEmits([
+  "uploading",
+  "uploadEdit",
+]);
+
+const items = computed(() => {
+  return uploads.map(item => {
+    const queryString = new URLSearchParams({
+      uuid: item.uuid,
+    }).toString();
+
+    return {
+      ...item,
+      downloadLink: generalStore.apiBaseURL + '/api/v1/upload?' + queryString,
+    }
+  })
+})
+
+const uploading = () => {
+  emits('uploading');
+};
+
+const uploadEdit = (event: any, data: any) => {
+  emits('uploadEdit', event, data);
+};
+
+const download = ({ uuid, name }: { uuid: string, name: string }) => {
+  uplodsStore.download(uuid, name)
+}
+
+</script>
+
+
 <template>
   <div class="card">
     <DataTable
       :loading="loading"
       table-style="min-width: 50rem"
-      :value="uploads"
+      :value="items"
     >
       <template #header>
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -25,75 +74,45 @@
             {{ slotProps.data.name }}
           </div>
           <div>
-            {{ slotProps.data.url }}
-          </div>
-          <div>
-            {{ slotProps.data.uuid }}
+            {{ slotProps.data.downloadLink }}
           </div>
         </template>
       </Column>
-      <Column
-        field="params"
-        h1eader="File"
-      >
+      <Column class="!text-end">
         <template #body="slotProps">
-          <div>
-            {{ slotProps.data.size }}
-          </div>
-          <div>
-            {{ slotProps.data.category }}
-          </div>
-          <div>
-            {{ slotProps.data.content_type }}
-          </div>
+          <Button
+            v-if="slotProps.data.url"
+            as="a"
+            :href="slotProps.data.url"
+            icon="pi pi-link"
+            rel="noopener"
+            rounded
+            severity="secondary"
+            size="small"
+            target="_blank"
+            type="button"
+          />
+          <Button
+            icon="pi pi-download"
+            rounded
+            severity="secondary"
+            size="small"
+            type="button"
+            @click="download(slotProps.data)"
+          />
+          <Button
+            icon="pi pi-pencil"
+            rounded
+            severity="secondary"
+            size="small"
+            type="button"
+            @click="uploadEdit($event, slotProps.data)"
+          />
         </template>
       </Column>
-      <Column
-        field="description"
-        header="Description"
-      >
-        <template #body="slotProps">
-          <div>
-            {{ slotProps.data.description }}
-          </div>
-        </template>
-      </Column>
-      <!-- <Column
-        field="created_at"
-        header="Created At"
-      >
-        <template #body="slotProps">
-          {{ formatDate(slotProps.data.created_at) }}
-        </template>
-      </Column> -->
       <template #footer>
         In total there are {{ uploads ? uploads.length : 0 }} uploads.
       </template>
     </DataTable>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
-import { Upload } from '../../types';
-
-// Define props
-const props = defineProps<{
-  uploads: Upload[];
-  loading: boolean;
-}>();
-
-// Define emits
-const emits = defineEmits(["uploading"]);
-
-const formatDate = (date: Date) => {
-  return new Date(date).toLocaleDateString();
-};
-
-const uploading = () => {
-  emits('uploading');
-};
-</script>
