@@ -9,6 +9,7 @@ export default () => [
     help: "Главный заголовок страницы",
     resolver: zodResolver(
       z.string()
+        .trim()
         .min(1, { message: 'Минимальная длина 1 символ' })
         .max(512, { message: 'Максимальная длина 512 символа' })
     ),
@@ -20,6 +21,7 @@ export default () => [
     help: "Выводится в окне браузера или вкладке",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(1024, { message: 'Максимальная длина 1024 символа' })
     ),
   },
@@ -30,6 +32,7 @@ export default () => [
     help: "Текст ссылки на страницу",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(64, { message: 'Максимальная длина 64 символа' })
     ),
   },
@@ -40,6 +43,7 @@ export default () => [
     help: "Список тэгов разделённых запятыми",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(64, { message: 'Максимальная длина 64 символа' })
     ),
   },
@@ -50,6 +54,7 @@ export default () => [
     help: "Шаблон вёрстки полной страницы",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
   },
@@ -66,6 +71,7 @@ export default () => [
     help: "Шаблон анонса страницы для вывода в списках страниц",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
   },
@@ -76,6 +82,7 @@ export default () => [
     help: "Выводится в списках страниц",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(1024, { message: 'Максимальная длина 1024 символа' })
     ),
   },

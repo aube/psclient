@@ -19,9 +19,6 @@ const fetchUploads = async () => {
   pagination.value = uploadsStore.pagination;
 }
 
-onMounted(async () => {
-  fetchUploads()
-})
 
 const loading = ref(false);
 const visible = ref(false);
@@ -34,10 +31,24 @@ const handleUploaded = () => {
 const op = ref();
 const uploadData = ref();
 
-const uploadEdit = (event: any, data: any) => {
+const uploadEditShow = (event: any, data: any) => {
   uploadData.value = data
   op.value.toggle(event);
 }
+
+const uploadEditSave = async (data: any) => {
+  try {
+    await uploadsStore.updateUpload(data)
+    op.value.toggle();
+  } catch(e) {
+    // eslint-disable-next-line no-console
+    console.error(e)
+  }
+}
+
+onMounted(async () => {
+  fetchUploads()
+})
 </script>
 
 
@@ -46,7 +57,7 @@ const uploadEdit = (event: any, data: any) => {
     v-if="uploads"
     :loading="loading"
     :uploads="uploads"
-    @upload-edit="(event, data) => uploadEdit(event, data)"
+    @upload-edit-show="(event, data) => uploadEditShow(event, data)"
     @uploading="visible = true"
   />
 
@@ -73,6 +84,9 @@ const uploadEdit = (event: any, data: any) => {
       </table>
     </div>
 
-    <UploadEditForm :upload="uploadData" />
+    <UploadEditForm
+      :upload="uploadData"
+      @submit="uploadEditSave"
+    />
   </Popover>
 </template>

@@ -50,8 +50,9 @@ const handleFileSelect = (e: Event) => {
 
 const isValidFileType = (file: File): boolean => {
   const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx']
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain',
+    'text/css', 'application/json', 'text/javascript', 'application/javascript', 'text/html']
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx', '.txt', '.css', '.json', '.js', '.html']
 
   // Check MIME type
   if (allowedTypes.includes(file.type)) {
@@ -181,7 +182,7 @@ const uploadFiles = async () => {
           Перетащите файлы сюда или нажмите для выбора
         </p>
         <p class="drop-hint">
-          Поддерживаемые форматы: JPG, PNG, PDF, DOC, DOCX
+          Поддерживаемые форматы: JPG, PNG, PDF, DOC, DOCX, TXT, CSS, JSON, JS, HTML
         </p>
       </div>
       <input

@@ -10,6 +10,7 @@ export default () => [
     help: "Имя сайта предназначено для отображения сайта по адресу: ИМЯ.d404.ru",
     resolver: zodResolver(
       z.string()
+        .trim()
         .min(4, { message: 'Минимальная длина 4 символа' })
         .max(32, { message: 'Максимальная длина 32 символа' })
         .refine((value:string) => regs.domainPart.test(value), {

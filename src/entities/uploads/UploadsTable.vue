@@ -16,7 +16,7 @@ const { uploads } = defineProps<{
 
 const emits = defineEmits([
   "uploading",
-  "uploadEdit",
+  "uploadEditShow",
 ]);
 
 const items = computed(() => {
@@ -37,7 +37,7 @@ const uploading = () => {
 };
 
 const uploadEdit = (event: any, data: any) => {
-  emits('uploadEdit', event, data);
+  emits('uploadEditShow', event, data);
 };
 
 const download = ({ uuid, name }: { uuid: string, name: string }) => {

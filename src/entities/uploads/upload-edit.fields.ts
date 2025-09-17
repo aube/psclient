@@ -8,8 +8,10 @@ export default () => [
     label: "Публичная ссылка",
     resolver: zodResolver(
       z.string()
-        .min(2, { message: 'Минимальная длина 2 символа' })
-        .max(512, { message: 'Максимальная длина 512 символа' })
+        .trim()
+        .refine(val => val === "" || (val.length >= 2 && val.length <= 512), {
+          message: "От 2 до 512 символов",
+        })
     ),
   },
   {
@@ -18,6 +20,7 @@ export default () => [
     label: "Категория",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
   },
@@ -27,6 +30,7 @@ export default () => [
     label: "Описание или метаданные",
     resolver: zodResolver(
       z.string()
+        .trim()
         .max(1024, { message: 'Максимальная длина 1024 символа' })
     ),
   },

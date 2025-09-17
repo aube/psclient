@@ -9,6 +9,7 @@ export default (formData : Record<string,string>) => [
     label: "Имя",
     resolver: zodResolver(
       z.string()
+        .trim()
         .min(4, { message: 'Минимальная длина 4 символа' })
         .max(32, { message: 'Максимальная длина 32 символа' })
         .refine((value:string) => regs.username.test(value), {
@@ -31,6 +32,7 @@ export default (formData : Record<string,string>) => [
     label: "Пароль",
     resolver: zodResolver(
       z.string()
+        .trim()
         .min(4, { message: 'Минимальная длина 6 символов' })
         .max(32, { message: 'Максимальная длина 32 символа' })
     ),
