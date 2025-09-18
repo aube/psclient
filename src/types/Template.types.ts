@@ -3,6 +3,8 @@ export interface Template {
   site_id: number;
   name: string;
   html: string;
+  title: string;
+  description: string;
   css: string;
   json: string;
   created_at: Date;

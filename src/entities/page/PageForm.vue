@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import ComControls from '../../components/ComControls.vue';
-import { Page } from '../../types/Page.types';
+import { Page } from '../../types';
 import getPageFields from './page.fields'
+import { useTemplatesStore } from '../../stores/templates';
+
+const templatesStore = useTemplatesStore()
 
 const emits = defineEmits(['submit'])
 
@@ -11,7 +14,7 @@ const { page } = defineProps<{
 }>()
 
 const isLoading = ref(false)
-const formFields = ref(getPageFields());
+const formFields = ref(getPageFields(templatesStore.selectOptions));
 
 const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<string, any>}) => {
   if (!valid) {

@@ -1,7 +1,8 @@
+import { Options } from '../../types'
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 
-export default () => [
+export default (templatesOptions: Options = []) => [
   {
     type: "input",
     name: "h1",
@@ -48,10 +49,11 @@ export default () => [
     ),
   },
   {
-    type: "input",
+    type: "select",
     name: "template",
     label: "Шаблон",
     help: "Шаблон вёрстки полной страницы",
+    options: templatesOptions,
     resolver: zodResolver(
       z.string()
         .trim()
@@ -65,10 +67,11 @@ export default () => [
     label: "Содержимое страницы",
   },
   {
-    type: "input",
+    type: "select",
     name: "template_anons",
     label: "Шаблон анонса",
     help: "Шаблон анонса страницы для вывода в списках страниц",
+    options: templatesOptions,
     resolver: zodResolver(
       z.string()
         .trim()

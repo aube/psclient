@@ -101,15 +101,15 @@ const handleChange = async (name, value) => {
         />
 
         <!-- Select -->
-        <Dropdown
+        <Select
           v-else-if="field.type === 'select'"
           :id="field.name"
           v-model="formData[field.name]"
           class="w-full"
           :disabled="field.disabled"
           :invalid="Boolean(errors[field.name])"
-          option-label="name"
-          option-value="code"
+          option-label="label"
+          option-value="value"
           :options="field.options"
           :placeholder="'Select ' + field.label"
           @update:model-value="handleChange(field.name, $event)"
@@ -124,8 +124,8 @@ const handleChange = async (name, value) => {
           :disabled="field.disabled"
           dropdown
           :invalid="Boolean(errors[field.name])"
-          option-label="name"
-          option-value="code"
+          option-label="label"
+          option-value="value"
           :placeholder="'AutoComplete ' + field.label"
           :suggestions="autoCompleteOptions[field.name]"
           @complete="autoCompleteFilter(field.name)"

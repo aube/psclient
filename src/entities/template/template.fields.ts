@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { regs } from '../../lib/utils'
 
 export default () => [
-  {
+  [{
     type: "input",
     name: "name",
-    label: "Имя шаблона",
+    label: "Системное имя",
     resolver: zodResolver(
       z.string()
         .trim()
@@ -24,23 +24,33 @@ export default () => [
     ),
   },
   {
+    type: "input",
+    name: "title",
+    label: "Название",
+  },
+  {
+    type: "textarea",
+    name: "description",
+    label: "Описание",
+  }],
+  [{
     type: "textarea",
     name: "html",
     label: "HTML разметка",
-  },
-  {
+  }],
+  [{
     type: "textarea",
     name: "json",
     label: "JSON структура полей",
-  },
-  {
+  }],
+  [{
     type: "textarea",
     name: "css",
     label: "CSS",
-  },
-  {
+  }],
+  [{
     type: "textarea",
     name: "js",
     label: "javascript",
-  },
+  }],
 ]

@@ -5,3 +5,11 @@ export * from "./Image.types"
 export * from "./Pagination.types"
 export * from "./Template.types"
 export * from "./Upload.types"
+
+
+
+export interface Option {
+  value: string;
+  label: string;
+}
+export type Options = Option[]

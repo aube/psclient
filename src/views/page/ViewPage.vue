@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Page } from '../../types/Page.types.ts';
+import { Page } from '../../types';
 import { usePagesStore } from '../../stores/pages';
+import { useTemplatesStore } from '../../stores/templates';
 import { useRouter, useRoute } from 'vue-router'
 import PageForm from '../../entities/page/PageForm.vue';
 import { ref, onMounted } from 'vue'
 
 const pagesStore = usePagesStore()
+const templatesStore = useTemplatesStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -23,6 +25,7 @@ const onSubmit = async (formData: Page) => {
 }
 
 onMounted(async () => {
+  await templatesStore.fetchTemplates()
   page.value = await pagesStore.getPage(route.params.pageID as string)
 })
 </script>

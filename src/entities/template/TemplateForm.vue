@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import ComControls from '../../components/ComControls.vue';
 import { Template } from '../../types/Template.types';
 import { useTemplatesStore } from '../../stores/templates.ts';
-import getTemplateFields from './template-new.fields'
+import getTemplateFields from './template.fields'
 
 const emits = defineEmits(['submit'])
 
@@ -53,16 +53,66 @@ const onFormSubmit = async ({ valid, values }: {valid:boolean, values: Record<st
 
 <template>
   <Form
-    class="flex flex-col gap-4 w-full sm:w-156"
     :validate-on-blur="true"
     :validate-on-value-update="true"
     @submit="onFormSubmit"
   >
-    <ComControls
-      :data="template"
-      :errors="formErrors"
-      :fields="formFields"
-    />
+    <Tabs value="0">
+      <TabList>
+        <Tab value="0">
+          Шаблон
+        </Tab>
+        <Tab value="1">
+          HTML
+        </Tab>
+        <Tab value="2">
+          JSON
+        </Tab>
+        <Tab value="3">
+          CSS
+        </Tab>
+        <Tab value="4">
+          JS
+        </Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel value="0">
+          <ComControls
+            :data="template"
+            :errors="formErrors"
+            :fields="formFields[0]"
+          />
+        </TabPanel>
+        <TabPanel value="1">
+          <ComControls
+            :data="template"
+            :errors="formErrors"
+            :fields="formFields[1]"
+          />
+        </TabPanel>
+        <TabPanel value="2">
+          <ComControls
+            :data="template"
+            :errors="formErrors"
+            :fields="formFields[2]"
+          />
+        </TabPanel>
+        <TabPanel value="3">
+          <ComControls
+            :data="template"
+            :errors="formErrors"
+            :fields="formFields[3]"
+          />
+        </TabPanel>
+        <TabPanel value="4">
+          <ComControls
+            :data="template"
+            :errors="formErrors"
+            :fields="formFields[4]"
+          />
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
 
     <Button
       icon="pi pi-check"

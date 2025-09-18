@@ -95,7 +95,7 @@ watch(() => items, () => {
   </Popover>
 
   <Paginator
-    v-if="pagination?.total"
+    v-if="pagination && pagination.total > pagination.size"
     :page="pagination.page"
     :rows="pagination.size"
     :template="{

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useTemplateAPI } from '../api/rest/template.api';
-import { Template, Templates, TemplateNew, Pagination } from '../types';
+import { Template, Templates, TemplateNew, Pagination, Options } from '../types';
 import { useNotificationStore, loadNotifications } from './notification';
 
 
@@ -27,25 +27,24 @@ export const useTemplatesStore = defineStore('templates', {
   }),
 
   getters: {
-    selectOptions(state) {
+    selectOptions(state):Options {
       return [
         {
-          name: "text",
-          value: "Plain Text",
+          label: "Текст",
+          value: "default",
         },
         {
-          name: "html",
+          label: "HTML-страница",
           value: "HTML",
         },
         ...state.templates.map(item => ({
-          name: item.name,
+          label: item.title,
           value: item.name,
         })),
-        {
-          name: "md",
-          value: "Markdown",
-          disabled: true,
-        },
+        // {
+        //   label: "md",
+        //   value: "Markdown",
+        // },
       ]
     },
   },

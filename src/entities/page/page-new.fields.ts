@@ -17,17 +17,6 @@ export default () => [
   },
   {
     type: "input",
-    name: "title",
-    label: "Заголовок (title)",
-    help: "Выводится в окне браузера или вкладке",
-    resolver: zodResolver(
-      z.string()
-        .trim()
-        .max(1024, { message: 'Максимальная длина 1024 символа' })
-    ),
-  },
-  {
-    type: "input",
     name: "name",
     label: "Имя страницы",
     help: "Внимание! Имя страницы устанавливается только при её создании",
@@ -45,67 +34,6 @@ export default () => [
         .refine((value:string) => !value || regs.alphadigits.test(value.slice(-1)), {
           message: 'Последний знак только латинские символы и числа',
         })
-    ),
-  },
-  {
-    type: "input",
-    name: "menu",
-    label: "Название в меню",
-    help: "Текст ссылки на страницу",
-    resolver: zodResolver(
-      z.string()
-        .trim()
-        .max(64, { message: 'Максимальная длина 64 символа' })
-    ),
-  },
-  {
-    type: "input",
-    name: "tags",
-    label: "Тэги",
-    help: "Список тэгов разделённых запятыми",
-    resolver: zodResolver(
-      z.string()
-        .trim()
-        .max(64, { message: 'Максимальная длина 64 символа' })
-    ),
-  },
-  {
-    type: "input",
-    name: "template",
-    label: "Шаблон",
-    help: "Шаблон вёрстки полной страницы",
-    resolver: zodResolver(
-      z.string()
-        .trim()
-        .max(32, { message: 'Максимальная длина 32 символа' })
-    ),
-  },
-
-  {
-    type: "textarea",
-    name: "content",
-    label: "Содержимое страницы",
-  },
-  {
-    type: "input",
-    name: "template_anons",
-    label: "Шаблон анонса",
-    help: "Шаблон анонса страницы для вывода в списках страниц",
-    resolver: zodResolver(
-      z.string()
-        .trim()
-        .max(32, { message: 'Максимальная длина 32 символа' })
-    ),
-  },
-  {
-    type: "textarea",
-    name: "anons",
-    label: "Анонс содержимого",
-    help: "Выводится в списках страниц",
-    resolver: zodResolver(
-      z.string()
-        .trim()
-        .max(1024, { message: 'Максимальная длина 1024 символа' })
     ),
   },
 ]
