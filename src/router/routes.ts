@@ -31,17 +31,17 @@ export const routes = [
       {
         path: 'templates',
         name: 'templates',
-        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPages.vue'),
+        component: (): Promise<typeof import('*.vue')> => import('../views/template/ViewTemplates.vue'),
       },
       {
-        path: 'templates/:templateID',
+        path: 'template/:templateID',
         name: 'template',
-        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPage.vue'),
+        component: (): Promise<typeof import('*.vue')> => import('../views/template/ViewTemplate.vue'),
       },
       {
-        path: 'templates/new',
+        path: 'template/new',
         name: 'templateNew',
-        component: (): Promise<typeof import('*.vue')> => import('../views/page/ViewPageNew.vue'),
+        component: (): Promise<typeof import('*.vue')> => import('../views/template/ViewTemplateNew.vue'),
       },
       {
         path: 'settings',

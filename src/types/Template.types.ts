@@ -20,3 +20,5 @@ export interface TemplateUpdate extends Partial<Omit<Template, 'id' | 'site_id'>
   id: number;
   site_id: number;
 }
+
+export type Templates = Template[]

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { usePagesStore } from '../../stores/pages';
+import { useTemplatesStore } from '../../stores/templates';
 import { onMounted,ref } from 'vue';
-import PagesList from '../../entities/page/PagesList.vue';
+import TemplatesList from '../../entities/template/TemplatesList.vue';
 
-const pagesStore = usePagesStore()
-const pages = ref()
+const templatesStore = useTemplatesStore()
+const templates = ref()
 const pagination = ref()
 
 onMounted(async () => {
-  await pagesStore.fetchPages();
-  pages.value = pagesStore.pages;
-  pagination.value = pagesStore.pagination;
+  await templatesStore.fetchTemplates();
+  templates.value = templatesStore.templates;
+  pagination.value = templatesStore.pagination;
 })
 
 </script>
@@ -19,13 +19,13 @@ onMounted(async () => {
   <div
     class="p-3"
   >
-    <PagesList
-      v-if="pages"
-      :items="pages"
+    <TemplatesList
+      v-if="templates"
+      :items="templates"
       :pagination="pagination"
     />
   </div>
-  <RouterLink :to="{name:'pageNew'}">
+  <RouterLink :to="{name:'templateNew'}">
     <Button
       aria-label="Search"
       rounded
@@ -33,7 +33,7 @@ onMounted(async () => {
       :style="{ position: 'absolute', right: '1rem', bottom: '1rem' }"
       variant="outlined"
     >
-      <img src="/ss-logo.svg"> добавить страницу
+      <img src="/ss-logo.svg"> добавить шаблон
     </Button>
   </RouterLink>
 </template>
