@@ -2,9 +2,9 @@
 <script setup lang="ts">
 import { useUploadsStore } from '../../stores/uploads';
 import { onMounted, ref } from 'vue';
-import UploadForm from '../../entities/uploads/UploadForm.vue';
-import UploadsTable from '../../entities/uploads/UploadsTable.vue';
-import UploadEditForm from '../../entities/uploads/UploadEditForm.vue';
+import FileUploadForm from '../../entities/upload/FileUploadForm.vue';
+import UploadsTable from '../../entities/upload/UploadsTable.vue';
+import UploadEditForm from '../../entities/upload/UploadEditForm.vue';
 
 import Dialog from 'primevue/dialog';
 
@@ -68,7 +68,7 @@ onMounted(async () => {
     position="topright"
   >
     <template #container>
-      <UploadForm @uploaded="handleUploaded" />
+      <FileUploadForm @uploaded="handleUploaded" />
     </template>
   </Dialog>
 

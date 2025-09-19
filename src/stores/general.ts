@@ -1,18 +1,19 @@
 import { defineStore } from 'pinia'
 import { name, version } from '../../package.json'
+import { ActionButton } from '../types'
 
-export const useGeneralStore = defineStore('general', () => {
+const MODE = import.meta.env.MODE;
+const PROD = import.meta.env.PROD;
+const DEV = import.meta.env.DEV;
+const SSR = import.meta.env.SSR;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const APP_NAVBAR_NAME = import.meta.env.VITE_APP_NAVBAR_NAME;
+const APP_TITLE_NAME = import.meta.env.VITE_APP_TITLE_NAME;
+const APP_LANG = import.meta.env.VITE_APP_LANG;
 
-  const MODE = import.meta.env.MODE;
-  const PROD = import.meta.env.PROD;
-  const DEV = import.meta.env.DEV;
-  const SSR = import.meta.env.SSR;
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const APP_NAVBAR_NAME = import.meta.env.VITE_APP_NAVBAR_NAME;
-  const APP_TITLE_NAME = import.meta.env.VITE_APP_TITLE_NAME;
-  const APP_LANG = import.meta.env.VITE_APP_LANG;
 
-  const app = {
+export const useGeneralStore = defineStore('general', {
+  state: () => ({
     name,
     version,
     mode: MODE,
@@ -24,13 +25,20 @@ export const useGeneralStore = defineStore('general', () => {
     navbarName: APP_NAVBAR_NAME || name,
     titleName: APP_TITLE_NAME || name,
     lang: APP_LANG || 'ru',
-  }
+    actionButtons: [] as ActionButton[],
+  }),
 
-  if (app.isDev && app.isBrowser) {
-    // eslint-disable-next-line no-console
-    console.log("app settings", app);
-  }
+  getters: {
+    gActionButtons: (state) => {
+      return state.actionButtons
+    },
+  },
 
-  return app
-
-})
+  actions: {
+    setActionButtons(btns: ActionButton[] = []) {
+      console.log(btns)
+      this.actionButtons = btns
+    },
+  },
+}
+)

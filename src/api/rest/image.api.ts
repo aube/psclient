@@ -1,12 +1,12 @@
 import { useRestApi } from '../../lib/restapi.js'
-import { Upload, UploadNew, Uploads, Pagination } from '../../types'
+import { Image, ImageNew, Images, Pagination } from '../../types'
 
 const { get, put, post, del, download } = useRestApi()
 
-export const useUploadAPI = () => {
+export const useImageAPI = () => {
 
-  const create = async (formData: UploadNew): Promise<Upload> => {
-    const response = await post<Upload>('/api/v1/upload', formData)
+  const create = async (formData: ImageNew): Promise<Image> => {
+    const response = await post<Image>('/api/v1/image', formData)
     if (!response.data) {
       if (response.error)
         throw Error(response.error)
@@ -16,8 +16,8 @@ export const useUploadAPI = () => {
     return response.data
   }
 
-  const update = async (formData: Upload): Promise<Upload> => {
-    const response = await put<Upload>('/api/v1/upload', formData)
+  const update = async (formData: Image): Promise<Image> => {
+    const response = await put<Image>('/api/v1/image', formData)
     if (!response.data) {
       if (response.error)
         throw Error(response.error)
@@ -27,12 +27,12 @@ export const useUploadAPI = () => {
     return response.data
   }
 
-  const downloadFile = async (uuid: string, filename: string) => {
-    await download('/api/v1/upload?uuid=' + uuid, filename)
+  const downloadImage = async (uuid: string, filename: string) => {
+    await download('/api/v1/image?uuid=' + uuid, filename)
   }
 
   const remove = async (id: number): Promise<boolean> => {
-    const response = await del<Upload>('/api/v1/upload/' + id)
+    const response = await del<Image>('/api/v1/image/' + id)
     if (!response) {
       throw Error("deletion error")
     }
@@ -40,8 +40,8 @@ export const useUploadAPI = () => {
   }
 
 
-  const list = async (): Promise<{rows:Uploads; pagination:Pagination}> => {
-    const response = await get<{rows:Uploads; pagination:Pagination}>('/api/v1/uploads')
+  const list = async (): Promise<{rows:Images; pagination:Pagination}> => {
+    const response = await get<{rows:Images; pagination:Pagination}>('/api/v1/images')
     if (!response.data) {
       if (response.error)
         throw Error(response.error)
@@ -53,7 +53,7 @@ export const useUploadAPI = () => {
 
   return {
     create,
-    downloadFile,
+    downloadImage,
     update,
     remove,
     list,

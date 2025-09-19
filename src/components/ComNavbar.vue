@@ -1,12 +1,10 @@
 <script setup>
 
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useRouter, useRoute } from "vue-router"
+import { useGeneralStore } from '../stores/general'
 
-import {
-  updatePrimaryPalette,
-  palette,
-} from '@primeuix/themes';
+const generalStore = useGeneralStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -28,33 +26,32 @@ const menu = [
   //   link: "users",
   // },
   {
-    label: 'Uploads',
-    icon: 'pi pi-cloud-upload',
+    label: 'Images',
+    icon: 'pi pi-image',
+    link: "uploads/images",
+  },
+  {
+    label: 'Site',
+    // icon: 'pi pi-cloud-upload',
     items: [
       {
-        label: 'Images',
-        icon: 'pi pi-image',
-        link: "uploads/images",
+        label: 'Settings',
+        icon: 'pi pi-cog',
+        link: "settings",
       },
       {
-        label: 'Files',
+        label: 'Uploads',
         icon: 'pi pi-file',
         link: "uploads/files",
       },
+      {
+        label: 'Templates',
+        icon: 'pi pi-code',
+        link: "templates",
+      },
     ],
   },
-  {
-    label: 'Templates',
-    icon: 'pi pi-code',
-    link: "templates",
-  },
-  {
-    label: 'Settings',
-    icon: 'pi pi-cog',
-    link: "settings",
-  },
 ]
-
 
 const items = computed(() => {
   if (!route.params.siteName) {
@@ -84,61 +81,6 @@ const items = computed(() => {
   return menu.map(getMenuItem)
 })
 
-
-function darkToggle(e) {
-  const html = document.body.parentNode
-  const isDark = html.className === "p-dark"
-
-  e.target.className = e.target.className.replace(
-    isDark ? "pi-sun" : "pi-moon",
-    isDark ? "pi-moon" : "pi-sun",
-  )
-
-  html.className = isDark ? "" : "p-dark"
-}
-
-const getNextColorPalette = (() => {
-
-  // https://primevue.org/theming/styled/#Palette
-
-  const colors = ['{red}', '#696969', '{yellow}', '{indigo}', '#10b981', '{gray}']
-  let c = 'red'
-  return function() {
-    const idx = colors.findIndex(i => i === c)
-    c = colors[idx + 1] || colors[0]
-    return palette(c);
-  }
-})()
-
-// change current theme to next
-const paletteToggle = () => {
-  const values = getNextColorPalette();
-  updatePrimaryPalette(values);
-}
-
-const rightButtons = ref([
-  {
-    ariaLabel: "Light mode",
-    icon: "pi pi-moon",
-    rounded: true,
-    severity: "secondary",
-    click: darkToggle,
-  },
-  {
-    ariaLabel: "Palette togle",
-    icon: "pi pi-palette",
-    rounded: true,
-    severity: "secondary",
-    click: paletteToggle,
-  },
-  {
-    ariaLabel: "Profile",
-    icon: "pi pi-user",
-    rounded: true,
-    severity: "secondary",
-    click: () => router.push('/profile'),
-  },
-])
 
 </script>
 
@@ -194,7 +136,7 @@ const rightButtons = ref([
             type="text"
           /> -->
           <Button
-            v-for="btn, idx in rightButtons"
+            v-for="btn, idx in generalStore.actionButtons"
             :key="idx"
             :aria-label="btn.ariaLabel"
             :icon="btn.icon"

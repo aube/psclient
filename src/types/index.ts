@@ -13,3 +13,11 @@ export interface Option {
   label: string;
 }
 export type Options = Option[]
+
+export interface ActionButton {
+    ariaLabel: string;
+    icon: string;
+    rounded: boolean;
+    severity: string;
+    click: (...args: any[]) => void;
+}

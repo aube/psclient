@@ -3,6 +3,7 @@ export interface Image {
   site_id: number;
   user_id: number;
   name: string;
+  url: string;
   category: string;
   size: string;
   content_type: string;

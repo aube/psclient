@@ -52,3 +52,31 @@ i:not(.pi) {
 .doc-table tr td:first-child {
   padding-inline: 0rem !important;
 }
+
+
+
+/* 1:1 (квадрат) */
+.img-square {
+  aspect-ratio: 1 / 1;
+}
+
+/* 16:9 (ландшафт) */
+.img-landscape {
+  aspect-ratio: 16 / 9;
+}
+
+/* 4:3 (стандарт) */
+.img-standard {
+  aspect-ratio: 4 / 3;
+}
+
+/* 9:16 (портрет) */
+.img-portrait {
+  aspect-ratio: 9 / 16;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
