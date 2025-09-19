@@ -139,8 +139,10 @@ const items = computed(() => {
             v-for="btn, idx in generalStore.actionButtons"
             :key="idx"
             :aria-label="btn.ariaLabel"
+            :disabled="btn.disabled"
             :icon="btn.icon"
-            :rounded="btn.rounded"
+            :label="btn.label"
+            rounded
             :severity="btn.severity"
             @click="btn.click"
           />

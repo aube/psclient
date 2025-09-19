@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { usePagesStore } from '../../stores/pages';
-import { onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router'
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+import { useGeneralStore } from '../../stores/general'
+
 import PagesList from '../../entities/page/PagesList.vue';
 
+const generalStore = useGeneralStore()
 const pagesStore = usePagesStore()
+
 const route = useRoute()
+const router = useRouter()
 
 const pages = ref()
 const pagination = ref()
@@ -16,13 +21,33 @@ const fetchPages = async () => {
   pagination.value = pagesStore.pagination;
 }
 
+function setButtons() {
+  generalStore.setActionButtons([
+    {
+      ariaLabel: "Add page",
+      label: "Add page",
+      icon: "pi pi-plus",
+      severity: "primary",
+      click: () => router.push(
+        { name:'pageNew', params: { parentID: route.params.parentID }}
+      ),
+    },
+  ])
+}
+
 onMounted(async () => {
   fetchPages()
+  setButtons()
+})
+
+onUnmounted(() => {
+  generalStore.setActionButtons([])
 })
 
 watch(() => route.params.parentID, () => {
   fetchPages()
 })
+
 
 </script>
 

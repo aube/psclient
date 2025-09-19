@@ -1,77 +1,49 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useSitesStore } from '../stores/sites';
 import { useGeneralStore } from '../stores/general'
-import {
-  updatePrimaryPalette,
-  palette,
-} from '@primeuix/themes';
+import { darkToggle, paletteToggle } from '../lib'
 
 import SitesList from '../entities/site/SitesList.vue'
 
 const generalStore = useGeneralStore()
 const sitesStore = useSitesStore()
 
+const router = useRouter()
+
 const sites = ref([])
 
-function darkToggle(e: any) {
-  const html = document.body.parentNode as any
-  const isDark = html?.className === "p-dark"
-
-  e.target.className = e.target.className.replace(
-    isDark ? "pi-sun" : "pi-moon",
-    isDark ? "pi-moon" : "pi-sun",
-  )
-
-  html.className = isDark ? "" : "p-dark"
+function setButtons() {
+  generalStore.setActionButtons([
+    {
+      ariaLabel: "Light mode",
+      icon: "pi pi-moon",
+      rounded: true,
+      severity: "secondary",
+      click: darkToggle,
+    },
+    {
+      ariaLabel: "Palette togle",
+      icon: "pi pi-palette",
+      rounded: true,
+      severity: "secondary",
+      click: paletteToggle,
+    },
+    {
+      ariaLabel: "Profile",
+      icon: "pi pi-user",
+      rounded: true,
+      severity: "secondary",
+      click: () => router.push({ name:'profile' }),
+    },
+  ])
 }
-
-const getNextColorPalette = (() => {
-
-  // https://primevue.org/theming/styled/#Palette
-
-  const colors = ['{red}', '#696969', '{yellow}', '{indigo}', '#10b981', '{gray}']
-  let c = 'red'
-  return function() {
-    const idx = colors.findIndex(i => i === c)
-    c = colors[idx + 1] || colors[0]
-    return palette(c);
-  }
-})()
-
-// change current theme to next
-const paletteToggle = () => {
-  const values = getNextColorPalette();
-  updatePrimaryPalette(values);
-}
-
-generalStore.setActionButtons([
-  {
-    ariaLabel: "Light mode",
-    icon: "pi pi-moon",
-    rounded: true,
-    severity: "secondary",
-    click: darkToggle,
-  },
-  {
-    ariaLabel: "Palette togle",
-    icon: "pi pi-palette",
-    rounded: true,
-    severity: "secondary",
-    click: paletteToggle,
-  },
-  {
-    ariaLabel: "Profile",
-    icon: "pi pi-user",
-    rounded: true,
-    severity: "secondary",
-    click: () => router.push('/profile'),
-  },
-])
 
 onMounted(async () => {
   const t = await sitesStore.listSites()
   sites.value = t.rows
+  setButtons()
 })
 
 </script>

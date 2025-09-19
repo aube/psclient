@@ -36,7 +36,6 @@ export const useGeneralStore = defineStore('general', {
 
   actions: {
     setActionButtons(btns: ActionButton[] = []) {
-      console.log(btns)
       this.actionButtons = btns
     },
   },
