@@ -15,7 +15,6 @@ const { uploads } = defineProps<{
 }>();
 
 const emits = defineEmits([
-  "uploading",
   "uploadEditShow",
 ]);
 
@@ -31,10 +30,6 @@ const items = computed(() => {
     }
   })
 })
-
-const uploading = () => {
-  emits('uploading');
-};
 
 const uploadEdit = (event: any, data: any) => {
   emits('uploadEditShow', event, data);
@@ -54,17 +49,6 @@ const download = ({ uuid, name }: { uuid: string, name: string }) => {
       table-style="min-width: 50rem"
       :value="items"
     >
-      <template #header>
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xl font-bold">Uploads</span>
-          <Button
-            icon="pi pi-cloud-upload"
-            raised
-            rounded
-            @click="uploading"
-          />
-        </div>
-      </template>
       <Column
         field="file"
         header="File"

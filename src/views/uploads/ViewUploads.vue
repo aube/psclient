@@ -1,13 +1,15 @@
 
 <script setup lang="ts">
 import { useUploadsStore } from '../../stores/uploads';
-import { onMounted, ref } from 'vue';
-import FileUploadForm from '../../entities/upload/FileUploadForm.vue';
-import UploadsTable from '../../entities/upload/UploadsTable.vue';
-import UploadEditForm from '../../entities/upload/UploadEditForm.vue';
+import { useGeneralStore } from '../../stores/general'
+import { onMounted, onUnmounted, ref } from 'vue';
+import FileUploadForm from '../../entities/uploads/FileUploadForm.vue';
+import UploadsTable from '../../entities/uploads/UploadsTable.vue';
+import UploadEditForm from '../../entities/uploads/UploadEditForm.vue';
 
 import Dialog from 'primevue/dialog';
 
+const generalStore = useGeneralStore()
 const uploadsStore = useUploadsStore()
 
 const uploads = ref()
@@ -46,8 +48,25 @@ const uploadEditSave = async (data: any) => {
   }
 }
 
+function setButtons() {
+  generalStore.setActionButtons([
+    {
+      ariaLabel: "Add upload",
+      label: "Add upload",
+      icon: "pi pi-plus",
+      severity: "primary",
+      click: () => visible.value = true,
+    },
+  ])
+}
+
 onMounted(async () => {
   fetchUploads()
+  setButtons()
+})
+
+onUnmounted(() => {
+  generalStore.setActionButtons([])
 })
 </script>
 
@@ -58,7 +77,6 @@ onMounted(async () => {
     :loading="loading"
     :uploads="uploads"
     @upload-edit-show="(event, data) => uploadEditShow(event, data)"
-    @uploading="visible = true"
   />
 
   <Dialog

@@ -1,13 +1,15 @@
 
 <script setup lang="ts">
 import { useImagesStore } from '../../stores/images';
-import { onMounted, ref } from 'vue';
+import { useGeneralStore } from '../../stores/general'
+import { onMounted, onUnmounted, ref } from 'vue';
 import ImageUploadForm from '../../entities/image/ImageUploadForm.vue';
 import ImagesList from '../../entities/image/ImagesList.vue';
 import ImageEditForm from '../../entities/image/ImageEditForm.vue';
 
 import Dialog from 'primevue/dialog';
 
+const generalStore = useGeneralStore()
 const imagesStore = useImagesStore()
 
 const images = ref()
@@ -46,8 +48,25 @@ const imageEditSave = async (data: any) => {
   }
 }
 
+function setButtons() {
+  generalStore.setActionButtons([
+    {
+      ariaLabel: "Add image",
+      label: "Add image",
+      icon: "pi pi-plus",
+      severity: "primary",
+      click: () => visible.value = true,
+    },
+  ])
+}
+
 onMounted(async () => {
   fetchImages()
+  setButtons()
+})
+
+onUnmounted(() => {
+  generalStore.setActionButtons([])
 })
 </script>
 

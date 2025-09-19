@@ -48,19 +48,14 @@ export const routes = [
         component: (): Promise<typeof import('*.vue')> => import('../views/site/ViewSiteSettings.vue'),
       },
       {
-        path: 'uploads',
-        children: [
-          {
-            path: 'files',
-            name: 'files',
-            component: (): Promise<typeof import('*.vue')> => import('../views/uploads/ViewUpload.vue'),
-          },
-          {
-            path: 'images',
-            name: 'images',
-            component: (): Promise<typeof import('*.vue')> => import('../views/images/ViewImage.vue'),
-          },
-        ],
+        path: 'files',
+        name: 'files',
+        component: (): Promise<typeof import('*.vue')> => import('../views/uploads/ViewUploads.vue'),
+      },
+      {
+        path: 'images',
+        name: 'images',
+        component: (): Promise<typeof import('*.vue')> => import('../views/images/ViewImages.vue'),
       },
       {
         path: 'users',

@@ -61,16 +61,5 @@ watch(() => route.params.parentID, () => {
       :pagination="pagination"
     />
   </div>
-  <RouterLink :to="{name:'pageNew', params: {parentID: route.params.parentID}}">
-    <Button
-      aria-label="Search"
-      rounded
-      severity="secondary"
-      :style="{ position: 'absolute', right: '1rem', bottom: '1rem' }"
-      variant="outlined"
-    >
-      <img src="/ss-logo.svg"> добавить страницу
-    </Button>
-  </RouterLink>
 </template>
 

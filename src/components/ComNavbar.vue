@@ -28,7 +28,7 @@ const menu = [
   {
     label: 'Images',
     icon: 'pi pi-image',
-    link: "uploads/images",
+    link: "images",
   },
   {
     label: 'Site',
@@ -42,7 +42,7 @@ const menu = [
       {
         label: 'Uploads',
         icon: 'pi pi-file',
-        link: "uploads/files",
+        link: "files",
       },
       {
         label: 'Templates',

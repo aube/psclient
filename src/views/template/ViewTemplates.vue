@@ -1,18 +1,45 @@
 <script setup lang="ts">
 import { useTemplatesStore } from '../../stores/templates';
-import { onMounted,ref } from 'vue';
+import { onMounted, onUnmounted,ref } from 'vue';
+import { useRouter } from 'vue-router'
+import { useGeneralStore } from '../../stores/general'
 import TemplatesList from '../../entities/template/TemplatesList.vue';
 
+const router = useRouter()
+
+const generalStore = useGeneralStore()
 const templatesStore = useTemplatesStore()
 const templates = ref()
 const pagination = ref()
 
-onMounted(async () => {
+const fetchTemplates = async () => {
   await templatesStore.fetchTemplates();
   templates.value = templatesStore.templates;
   pagination.value = templatesStore.pagination;
+}
+
+function setButtons() {
+  generalStore.setActionButtons([
+    {
+      ariaLabel: "Add template",
+      label: "Add template",
+      icon: "pi pi-plus",
+      severity: "primary",
+      click: () => router.push(
+        { name:'templateNew' }
+      ),
+    },
+  ])
+}
+
+onMounted(async () => {
+  fetchTemplates()
+  setButtons()
 })
 
+onUnmounted(() => {
+  generalStore.setActionButtons([])
+})
 </script>
 
 <template>
@@ -25,16 +52,5 @@ onMounted(async () => {
       :pagination="pagination"
     />
   </div>
-  <RouterLink :to="{name:'templateNew'}">
-    <Button
-      aria-label="Search"
-      rounded
-      severity="secondary"
-      :style="{ position: 'absolute', right: '1rem', bottom: '1rem' }"
-      variant="outlined"
-    >
-      <img src="/ss-logo.svg"> добавить шаблон
-    </Button>
-  </RouterLink>
 </template>
 
