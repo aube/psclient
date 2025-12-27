@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log*
+pnpm-debug.log*
+.git
+.gitignore
+README.md
+.env
+.env.*
+.nyc_output
+coverage
+.dockerignore
+Dockerfile
+dist
+# Кэш pnpm
+.pnpm-store

@@ -1,56 +1,86 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import tailwindcss from '@tailwindcss/vite'
-import Components from 'unplugin-vue-components/vite';
-import AutoImport from 'unplugin-auto-import/vite'
-import { PrimeVueResolver } from '@primevue/auto-import-resolver';
 
-export default defineConfig({
+// export default defineConfig({
+//   plugins: [
+//     vue({
+//       template: {
+//         transformAssetUrls: false, // полностью отключаем
+//         // transformAssetUrls: { img: []}, // отключаем для изображений
+
+//       },
+//     }),
+//     {
+//       name: 'ignore-assets',
+//       resolveId(source) {
+//         // Игнорируем импорты изображений
+//         if (source.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) {
+//           return { id: source, external: true }
+//         }
+//       },
+//     },
+//   ],
+//   build: {
+//     rollupOptions: {
+//       external: [
+//         /\.(png|jpg|jpeg|gif|svg|webp)$/i,
+//       ],
+//     },
+//   },
+//   // resolve: {
+//   //   alias: {
+//   //     vue: 'vue/dist/vue.esm-bundler.js',
+//   //   },
+//   // },
+// })
+
+
+
+// eslint-disable-next-line no-undef
+const isProduction = process.env.NODE_ENV === 'production'
+
+const config = {
   plugins: [
-    vue(),
-    tailwindcss(),
+    vue({
+      template: {
+        transformAssetUrls: false, // полностью отключаем
+        // transformAssetUrls: { img: []}, // отключаем для изображений
 
-    // PrimeVue autoimport and tree shaking
-    Components({
-      resolvers: [
-        PrimeVueResolver(),
-      ],
-    }),
-
-    AutoImport({
-      imports: [
-        'vue',
-        'pinia',
-        {
-          from: 'vue',
-          imports: [
-            'ref',
-            'computed',
-            'reactive',
-            'onMounted',
-            'onUnmounted',
-            'watch',
-            'watchEffect',
-            'nextTick',
-            'defineProps',
-            'defineEmits',
-            'defineExpose',
-            'withDefaults',
-          ],
-          type: true,
-        },
-      ],
-      dts: true, // генерация файла типов
-      eslintrc: {
-        enabled: true, // генерация конфига для eslint
       },
     }),
-
+    {
+      name: 'ignore-assets',
+      resolveId(source) {
+        // Игнорируем импорты изображений
+        if (source.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)) {
+          return { id: source, external: true }
+        }
+      },
+    },
   ],
+  build: {
+    rollupOptions: {
+      external: [
+        /\.(png|jpg|jpeg|gif|svg|webp)$/i,
+      ],
+    },
+  },
+} as any
 
-  // resolve: {
-  //   alias: {
-  //     vue: 'vue/dist/vue.esm-bundler.js',
-  //   },
-  // },
-})
+
+if (!isProduction) {
+  config.server = {
+    host: '0.0.0.0',
+    port: 8090,
+    strictPort: true,
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
+    hmr: {
+      port: 24677,
+    },
+  }
+}
+
+export default defineConfig(config)

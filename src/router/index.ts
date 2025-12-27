@@ -1,6 +1,6 @@
 import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import { routes } from './routes'
-import { guestGuard, activeSiteSelector } from './hooks'
+import { pageDataRequester } from './hooks'
 
 const history = import.meta.env.SSR
   ? createMemoryHistory()
@@ -11,7 +11,7 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(guestGuard)
-router.beforeEach(activeSiteSelector)
+// router.beforeEach(guestGuard)
+router.beforeEach(pageDataRequester)
 
 export default router

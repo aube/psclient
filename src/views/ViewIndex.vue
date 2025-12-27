@@ -1,70 +1,88 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useSitesStore } from '../stores/sites';
-import { useGeneralStore } from '../stores/general'
-import { darkToggle, paletteToggle } from '../lib'
+<script setup>
+import { ref, onMounted, compile } from 'vue';
+import { createApp, onUnmounted } from 'vue'
+import { usePagesStore } from '../stores/pages'
 
-import SitesList from '../entities/site/SitesList.vue'
 
-const generalStore = useGeneralStore()
-const sitesStore = useSitesStore()
+const pagesStore = usePagesStore()
+const container = ref(null)
+let app = null
 
-const router = useRouter()
+const compileAndMount = async (template, props = {}) => {
+  if (app) {
+    app.unmount()
+  }
 
-const sites = ref([])
+  try {
+    // Компиляция шаблона с помощью Vue compile функции
+    const render = compile(template)
 
-function setButtons() {
-  generalStore.setActionButtons([
-    {
-      ariaLabel: "Light mode",
-      icon: "pi pi-moon",
-      rounded: true,
-      severity: "secondary",
-      click: darkToggle,
-    },
-    {
-      ariaLabel: "Palette togle",
-      icon: "pi pi-palette",
-      rounded: true,
-      severity: "secondary",
-      click: paletteToggle,
-    },
-    {
-      ariaLabel: "Profile",
-      icon: "pi pi-user",
-      rounded: true,
-      severity: "secondary",
-      click: () => router.push({ name:'profile' }),
-    },
-  ])
+    const component = {
+      // props: Object.keys(props),
+      data() {
+        return { ...props }
+      },
+      methods: {
+        handleClick() {
+          console.log('Button clicked!')
+        },
+      },
+      render,
+    }
+
+    app = createApp(component, props)
+    app.mount(container.value)
+  } catch (error) {
+    console.error('Compilation error:', error)
+  }
 }
 
-onMounted(async () => {
-  const t = await sitesStore.listSites()
-  sites.value = t.rows
-  setButtons()
+onMounted(() => {
+  // const template = `
+  //   <div class="card">
+  //     <h2>{{ title }}</h2>
+  //     <p>{{ content }}</p>
+  //     <button @click="handleClick">Action</button>
+  //   </div>
+  //   <img src="/upload" alt="upload"/>
+  // `
+
+  // compileAndMount(template, {
+  //   title: 'Динамический заголовок',
+  //   content: 'Динамическое содержимое',
+  // })
 })
 
+onUnmounted(() => {
+  if (app) {
+    app.unmount()
+  }
+})
 </script>
 
 <template>
   <div class="grid gap-4 px-3">
-    <SitesList :items="sites" />
-    <pre>{{ sites }}</pre>
+    <!-- <div ref="container" /> -->
 
-    <RouterLink to="/site/new">
-      <Button
-        aria-label="Search"
-        rounded
-        severity="secondary"
-        :style="{ position: 'absolute', right: '1rem', bottom: '1rem' }"
-        variant="outlined"
-      >
-        <img src="/ss-logo.svg"> добавить сайт
-      </Button>
+    <br>
+    <br>
+    <RouterLink to="/">
+      index
+    </RouterLink>
+    <br>
+    <br>
+    <RouterLink to="/qweq">
+      qweq
+    </RouterLink>
+    <br>
+    <br>
+    <RouterLink to="/qweq2">
+      qweq2
     </RouterLink>
 
-    <div ref="container" />
+    <div
+      v-if="pagesStore.current.html"
+      v-html="pagesStore.current.html"
+    />
   </div>
 </template>

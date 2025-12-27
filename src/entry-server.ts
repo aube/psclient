@@ -3,12 +3,12 @@ import { createApp } from './main'
 import { useUserStore } from './stores/user'
 import { useSitesStore } from './stores/sites'
 import { useRestApi } from './lib/restapi'
-import { User } from './types/User.types'
+import { User, Site } from './types'
 import * as devalue from 'devalue';
 
 
 
-export async function render(_url: string, user: User | null, token: string) {
+export async function render(_url: string, user: User | null, site: Site, token: string) {
   const { app, router, pinia } = createApp()
   const { setHeader } = useRestApi()
 
@@ -20,7 +20,7 @@ export async function render(_url: string, user: User | null, token: string) {
   setHeader("Authorization", `Bearer ${token}`)
 
   userStore.setUser(user)
-  await sitesStore.fetchSites()
+  sitesStore.setSite(site)
 
   try {
     await router.push('/' + _url);

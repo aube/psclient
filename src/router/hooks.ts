@@ -1,7 +1,7 @@
 import { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
-import { useUserStore } from '../stores/user'
-import { useSitesStore } from '../stores/sites'
-import { setActiveSiteID } from '../lib/restapi'
+import { usePagesStore } from '../stores/pages'
+// import { useSitesStore } from '../stores/sites'
+// import { setActiveSiteID } from '../lib/restapi'
 
 // let userStore: ReturnType<typeof useUserStore>
 // const loadingUser = loadUserStore().then(store => {
@@ -14,42 +14,18 @@ import { setActiveSiteID } from '../lib/restapi'
 // })
 
 
-export const guestGuard = async (
+
+export const pageDataRequester = async (
   to: RouteLocationNormalized,
   _from: RouteLocationNormalized,
   next: NavigationGuardNext
 ): Promise<void> => {
 
-  // await loadingUser
-  const userStore = useUserStore()
+  const pagesStore = usePagesStore()
 
-  if (to.meta.guestAccess) {
-    return next()
-  } else if (userStore?.isAuthenticated) {
-    return next()
-  }
+  pagesStore.fetchCurrent(to.path)
+  console.log(to.path)
 
-  next({ name: 'error403' })
-}
-
-export const activeSiteSelector = async (
-  to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  next: NavigationGuardNext
-): Promise<void> => {
-
-  // await loadingSites
-  const sitesStore = useSitesStore()
-
-  const siteName = to.params?.siteName as string
-  if (siteName) {
-    const site = sitesStore.getSiteByName(siteName)
-    if (site) {
-      sitesStore.currentSite = site
-    }
-
-    setActiveSiteID(Number(site?.id))
-  }
 
   next()
 }

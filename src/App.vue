@@ -1,36 +1,34 @@
 <script setup lang="ts">
 import ComNavbar from './components/ComNavbar.vue';
-import Toast from 'primevue/toast';
-import { onMounted, ref } from 'vue';
-import { User } from './types/User.types';
-import { useUserStore } from './stores/user';
-import { useGeneralStore } from './stores/general.js'
 
-useGeneralStore()
-const userStore = useUserStore()
+// import Toast from 'primevue/toast';
+// import { onMounted, ref } from 'vue';
+// import { User } from './types/User.types';
+// import { useUserStore } from './stores/user';
+// import { useGeneralStore } from './stores/general.js'
+import { usePagesStore } from './stores/pages.js'
+// import { useTemplatesStore } from './stores/templates.js'
 
-const isToastLoaded = ref(false)
-const iAm = ref<User | null>(null)
-iAm.value = userStore.currentUser() as User
+// useGeneralStore()
 
-onMounted(() => {
-  isToastLoaded.value = true
-})
+const pagesStore = usePagesStore()
+pagesStore.fetchPages()
+
+// const templatesStore = useTemplatesStore()
+// templatesStore.fetchTemplates()
+
 
 </script>
 
 <template>
+  <header>
+    <ComNavbar />
+  </header>
   <main>
-    <ComNavbar
-      v-if="userStore.isAuthenticated"
-      class="mb-3"
-    />
-
     <RouterView />
-
-    <Toast v-if="isToastLoaded" />
   </main>
+
+  <footer>
+    <!-- {{ pagesStore.pages }} -->
+  </footer>
 </template>
-
-
-<style scoped></style>

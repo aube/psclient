@@ -3,6 +3,7 @@ import express from 'express'
 import http from 'http'
 import dotenv from 'dotenv'
 import {readNodeCookie} from './src/lib/cookies.node.js'
+// import { setActiveSiteID } from './src/lib/restapi.ts'
 
 const isProduction = process.env.NODE_ENV === 'production'
 dotenv.config({ path: isProduction ?`.env` : `.env.local` })
@@ -10,14 +11,11 @@ console.log("NODE_ENV", process.env.NODE_ENV)
 console.log("VITE_API_BASE_URL", process.env.VITE_API_BASE_URL) 
 
 // Constants
-const port = process.env.PORT || 5173
+const port = process.env.PORT || 9000
 const base = process.env.BASE || '/'
 const API = process.env.VITE_API_BASE_URL
 
-// Cached production assets
-const templateHtml = isProduction
-  ? await fs.readFile('./dist/client/index.html', 'utf-8')
-  : ''
+const defaultTemplateHtml = await fs.readFile('./index.html', 'utf-8')
 
 // Create http server
 const app = express()
@@ -50,9 +48,25 @@ async function getUser(token) {
   return user?.data
 }
 
+function getHost(req) {
+  return req.get('host') || req.get('origin').split('//')[1]
+}
+
+async function getSite(req) {
+  const domain = getHost(req)
+  let site = {}
+  try {
+    site = await makeRequest(API + "/api/v1/site/" + domain, domain)
+  } catch(e) {
+    console.error(e, API + "/api/v1/site/" + domain)
+  }
+  return site.data || {}
+}
+
 
 // Serve HTML
 app.use('*all', async (req, res) => {
+  console.log("req.path", req.path)
   try {
     const url = req.originalUrl.replace(base, '')
     if (url.includes("logout")) {
@@ -63,25 +77,24 @@ app.use('*all', async (req, res) => {
 
     const token = await getToken(req)
     const user = await getUser(token)
-    // if (user) {
-    //   user.token = token
-    // }
+
+    const site = await getSite(req, token)
+    // setActiveSiteID(site.uuid)
 
     /** @type {string} */
-    let template
+    let template = site?.template || defaultTemplateHtml
+
     /** @type {import('./src/entry-server.ts').render} */
     let render
     if (!isProduction) {
       // Always read fresh template in development
-      template = await fs.readFile('./index.html', 'utf-8')
       template = await vite.transformIndexHtml(url, template)
       render = (await vite.ssrLoadModule('/src/entry-server.ts')).render
     } else {
-      template = templateHtml
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const { stream, statusCode, serializedState } = await render(url, user || null, token || '')
+    const { stream, statusCode, serializedState } = await render(url, user || null, site, token || '')
   
     if (user) {
       const headAnchor = "<!--app-head-->"
@@ -125,8 +138,56 @@ app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 })
 
+function makeRequest(url, host = '', method = 'GET', data = null) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    
+    const options = {
+      hostname: urlObj.hostname,
+      port: urlObj.port || 80,
+      path: urlObj.pathname + urlObj.search,
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Node.js/HTTPClient',
+        'x-forwarded-host': host,
+      }
+    };
 
+    const req = http.request(options, (res) => {
+      let responseData = '';
 
+      res.on('data', (chunk) => {
+        responseData += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(responseData);
+          resolve({
+            statusCode: res.statusCode,
+            headers: res.headers,
+            data: parsedData
+          });
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+      const postData = JSON.stringify(data);
+      req.setHeader('Content-Length', Buffer.byteLength(postData));
+      req.write(postData);
+    }
+
+    req.end();
+  });
+}
 
 function makeRequestWithAuth(url, authToken, method = 'GET', data = null) {
   return new Promise((resolve, reject) => {
@@ -138,7 +199,7 @@ function makeRequestWithAuth(url, authToken, method = 'GET', data = null) {
       path: urlObj.pathname + urlObj.search,
       method: method,
       headers: {
-        'Authorization': `Bearer ${authToken}`,
+        // 'Authorization': `Bearer ${authToken}`,
         'Content-Type': 'application/json',
         'User-Agent': 'Node.js/HTTPClient'
       }

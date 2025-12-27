@@ -1,162 +1,88 @@
 <script setup>
 
-import { computed } from "vue";
-import { useRouter, useRoute } from "vue-router"
-import { useGeneralStore } from '../stores/general'
+// import { useRouter, useRoute } from "vue-router"
+// import { useGeneralStore } from '../stores/general'
 
-const generalStore = useGeneralStore()
+// const generalStore = useGeneralStore()
+// const route = useRoute()
+// const router = useRouter()
 
-const route = useRoute()
-const router = useRouter()
+// active = route.fullPath === linkPrefixe + link
 
-const menu = [
-  {
-    label: 'Pages',
-    icon: 'pi pi-sitemap',
-    link: "pages",
-  },
-  // {
-  //   label: 'Users',
-  //   icon: 'pi pi-user',
-  //   link: "users",
-  // },
-  // {
-  //   label: 'Clients',
-  //   icon: 'pi pi-users',
-  //   link: "users",
-  // },
-  {
-    label: 'Images',
-    icon: 'pi pi-image',
-    link: "images",
-  },
-  {
-    label: 'Site',
-    // icon: 'pi pi-cloud-upload',
-    items: [
-      {
-        label: 'Settings',
-        icon: 'pi pi-cog',
-        link: "settings",
-      },
-      {
-        label: 'Uploads',
-        icon: 'pi pi-file',
-        link: "files",
-      },
-      {
-        label: 'Templates',
-        icon: 'pi pi-code',
-        link: "templates",
-      },
-    ],
-  },
-]
-
-const items = computed(() => {
-  if (!route.params.siteName) {
-    return []
-  }
-  const linkPrefixe = "/site/" + route.params.siteName
-
-  function getMenuItem(item) {
-    let link
-    let active = null
-    let command = null
-
-    if (item.link != undefined) {
-      link = item.link ? "/" + item.link : ""
-      active = route.fullPath === linkPrefixe + link
-      command = () => router.push(linkPrefixe + link)
-    }
-
-    return {
-      ...item,
-      items: item.items ? item.items.map(getMenuItem) : null,
-      active,
-      command,
-    }
-  }
-
-  return menu.map(getMenuItem)
-})
-
+const items = [{
+  link: "#services",
+  title: "Services",
+}, {
+  link: "#portfolio",
+  title: "Portfolio",
+}, {
+  link: "#about",
+  title: "About",
+}, {
+  link: "#team",
+  title: "Team",
+}, {
+  link: "#contact",
+  title: "Contact",
+}]
 
 </script>
 
 <template>
-  <div
-    id="com-navbar"
-    class="card"
+  <nav
+    id="mainNav"
+    class="navbar navbar-expand-lg navbar-dark fixed-top navbar-shrink"
   >
-    <Menubar :model="items">
-      <template #start>
-        <RouterLink to="/">
-          <ComLogo />
-        </RouterLink>
-      </template>
-      <template
-        #item="{
-          item,
-          props,
-          hasSubmenu,
-          root
-        }"
+    <div class="container">
+      <a
+        class="navbar-brand"
+        href="#page-top"
+      ><img
+        alt="..."
+        src="/image/navbar-logo.svg"
+      ></a>
+      <button
+        aria-controls="navbarResponsive"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        class="navbar-toggler collapsed"
+        data-bs-target="#navbarResponsive"
+        data-bs-toggle="collapse"
+        type="button"
       >
-        <a
-          class="flex items-center"
-          v-bind="props.action"
-          :class="item.active ? 'active': ''"
-        >
-          <span
-            v-if="item.icon"
-            :class="item.icon"
-          />
-          <span>{{ item.label }}</span>
-          <Badge
-            v-if="item.badge"
-            :class="{ 'ml-auto': !root, 'ml-2': root }"
-            :value="item.badge"
-          />
-          <span
-            v-if="item.shortcut"
-            class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
-          >{{ item.shortcut }}</span>
-          <i
-            v-if="hasSubmenu"
-            :class="['pi pi-angle-down ml-auto', { 'pi-angle-down': root, 'pi-angle-right': !root }]"
-          />
-        </a>
-      </template>
-      <template #end>
-        <div class="flex items-center gap-2">
-          <!-- <InputText
-            class="w-32 sm:w-auto"
-            placeholder="Search"
-            type="text"
-          /> -->
-          <Button
-            v-for="btn, idx in generalStore.actionButtons"
-            :key="idx"
-            :aria-label="btn.ariaLabel"
-            :disabled="btn.disabled"
-            :icon="btn.icon"
-            :label="btn.label"
-            rounded
-            :severity="btn.severity"
-            @click="btn.click"
-          />
-        </div>
-      </template>
-    </Menubar>
-  </div>
+        <svg
+          aria-hidden="true"
+          class="svg-inline--fa fa-bars ms-1"
+          data-fa-i2svg=""
+          data-icon="bars"
+          data-prefix="fas"
+          focusable="false"
+          role="img"
+          viewBox="0 0 448 512"
+          xmlns="http://www.w3.org/2000/svg"
+        ><path
+          d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"
+          fill="currentColor"
+        /></svg>
+      </button>
+      <div
+        id="navbarResponsive"
+        class="navbar-collapse collapse"
+        style=""
+      >
+        <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+          <li
+            v-for="item in items"
+            :key="item.link"
+            class="nav-item"
+          >
+            <a
+              class="nav-link"
+              :href="item.link"
+            >{{ item.title }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 </template>
-
-<style>
-#com-navbar {
-  .p-menubar-item-link.active {
-    color: var(--p-button-link-color);
-    font-weight: 500;
-  }
-}
-</style>
