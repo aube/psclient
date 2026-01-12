@@ -1,0 +1,25 @@
+services:
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    env_file:
+      - .env.local
+    ports:
+      - "9000:9000"
+      - "24677:24677"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules  # Изолируем node_modules
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm run dev -- --poll"
+    stdin_open: true
+    tty: true
+    networks:
+      app_net:
+        aliases:
+          - d404.localhost
+
+networks:
+  app_net:
+    driver: bridge
