@@ -5,6 +5,8 @@ import dotenv from 'dotenv'
 import {readNodeCookie} from './src/lib/cookies.node.js'
 // import { setActiveSiteID } from './src/lib/restapi.ts'
 
+const packageJson = await fs.readFile('./package.json', 'utf-8').then(JSON.parse);
+
 const isProduction = process.env.NODE_ENV === 'production'
 dotenv.config({ path: isProduction ?`.env` : `.env.local` })
 console.log("NODE_ENV", process.env.NODE_ENV) 
@@ -63,6 +65,14 @@ async function getSite(req) {
   return site.data || {}
 }
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: "ok",
+    service: packageJson.name,
+    timestamp: Date.now()
+  });
+});
 
 // Serve HTML
 app.use('*all', async (req, res) => {

@@ -76,6 +76,19 @@ if (!isProduction) {
     watch: {
       usePolling: true,
       interval: 1000,
+      ignored: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/coverage/**',
+        '**/.git/**',
+        '**/.nuxt/**',
+        '**/.output/**',
+        '**/.cache/**',
+        '**/logs/**',
+        '**/tmp/**',
+        '**/*.log',
+        '**/.pnpm-store/**'
+      ]
     },
     hmr: {
       port: 24677,
