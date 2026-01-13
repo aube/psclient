@@ -1,4 +1,6 @@
 import fs from 'fs/promises';
+import fsOrig from 'fs';
+import path from 'path';
 import express from 'express';
 import axios from 'axios';
 import Handlebars from 'handlebars';
@@ -22,11 +24,12 @@ async function initialize() {
   console.log("PORT", process.env.PORT)
   console.log("API_SERVER_ADDRESS", process.env.API_SERVER_ADDRESS)
   console.log("API_BASE_URL", process.env.API_BASE_URL)
+ console.log("Hot reload enabled");
 
   // Constants
   PORT = process.env.PORT || 9000
   API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS
-  API_BASE_URL = process.env.API_BASE_URL
+ API_BASE_URL = process.env.API_BASE_URL
 }
 
 await initialize().catch(console.error);
@@ -57,6 +60,66 @@ const htmlCache = new Map();
 // Get cache TTL from environment variable (default 10 minutes)
 const HTML_CACHE_TTL = parseInt(process.env.HTML_CACHE) || 10 * 60 * 1000; // 10 minutes in milliseconds
 
+// Hot Reload functionality
+const connections = new Set();
+
+// SSE endpoint for hot reload
+app.get('/hot-reload', (req, res) => {
+  // Set SSE headers
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  });
+
+  // Send initial connection event
+  res.write(`data: connected\n\n`);
+
+  // Add connection to the set
+  connections.add(res);
+
+  // Remove connection when client disconnects
+  req.on('close', () => {
+    connections.delete(res);
+  });
+});
+
+// Function to broadcast reload event to all connected clients
+function broadcastReloadEvent() {
+  console.log('Detected file change, broadcasting reload event...');
+  connections.forEach(connection => {
+    try {
+      connection.write(`data: reload\n\n`);
+    } catch (error) {
+      // Remove connection if sending failed (client disconnected)
+      connections.delete(connection);
+    }
+  });
+}
+
+// Watch for file changes in common directories
+function setupFileWatcher() {
+ const watchPaths = ['./views', './public', './templates', '.'];
+  
+  watchPaths.forEach(watchPath => {
+    if (fsOrig.existsSync(watchPath)) {
+      fsOrig.watch(watchPath, { recursive: true }, (eventType, filename) => {
+        if (eventType === 'change' || eventType === 'rename') {
+          // Filter out temporary files and irrelevant changes
+          if (!filename.endsWith('~') && !filename.startsWith('.')) {
+            broadcastReloadEvent();
+          }
+        }
+      });
+      console.log(`Watching for changes in: ${watchPath}`);
+    }
+  });
+}
+
+// Initialize file watcher
+setupFileWatcher();
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
@@ -64,6 +127,7 @@ app.get('/health', (req, res) => {
     service: packageJson.name,
     timestamp: Date.now()
   });
+  return;
 });
 
 // Function to get cached HTML template or fetch it
@@ -166,6 +230,12 @@ function replacePartialSections(htmlTemplate, partials) {
 
 // Main request handler
 app.get('*', async (req, res) => {
+  if (req.path === '/health') {
+    return; // Не обрабатываем /health
+  }
+  if (res.writableEnded) {
+    return
+  }
   try {
     const requestedWith = req.headers['x-requested-with'];
     const isPjax = requestedWith && requestedWith.toLowerCase() === 'pjax';
@@ -194,8 +264,39 @@ app.get('*', async (req, res) => {
       // For regular requests, render the full HTML with partials inserted
       const finalHtml = replacePartialSections(htmlTemplate, renderedPartials);
       
-      res.setHeader('Content-Type', 'text/html');
-      res.send(finalHtml);
+      // Inject hot reload script if not in production
+      if (process.env.NODE_ENV !== 'production') {
+        const hotReloadScript = `
+          <script>
+            // Hot Reload Client Script
+            const eventSource = new EventSource('/hot-reload');
+            
+            eventSource.onmessage = function(event) {
+              if (event.data === 'connected') {
+                console.log('Hot reload connected');
+              } else if (event.data === 'reload') {
+                console.log('File changed, reloading...');
+                eventSource.close();
+                window.location.reload();
+              }
+            };
+            
+            eventSource.onerror = function(event) {
+              console.log('Hot reload connection error:', event);
+            };
+          </script>`;
+        
+        // Inject the script before the closing body tag
+        const finalHtmlWithScript = finalHtml.includes('</body>')
+          ? finalHtml.replace('</body>', hotReloadScript + '</body>')
+          : finalHtml + hotReloadScript;
+          
+        res.setHeader('Content-Type', 'text/html');
+        res.send(finalHtmlWithScript);
+      } else {
+        res.setHeader('Content-Type', 'text/html');
+        res.send(finalHtml);
+      }
     }
   } catch (error) {
     console.error('Request error:', error.message);
@@ -246,6 +347,9 @@ app.post('*', async (req, res) => {
 
 // PUT, DELETE, and other HTTP methods
 app.all('*', async (req, res) => {
+  if (res.writableEnded) {
+    return
+  }
   try {
     const requestedWith = req.headers['x-requested-with'];
     const isPjax = requestedWith && requestedWith.toLowerCase() === 'pjax';

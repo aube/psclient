@@ -425,6 +425,13 @@ document.addEventListener('DOMContentLoaded', () => {
   window.PJAX = new PJAXClient(config);
 });
 
+// Handle page reload events from hot reload
+window.addEventListener('beforeunload', () => {
+  if (window.PJAX && typeof window.PJAX.destroy === 'function') {
+    window.PJAX.destroy();
+  }
+});
+
 // Export for module systems (if applicable)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PJAXClient;
