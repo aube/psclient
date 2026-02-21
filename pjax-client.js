@@ -248,9 +248,8 @@ class PJAXClient {
     * Update a specific container with new content
     */
    updateContainer(sectionName, htmlContent) {
-     // Use the same comment pattern as the server: <!-- pjax-start: ${sectionName} --> and <!-- pjax-end: ${sectionName} -->
-     const startCommentPattern = `<!-- pjax-start: ${sectionName} -->`;
-     const endCommentPattern = `<!-- pjax-end: ${sectionName} -->`;
+     const startCommentPattern = `<!--${sectionName}-->`;
+     const endCommentPattern = `<!--/${sectionName}-->`;
 
      // Find the start and end comment nodes in the current document
      const walker = document.createTreeWalker(

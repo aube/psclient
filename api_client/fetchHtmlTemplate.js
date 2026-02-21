@@ -13,14 +13,17 @@ export async function fetchHtmlTemplate(host) {
       throw new Error('API base URL is not configured');
     }
     
-    const URL = `http://${baseUrl}/site/${host}`
+    const URL = `http://${baseUrl}/site/${host}/html`
     logger.debug('api_client request', 'URL', URL);
 
-    const response = await axios.get(URL);
-    
+    const response = await axios.get(URL, {
+      headers: {
+        'x-host': host,
+      }
+    });
     const template = response.data;
     
-    logger.debug('HTML template fetched from API successfully', 'host', host, 'templateLength', template.length);
+    logger.debug('HTML template fetched from API successfully', 'host', host, 'templateLength', template.length, "template", template);
     
     return template;
   } catch (error) {

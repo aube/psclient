@@ -39,8 +39,8 @@ const app = express();
 
 // Middleware для логирования запросов
 app.use((req, res, next) => {
-  if (req.path === '/health') {
-    return; // Не обрабатываем /health
+  if (req.path === "/health" || req.path === "/hot-reload") {
+    return;
   }
 
   logger.info("Request start", "Method", req.method, "URL", req.url, "ip", req.ip, "userAgent", req.get('User-Agent'), "contentType", req.get('Content-Type'));
@@ -109,10 +109,10 @@ app.get('/health', healthHandler);
 app.get('*', getHandler);
 
 // POST handler for forms and other methods
-app.post('*', postHandler);
+// app.post('*', postHandler);
 
 // PUT, DELETE, and other HTTP methods
-app.all('*', allHandler);
+// app.all('*', allHandler);
 
 
 // Use the PORT constant
