@@ -1,7 +1,9 @@
 import Handlebars from 'handlebars';
 import logger from '../logger.pino.js';
-import { getHtmlTemplate, setHtmlTemplate } from '../utils/cacheHTML.js';
-import { fetchHtmlTemplate } from '../api_client/fetchHtmlTemplate.js';
+// import { getHtmlLayout, setHtmlLayout } from '../utils/cacheHTML.js';
+// import { fetchHtmlLayout } from '../api_client/fetchHtmlLayout.js';
+import { fetchSite } from '../api_client/fetchSite.js';
+import { fetchSnippets } from '../api_client/fetchSnippets.js';
 import { fetchPageData } from '../api_client/fetchPageData.js';
 
 
@@ -11,18 +13,18 @@ function updateDynamicIncludes(template) {
 }
 
 // Function to get cached HTML template or fetch it
-async function getCachedHtmlTemplate(host) {
+async function getCachedHtmlLayout(host) {
   const cacheKey = host;
   
   // First try to get from cache
-  let template = getHtmlTemplate(host);
-  
+  let template = getHtmlLayout(host);
+
   // If not in cache, fetch from API
   if (template === '') {
     try {
-      template = await fetchHtmlTemplate(host);
+      template = await fetchHtmlLayout(host);
       
-      setHtmlTemplate(host, template);
+      setHtmlLayout(host, template);
       
     } catch (error) {
       logger.error('Error fetching HTML ' + host, error.message);
@@ -38,10 +40,42 @@ async function getCachedHtmlTemplate(host) {
   return template ? updateDynamicIncludes(template) : "empty template";
 }
 
-function replacePartialSections(name, htmlTemplate, partialHTML) {
+async function getSite(host) {
+  const cacheKey = host;
+  
+  let site = ""
+    try {
+      site = await fetchSite(host);
+    } catch (error) {
+      logger.error('Error fetching HTML ' + host, error.message);
+      throw error;
+    }
+  
+  logger.debug('getSite', 'site', site);
+
+  return site
+}
+
+async function getSnippets(host) {
+  const cacheKey = host;
+  
+  let snippets = {}
+    try {
+      snippets = await fetchSnippets(host);
+    } catch (error) {
+      logger.error('Error fetching HTML ' + host, error.message);
+      throw error;
+    }
+  
+  logger.debug('getSnippets', 'snippets', snippets);
+
+  return snippets
+}
+
+function replacePartialSections(name, htmlLayout, partialHTML) {
   const regex = new RegExp(`<!--${name}-->.*<!--/${name}-->`, 'gs');
   const resultStriong = `<!--${name}-->${partialHTML}<!--/${name}-->`
-  return htmlTemplate.replace(regex, resultStriong);
+  return htmlLayout.replace(regex, resultStriong);
 }
 
 // Function to render Handlebars templates
@@ -105,24 +139,61 @@ export const getHandler = async (req, res) => {
     const host = req.headers.host;
     
     // Fetch the main HTML template
-    const htmlTemplate = await getCachedHtmlTemplate(host, authToken);
-    
+    // const htmlLayout = await getCachedHtmlLayout(host, authToken);
+
+    const snippets = await getSnippets(host);
+    const site = await getSite(host);
+    site.settings = site.settings ? JSON.parse(site.settings) : {}
+    let htmlLayout = site?.html ? site.html : "empty template";
+
+    if (site?.html) {
+      let layoutData = {
+        settings: site.settings,
+        meta: site.meta ? JSON.parse(site.meta) : {},
+        entity: {},
+      }
+      htmlLayout = updateDynamicIncludes(htmlLayout)
+      htmlLayout = renderHandlebarsTemplate(htmlLayout, layoutData)
+      htmlLayout += "<pre>" + JSON.stringify(layoutData, null, 2) + "</pre>"
+    }
+
     // Fetch page data from corresponding backend API endpoint
     const pageData = await fetchPageData(req.url, host, authToken);
     
+
+    // Тут нужно сделать рендер сниппетов с данными страницы
+    // Тут нужно сделать рендер сниппетов с данными страницы
+    // Тут нужно сделать рендер сниппетов с данными страницы
+    // Тут нужно сделать рендер сниппетов с данными страницы
+    // Тут нужно сделать рендер сниппетов с данными страницы
     const renderedPartials = {};
+    for (const [sectionName, section] of Object.entries(snippets)) {
+      if (htmlLayout.includes(`<!--${sectionName}-->`)) {
+        renderedPartials[sectionName] = renderHandlebarsTemplate(section.html, {
+          ...section.data,
+          settings: {
+            ...site.settings,
+            ...(section.data.settings || {})
+          }
+        });
+      }
+    }
     for (const [sectionName, section] of Object.entries(pageData)) {
-      if (htmlTemplate.includes(`<!--${sectionName}-->`)) {
+      if (htmlLayout.includes(`<!--${sectionName}-->`)) {
         renderedPartials[sectionName] = renderHandlebarsTemplate(section.html, section);
       }
     }
-    
+
     if (isPjax) {
       // For PJAX requests, return JSON with rendered partial content
       res.json(renderedPartials);
     } else {
       // For regular requests, render the full HTML with partials inserted
-      let finalHTML = htmlTemplate
+      let finalHTML = htmlLayout
+
+      for (const [sectionName, HTML] of Object.entries(snippets)) {
+        finalHTML = replacePartialSections(sectionName, finalHTML, renderedPartials[sectionName] || HTML);
+      }
 
       for (const [sectionName, HTML] of Object.entries(pageData)) {
         finalHTML = replacePartialSections(sectionName, finalHTML, renderedPartials[sectionName] || HTML);
