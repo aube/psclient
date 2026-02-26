@@ -3,7 +3,14 @@
  * Client-side implementation for partial page loads with history management
  */
 
-class PJAXClient {
+import {
+  buildHbAttrMap,
+  buildHbTextMap,
+  updateHbTexts,
+  updateHbAttrs
+} from "/static/varsMap.js"
+
+export class PJAXClient {
   constructor(options = {}) {
     // Default configuration
     this.config = {
@@ -19,6 +26,9 @@ class PJAXClient {
     this.isActive = false;
     this.isProcessing = false;
     this.currentUrl = window.location.href;
+
+    this.hbAttrMap = buildHbAttrMap();
+    this.hbTextMap = buildHbTextMap();
 
     // Bind event handlers
     this.handleLinkClick = this.handleLinkClick.bind(this);
@@ -230,15 +240,13 @@ class PJAXClient {
   updateContent(data, url) {
     // Process each section in the response data
     for (const [sectionName, htmlContent] of Object.entries(data)) {
-      if (sectionName !== 'title' && htmlContent) { // Skip title field
+      if (sectionName === sectionName.toLocaleUpperCase()) {
         this.updateContainer(sectionName, htmlContent);
       }
     }
-
-    // Update page title if provided
-    if (data.title) {
-      document.title = data.title;
-    }
+    
+    updateHbTexts(this.hbTextMap, data)
+    updateHbAttrs(this.hbAttrMap, data)
 
     // Update current URL
     this.currentUrl = url;
@@ -248,9 +256,9 @@ class PJAXClient {
     * Update a specific container with new content
     */
    updateContainer(sectionName, htmlContent) {
-     const startCommentPattern = `<!--${sectionName}-->`;
-     const endCommentPattern = `<!--/${sectionName}-->`;
-
+     const startCommentPattern = `${sectionName}`;
+     const endCommentPattern = `/${sectionName}`;
+     
      // Find the start and end comment nodes in the current document
      const walker = document.createTreeWalker(
        document.body,
@@ -413,25 +421,4 @@ class PJAXClient {
     
     console.log('PJAX Client destroyed');
   }
-}
-
-// Auto-initialize if the script is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Allow customization via data attributes on the script tag or global config
-  const config = window.PJAX_CONFIG || {};
-  
-  // Create the PJAX client instance
-  window.PJAX = new PJAXClient(config);
-});
-
-// Handle page reload events from hot reload
-window.addEventListener('beforeunload', () => {
-  if (window.PJAX && typeof window.PJAX.destroy === 'function') {
-    window.PJAX.destroy();
-  }
-});
-
-// Export for module systems (if applicable)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = PJAXClient;
 }

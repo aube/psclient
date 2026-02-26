@@ -2,11 +2,12 @@ import fs from 'fs/promises';
 import fsOrig from 'fs';
 import express from 'express';
 import logger from './logger.pino.js';
-import { healthHandler } from './routes/health.js';
-import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReload.js';
+import { healthHandler } from './routes/healthHandler.js';
+import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
 import { getHandler } from './routes/getHandler.js';
-import { postHandler } from './routes/postHandler.js';
-import { allHandler } from './routes/allHandler.js';
+
+// прочие методы, пока не используются
+// import { otherHandler, postHandler } from './routes/otherHandler.js';
 
 // Initialize environment and constants
 let packageJson;
@@ -74,12 +75,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files from ./static directory
+app.use('/static', express.static('./static'));
+
 // Hot Reload functionality is now handled in routes/hotReload.js
 // Import the connections set from the hotReload module
 
 // Watch for file changes in common directories
 function setupFileWatcher() {
- const watchPaths = ['./views', './public', './templates', '.'];
+ const watchPaths = ['./static', '.'];
   
   watchPaths.forEach(watchPath => {
     if (fsOrig.existsSync(watchPath)) {
@@ -108,11 +112,11 @@ app.get('/health', healthHandler);
 // Main request handler
 app.get('*', getHandler);
 
+
 // POST handler for forms and other methods
 // app.post('*', postHandler);
-
 // PUT, DELETE, and other HTTP methods
-// app.all('*', allHandler);
+// app.all('*', otherHandler);
 
 
 // Use the PORT constant
