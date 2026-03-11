@@ -1,100 +1,19 @@
-import Handlebars from 'handlebars';
 import logger from '../logger.pino.js';
-// import { getHtmlLayout, setHtmlLayout } from '../utils/cacheHTML.js';
-// import { fetchHtmlLayout } from '../api_client/fetchHtmlLayout.js';
 import { fetchSite } from '../api_client/fetchSite.js';
-import { fetchSnippets } from '../api_client/fetchSnippets.js';
 import { fetchPageData } from '../api_client/fetchPageData.js';
 import { addClientScript } from '../utils/addClientScript.js';
 import { addHotReloadScript } from '../utils/addHotReloadScript.js';
-import { wrapHbVars } from '../static/wrapHbVars.js';
 
-// [{NAME}] => <!--NAME--><!--/NAME-->
-function updateDynamicIncludes(htmlLayout) {
-  return htmlLayout.replace(/\[{([^\]]+)}\]/g, '<!--$1--><!--/$1-->');
-}
+import {
+  getLayout,
+  getSnippets,
+  getRenderedSnippets,
+  getRenderedPage,
+  replacePartialSections,
+} from '../templates/index.js'
 
-function replacePartialSections(name, htmlLayout, partialHTML) {
-  const regex = new RegExp(`<!--${name}-->.*<!--/${name}-->`, 'gs');
-  const resultString = `<!--${name}-->${partialHTML}<!--/${name}-->`
-  return htmlLayout.replace(regex, resultString);
-}
 
-// Function to render Handlebars templates
-function renderHandlebarsTemplate(templateString, data) {
-  const template = Handlebars.compile(templateString);
-  const result = template(data)
 
-  logger.debug(
-    'Render Handlebars Template',
-    'templateString', templateString,
-    'data', data,
-    'result', result
-  );
-
- return result;
-}
-
-async function getLayout(site) {
-  site.settings = site.settings ? JSON.parse(site.settings) : {}
-  let htmlLayout = site?.html ? site.html : "empty template";
-
-  if (site?.html) {
-    let layoutData = {
-      settings: site.settings,
-      meta: site.meta ? JSON.parse(site.meta) : {},
-      entity: {},
-    }
-    htmlLayout = updateDynamicIncludes(htmlLayout)
-    htmlLayout = wrapHbVars(htmlLayout)
-    htmlLayout = renderHandlebarsTemplate(htmlLayout, layoutData)
-    htmlLayout += "<pre>" + JSON.stringify(layoutData, null, 2) + "</pre>"
-  }
-  return htmlLayout
-} 
-
-async function getSnippets(host) {
-  const snippets = await fetchSnippets(host);
-
-  for (const [snippetName, snippet] of Object.entries(snippets)) {
-    snippets[snippetName] = {
-      ...snippet,
-      html: wrapHbVars(snippet.html),
-    }
-  }
-  return snippets
-} 
-
-async function getRenderedSnippets(snippets, htmlLayout, siteSettings) {
-  const renderedPartials = {};
-  for (const [sectionName, section] of Object.entries(snippets)) {
-    if (htmlLayout.includes(`<!--${sectionName}-->`)) {
-      renderedPartials[sectionName] = renderHandlebarsTemplate(section.html, {
-        ...section.data,
-        settings: {
-          ...siteSettings,
-          ...(section.data.settings || {})
-        }
-      });
-    }
-  }
-  return renderedPartials
-}
-
-async function getRenderedPage(pageData, htmlLayout) {
-  const renderedPartials = {};
-  for (const [sectionName, section] of Object.entries(pageData)) {
-    if (htmlLayout.includes(`<!--${sectionName}-->`)) {
-      const data = {
-        ...section,
-        ...JSON.parse(section.data),
-        data: null,
-      }
-      renderedPartials[sectionName] = renderHandlebarsTemplate(section.template, data);
-    }
-  }
-  return renderedPartials
-}
 
 // Main request handler
 export const getHandler = async (req, res) => {

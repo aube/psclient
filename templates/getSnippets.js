@@ -1,0 +1,15 @@
+import { fetchSnippets } from '../api_client/fetchSnippets.js';
+import { wrapHbVars } from '../static/wrapHbVars.js';
+
+
+export async function getSnippets(host) {
+  const snippets = await fetchSnippets(host);
+
+  for (const [snippetName, snippet] of Object.entries(snippets)) {
+    snippets[snippetName] = {
+      ...snippet,
+      html: wrapHbVars(snippet.html),
+    }
+  }
+  return snippets
+} 
