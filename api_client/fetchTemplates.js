@@ -3,51 +3,28 @@ import logger from '../logger.pino.js';
 import {
   saveTemplates,
   getLastUpdatedTemplate,
-} from '../utils/redisClient.js';
+} from '../redis/index.js';
 
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
 
 
-export async function fetchTemplatesShared() {
+export async function fetchTemplates(host) {
   try {
     const baseUrl = API_SERVER_ADDRESS + API_BASE_URL;
-    const lastUpdatedTemplate = await getLastUpdatedTemplate("SHARED");
-    const at = (new Date(lastUpdatedTemplate)).toISOString();
-
-    const URL = `http://${baseUrl}/templates/shared/${at}`;
-    logger.debug('api_client request', 'URL', URL);
-
-    const response = await axios.get(URL);
-
-    logger.debug('Templates fetched from API successfully');
-
-    let templates = {}
-
-    if (response.data) {
-      templates = await saveTemplates('SHARED', response.data)
-    }
-    
-    return templates;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function fetchTemplatesSite(host) {
-  try {
-    const baseUrl = API_SERVER_ADDRESS + API_BASE_URL;
-    const lastUpdatedTemplate = await getLastUpdatedTemplate("SHARED");
-    const at = (new Date(lastUpdatedTemplate)).toISOString();
+    const at = await getLastUpdatedTemplate(host);
     
     const URL = `http://${baseUrl}/templates/${host}/${at}`;
     logger.debug('api_client request', 'URL', URL);
 
-    const response = await axios.get(URL, {
-      headers: {
+    let options = {}
+    if (host !== "SHARED") {
+      options.headers = {
         'x-host': host,
       }
-    });
+    }
+
+    const response = await axios.get(URL, options);
 
     logger.debug('Templates fetched from API successfully', 'host', host);
 

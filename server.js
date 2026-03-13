@@ -5,8 +5,8 @@ import logger from './logger.pino.js';
 import { healthHandler } from './routes/healthHandler.js';
 import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
 import { getHandler } from './routes/getHandler.js';
-import { initRedis } from './utils/redisClient.js';
-import { fetchTemplatesShared } from './api_client/fetchTemplates.js';
+import { initRedis } from './redis/index.js';
+import { fetchTemplates } from './api_client/fetchTemplates.js';
 
 // прочие методы, пока не используются
 // import { otherHandler, postHandler } from './routes/otherHandler.js';
@@ -50,7 +50,7 @@ await initialize().catch(logger.error);
 
 await initRedis();
 
-await fetchTemplatesShared();
+await fetchTemplates("SHARED");
 
 
 const app = express();

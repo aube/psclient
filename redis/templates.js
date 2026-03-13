@@ -1,34 +1,5 @@
-import { createClient } from 'redis';
 import logger from '../logger.pino.js';
-
-const REDIS_SERVER_ADDRESS = process.env.REDIS_SERVER_ADDRESS;
-
-let redisClient;
-
-// Get Redis client instance
-function getRedisClient() {
-  return redisClient;
-}
-
-// Initialize Redis client
-export async function initRedis() {
-  if (!redisClient && REDIS_SERVER_ADDRESS) {
-    try {
-      redisClient = createClient({
-        url: REDIS_SERVER_ADDRESS
-      });
-      await redisClient.connect();
-      const modules = await redisClient.info('modules');
-
-      logger.info('Connected to Redis server',
-        "config", { url: REDIS_SERVER_ADDRESS  },
-        "modules", modules
-      );
-    } catch (error) {
-      logger.error('Failed to connect to Redis', { error: error.message });
-    }
-  }
-}
+import { getRedisClient } from './index.js'
 
 export async function getTemplatesByCategory(host, category) {
   const client = getRedisClient();
@@ -103,7 +74,7 @@ export async function getLastUpdatedTemplate(host) {
   try {
     const key = `templates:${host}:lastTemplate`;
     const value = await client.get(key);
-    return value || '0'
+    return value || (new Date(0)).toISOString();
   } catch (error) {
     logger.error('Error reading from Redis', { error: error.message });
   }
