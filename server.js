@@ -6,6 +6,7 @@ import { healthHandler } from './routes/healthHandler.js';
 import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
 import { getHandler } from './routes/getHandler.js';
 import { initRedis } from './utils/redisClient.js';
+import { fetchTemplatesShared } from './api_client/fetchTemplates.js';
 
 // прочие методы, пока не используются
 // import { otherHandler, postHandler } from './routes/otherHandler.js';
@@ -33,12 +34,24 @@ async function initialize() {
   PORT = process.env.PORT || 9000
   API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS
   API_BASE_URL = process.env.API_BASE_URL
+
+  if (!API_SERVER_ADDRESS || !API_BASE_URL) {
+    logger.warn('API base URL is not configured properly',
+      'API_SERVER_ADDRESS', API_SERVER_ADDRESS,
+      'API_BASE_URL', API_BASE_URL
+    );
+    throw new Error('API ADDRESS is not configured');
+  }
+
 }
 
 // Initialize Redis connection
+await initialize().catch(logger.error);
+
 await initRedis();
 
-await initialize().catch(logger.error);
+await fetchTemplatesShared();
+
 
 const app = express();
 
