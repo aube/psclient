@@ -1,9 +1,9 @@
-import { fetchTemplates } from '../api_client/fetchTemplates.js';
+import { fetchTemplatesLast } from '../api_client/fetchTemplatesLast.js';
 import { wrapHbVars } from '../static/wrapHbVars.js';
 
 
 export async function getSnippets(host) {
-  const snippets = await fetchTemplates(host);
+  const snippets = await fetchTemplatesLast(host);
 
   for (const [snippetName, snippet] of Object.entries(snippets)) {
     snippets[snippetName] = {

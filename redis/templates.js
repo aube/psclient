@@ -4,10 +4,15 @@ import { getRedisClient } from './index.js'
 export async function getTemplatesByCategory(host, category) {
   const client = getRedisClient();
   const key = `templates:${host}:${category}`;
+  const sharedKey = `templates:SHARED:${category}`;
 
   try {
+    const sharedValue = await client.json.get(sharedKey);
     const value = await client.json.get(key);
-    return value
+    return {
+      ...sharedValue,
+      ...value,
+    }
   } catch (error) {
     logger.error('Error reading from Redis', { error: error.message });
   }
@@ -16,14 +21,22 @@ export async function getTemplatesByCategory(host, category) {
 export async function getTemplateByName(host, name, category = "") {
   const client = getRedisClient();
   const keyMap = `templates:${host}:_map`;
+  
   if (!category) {
-    category = await client.json.get(keyMap, "$." + name);
-  }
+    category = await client.json.get(keyMap, { path: "$." + name });
+    category = category[0] || ""
+  } 
+
   const key = `templates:${host}:${category}`;
 
   try {
-    const value = await client.json.get(key, "$." + name);
-    return value
+    const value = await client.json.get(key, { path: "$." + name });
+
+    if (!value && host !== "SHARED") {
+      return await getTemplateByName("SHARED", name, category)
+    } else {
+      return value[0]
+    }
   } catch (error) {
     logger.error('Error reading from Redis', { error: error.message });
   }
@@ -41,13 +54,13 @@ export async function saveTemplates(host, templates = []) {
     for (const item of templates) {
       const category = item.category || "_nocat";
       const key = keyPrefix + ":" + category;
-      const data = JSON.parse(item.data || "{}")
 
       await client.json.set(key, "$", {}, { condition: 'NX' });
-      await client.json.set(key, "$." + item.name, {...item, data});
+      await client.json.set(key, "$." + item.name, item);
       await client.json.set(keyMap, "$." + item.name, category);
 
       maxUpdatedDate = maxUpdatedDate > item.updated_at ? maxUpdatedDate : item.updated_at
+      console.log(maxUpdatedDate)
     }
     saveLastUpdatedTemplate(host, maxUpdatedDate)
   } catch (error) {

@@ -15,7 +15,7 @@ export async function getSite(host) {
   }
 }
 
-export async function saveSite(host, site) {
+export async function setSite(host, site) {
   const client = getRedisClient();
   const key = `sites:${host}`;
 
@@ -29,6 +29,7 @@ export async function saveSite(host, site) {
 
 export async function getLastSiteRequestTime(host) {
   const client = getRedisClient();
+  
   try {
     const key = `sites:${host}:lastRequest`;
     const value = await client.get(key);

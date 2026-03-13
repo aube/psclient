@@ -4,9 +4,9 @@ import express from 'express';
 import logger from './logger.pino.js';
 import { healthHandler } from './routes/healthHandler.js';
 import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
-import { getHandler } from './routes/getHandler.js';
+import { mainHandler } from './routes/mainHandler.js';
 import { initRedis } from './redis/index.js';
-import { fetchTemplates } from './api_client/fetchTemplates.js';
+import { fetchTemplatesLast } from './api_client/fetchTemplatesLast.js';
 
 // прочие методы, пока не используются
 // import { otherHandler, postHandler } from './routes/otherHandler.js';
@@ -50,7 +50,7 @@ await initialize().catch(logger.error);
 
 await initRedis();
 
-await fetchTemplates("SHARED");
+await fetchTemplatesLast("SHARED");
 
 
 const app = express();
@@ -127,7 +127,7 @@ app.get('/hot-reload', hotReloadHandler);
 app.get('/health', healthHandler);
 
 // Main request handler
-app.get('*', getHandler);
+app.get('*', mainHandler);
 
 
 // POST handler for forms and other methods

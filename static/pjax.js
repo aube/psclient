@@ -238,6 +238,7 @@ export class PJAXClient {
    * Update page content with partial HTML
    */
   updateContent(data, url) {
+    console.log(data)
     // Process each section in the response data
     for (const [sectionName, htmlContent] of Object.entries(data)) {
       if (sectionName === sectionName.toLocaleUpperCase()) {

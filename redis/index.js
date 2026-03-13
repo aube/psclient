@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import logger from '../logger.pino.js';
 export * from './templates.js'
+export * from './sites.js'
 
 const REDIS_SERVER_ADDRESS = process.env.REDIS_SERVER_ADDRESS;
 

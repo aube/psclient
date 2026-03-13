@@ -9,7 +9,7 @@ const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
 
 
-export async function fetchTemplates(host) {
+export async function fetchTemplatesLast(host) {
   try {
     const baseUrl = API_SERVER_ADDRESS + API_BASE_URL;
     const at = await getLastUpdatedTemplate(host);
@@ -28,13 +28,15 @@ export async function fetchTemplates(host) {
 
     logger.debug('Templates fetched from API successfully', 'host', host);
 
-    let templates = {}
+    let templates = response.data
 
-    if (response.data) {
-      templates = await saveTemplates(host, response.data)
+    if (templates) {
+      templates.forEach(item => {
+        item.data = JSON.parse(item.data || "{}")
+      })
+      await saveTemplates(host, templates)
     }
-    
-    return templates;
+
   } catch (error) {
     throw error;
   }

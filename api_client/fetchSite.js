@@ -1,6 +1,14 @@
 import axios from 'axios';
 import logger from '../logger.pino.js';
 
+import {
+  getSite,
+  getLastSiteRequestTime,
+  setSite,
+  setLastSiteRequestTime,
+} from '../redis/index.js';
+
+
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
 const API_CACHE_TTL_SECOUNDS = process.env.API_CACHE_TTL_SECOUNDS;
@@ -18,7 +26,7 @@ export async function fetchSite(host) {
       }
     }
     
-    const URL = `http://${baseUrl}/site/${host}`
+    const URL = `http://${baseUrl}/site/${host}/html`
     logger.debug('api_client request', 'URL', URL);
 
     const response = await axios.get(URL, {
@@ -28,8 +36,21 @@ export async function fetchSite(host) {
     });
     site = response.data;
 
-    await setSite(host, site);
-    await setLastSiteRequestTime(host);
+    if (site) {
+      try {
+        site.data = JSON.parse(site.data)
+      } catch(e) {
+        site.data = {}
+      }
+      try {
+        site.meta = JSON.parse(site.meta)
+      } catch(e) {
+        site.meta = {}
+      }
+
+      await setSite(host, site);
+      await setLastSiteRequestTime(host);
+    }
 
     logger.info('Site fetched from API successfully', 'host', host, "site", site);
     

@@ -1,45 +1,43 @@
 import logger from '../logger.pino.js';
 import { fetchSite } from '../api_client/fetchSite.js';
-import { fetchPageData } from '../api_client/fetchPageData.js';
+import { fetchURL } from '../api_client/fetchURL.js';
+import { fetchTemplatesLast } from '../api_client/fetchTemplatesLast.js';
 import { addClientScript } from '../utils/addClientScript.js';
 import { addHotReloadScript } from '../utils/addHotReloadScript.js';
 
 import {
   getLayout,
-  getSnippets,
-  getRenderedSnippets,
-  getRenderedPage,
-  replacePartialSections,
+  injectURLContent,
+  injectSnippets,
+  renderURLContent,
 } from '../templates/index.js'
 
 
 
-async function firstLoad(req, res) {
+
+async function fullLoad(req, res) {
   try {
     const authToken = req.cookies.auth_token;
     const host = req.headers.host;
 
-    logger.debug('firstLoad', 'url', req.url, 'host', host);
+    logger.debug('fullLoad', 'url', req.url, 'host', host);
 
     const site = await fetchSite(host);
-    const htmlLayout = await getLayout(site)
+    const content = await fetchURL(host, req.url, authToken);
 
-    const pageData = await fetchPageData(req.url, host, authToken);
-    const renderedPagePartials = await getRenderedPage(pageData, htmlLayout);
+    const htmlLayout = await getLayout(host, site);
 
-    const snippets = await getSnippets(host);
-
-    const renderedSnippetsPartials = await getRenderedSnippets(snippets, htmlLayout, site.settings);
+    const dynamicData = {
+      ...site.settings,
+      ...site.meta,
+      ...content.ENTITY.data,
+    }
 
     let finalHTML = htmlLayout
 
-    for (const [sectionName, HTML] of Object.entries(snippets)) {
-      finalHTML = replacePartialSections(sectionName, finalHTML, renderedSnippetsPartials[sectionName] || HTML);
-    }
+    finalHTML = await injectURLContent(host, finalHTML, content, dynamicData)
 
-    for (const [sectionName, HTML] of Object.entries(pageData)) {
-      finalHTML = replacePartialSections(sectionName, finalHTML, renderedPagePartials[sectionName] || HTML);
-    }
+    finalHTML = await injectSnippets(host, finalHTML, dynamicData)
 
     finalHTML = addClientScript(finalHTML)
     
@@ -50,10 +48,9 @@ async function firstLoad(req, res) {
     logger.debug(
       'Final HTML generated',
       'url', req.url,
-      'pagePartialsCount', Object.keys(renderedPagePartials).length,
-      'snippetsPartialsCount', Object.keys(renderedSnippetsPartials).length,
       'htmlLength', finalHTML.length
     );
+
     res.setHeader('Content-Type', 'text/html');
     res.send(finalHTML);
 
@@ -69,15 +66,20 @@ async function partialLoad(req, res) {
     const authToken = req.cookies.auth_token;
     const host = req.headers.host;
 
-    logger.debug('Processing GET request', 'url', req.url, 'isPjax', isPjax, 'host', host);
+    logger.debug('Processing PJAX request', 'url', req.url, 'host', host);
 
     const site = await fetchSite(host);
-    const htmlLayout = await getLayout(site)
+    const content = await fetchURL(host, req.url, authToken);
 
-    const pageData = await fetchPageData(req.url, host, authToken);
-    const renderedPagePartials = await getRenderedPage(pageData, htmlLayout);
+    const dynamicData = {
+      ...site.settings,
+      ...site.meta,
+      ...content.ENTITY.data,
+    }
 
-    res.json(renderedPagePartials);
+    const renderedContent = await renderURLContent(host, content, dynamicData)
+
+    res.json(renderedContent);
 
   } catch (error) {
     console.log(error)
@@ -86,8 +88,7 @@ async function partialLoad(req, res) {
   }
 }
 
-// Main request handler
-export const getHandler = async (req, res) => {
+export const mainHandler = async (req, res) => {
   if (req.path === '/health') {
     return;
   }
@@ -98,9 +99,12 @@ export const getHandler = async (req, res) => {
   const requestedWith = req.headers['x-requested-with'];
   const isPjax = requestedWith && requestedWith.toLowerCase() === 'partial';
 
+  const host = req.headers.host;
+  await fetchTemplatesLast(host);
+
   if (isPjax) {
     partialLoad(req, res)
   } else {
-    firstLoad(req, res)
+    fullLoad(req, res)
   }
 };

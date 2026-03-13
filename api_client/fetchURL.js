@@ -4,8 +4,12 @@ import logger from '../logger.pino.js';
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 
 // Function to fetch page data from corresponding backend API endpoint
-export async function fetchPageData(url, host, authToken) {
-  logger.debug('Fetching page data from API', 'url', url, 'host', host, 'hasAuthToken', !!authToken);
+export async function fetchURL(host, url, authToken) {
+  logger.debug('Fetching page data from API',
+    'url', url,
+    'host', host,
+    'hasAuthToken', !!authToken
+  );
   
   try {    
     const baseUrl = API_SERVER_ADDRESS;
