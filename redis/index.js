@@ -31,3 +31,33 @@ export async function initRedis() {
     }
   }
 }
+
+export async function flushDb() {
+  await getRedisClient().flushDb();
+}
+
+
+export async function flushAll() {
+  await getRedisClient().flushAll();
+}
+
+export async function getString(key) {
+  const client = getRedisClient();
+  try {
+    const value = await client.get(key);
+    return value
+  } catch (error) {
+    logger.error('Error reading from Redis', { error: error.message });
+  }
+  
+  return 0;
+}
+
+export async function setString(key, value) {
+  const client = getRedisClient();
+  try {
+    await client.set(key, hash);
+  } catch (error) {
+    logger.error('Error writing to Redis', { error: error.message });
+  }
+}

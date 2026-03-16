@@ -5,7 +5,7 @@ import logger from './logger.pino.js';
 import { healthHandler } from './routes/healthHandler.js';
 import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
 import { mainHandler } from './routes/mainHandler.js';
-import { initRedis } from './redis/index.js';
+import { initRedis, flushDb } from './redis/index.js';
 import { fetchTemplatesLast } from './api_client/fetchTemplatesLast.js';
 
 // прочие методы, пока не используются
@@ -49,6 +49,8 @@ async function initialize() {
 await initialize().catch(logger.error);
 
 await initRedis();
+
+await flushDb();
 
 await fetchTemplatesLast("SHARED");
 

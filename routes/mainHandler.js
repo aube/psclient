@@ -1,6 +1,8 @@
 import logger from '../logger.pino.js';
 import { fetchSite } from '../api_client/fetchSite.js';
 import { fetchURL } from '../api_client/fetchURL.js';
+import { sendJSON } from '../api_client/sendJSON.js';
+import { sendStringAsFile } from '../api_client/sendStringAsFile.js';
 import { fetchTemplatesLast } from '../api_client/fetchTemplatesLast.js';
 import { addClientScript } from '../utils/addClientScript.js';
 import { addHotReloadScript } from '../utils/addHotReloadScript.js';
@@ -12,8 +14,18 @@ import {
   renderURLContent,
 } from '../templates/index.js'
 
+import {
+  getString,
+  setString,
+  getHostCSSClasses,
+} from '../redis/index.js'
+
+import {
+  hashString,
+} from '../utils/index.js'
 
 
+const TWCSS_SERVER_ADDRESS = process.env.TWCSS_SERVER_ADDRESS
 
 async function fullLoad(req, res) {
   try {
@@ -88,6 +100,35 @@ async function partialLoad(req, res) {
   }
 }
 
+async function cssRegenerate(host) {
+  const classes = await getHostCSSClasses(host)
+  if (!classes.length) {
+
+  }
+
+  const hash = hashString(classes.join())
+  const hashKey = `templates:${host}:CSSClassesHash`
+  const currentHash = await getString(hashKey)
+  
+  if (hash != currentHash) {
+    try {
+      const resp = await sendJSON(TWCSS_SERVER_ADDRESS + '/tw', {
+        classes,
+        responseType: 'string',
+      });
+      console.log(resp)
+      await setString(hashKey, hash);
+
+    } catch (error) {
+      console.log(error);
+      logger.error('cssRegenerate',
+        'message', error.message,
+      );
+    }
+  }
+
+} 
+
 export const mainHandler = async (req, res) => {
   if (req.path === '/health') {
     return;
@@ -100,7 +141,11 @@ export const mainHandler = async (req, res) => {
   const isPjax = requestedWith && requestedWith.toLowerCase() === 'partial';
 
   const host = req.headers.host;
-  await fetchTemplatesLast(host);
+  const templatesUpdated = await fetchTemplatesLast(host);
+
+  if (templatesUpdated) {
+    cssRegenerate(host) 
+  }
 
   if (isPjax) {
     partialLoad(req, res)
