@@ -1,4 +1,3 @@
-import axios from 'axios';
 import logger from '../logger.pino.js';
 
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
@@ -18,10 +17,9 @@ export async function forwardPostRequest(url, body, host, authToken, originalHea
     // Forward the POST request to the backend
     const apiUrl = url.startsWith('/api/') ? url : `/api${url}`;
     
-    const response = await axios({
+    const response = await fetch(`http://${baseUrl}${apiUrl}`, {
       method: 'post',
-      url: `http://${baseUrl}${apiUrl}`,
-      data: body,
+      body: body,
       headers: {
         'x-host': host,
         'Authorization': authToken ? `Bearer ${authToken}` : '',
@@ -29,9 +27,15 @@ export async function forwardPostRequest(url, body, host, authToken, originalHea
       }
     });
     
-    logger.debug('POST request forwarded successfully', 'url', url, 'apiUrl', apiUrl, 'responseDataSize', JSON.stringify(response.data).length);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    return response;
+    const data = await response.json();
+    
+    logger.debug('POST request forwarded successfully', 'url', url, 'apiUrl', apiUrl, 'responseDataSize', JSON.stringify(data).length);
+    
+    return { data };
   } catch (error) {
     logger.error('Error forwarding POST request:', error.message);
     throw error;

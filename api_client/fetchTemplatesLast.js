@@ -1,4 +1,3 @@
-import axios from 'axios';
 import logger from '../logger.pino.js';
 import {
   saveTemplates,
@@ -38,11 +37,15 @@ export async function fetchTemplatesLast(host) {
       }
     }
 
-    const response = await axios.get(URL, options);
+    const response = await fetch(URL, options);
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const templates = await response.json();
 
     logger.debug('Templates fetched from API successfully', 'host', host);
-
-    let templates = response.data
 
     if (templates) {
       templates.forEach(item => {

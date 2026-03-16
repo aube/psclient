@@ -1,4 +1,3 @@
-import axios from 'axios';
 import logger from '../logger.pino.js';
 
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
@@ -16,12 +15,18 @@ export async function fetchHtmlLayout(host) {
     const URL = `http://${baseUrl}/site/${host}/html`
     logger.debug('api_client request', 'URL', URL);
 
-    const response = await axios.get(URL, {
+    const response = await fetch(URL, {
       headers: {
         'x-host': host,
       }
     });
-    const layout = response.data.html;
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const layout = data.html;
 
     logger.debug('HTML layout fetched from API successfully', 'host', host, 'layoutLength', layout.length, "layout", layout);
     

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import logger from '../logger.pino.js';
 
 import {
@@ -29,12 +28,17 @@ export async function fetchSite(host) {
     const URL = `http://${baseUrl}/site/${host}/html`
     logger.debug('api_client request', 'URL', URL);
 
-    const response = await axios.get(URL, {
+    const response = await fetch(URL, {
       headers: {
         'x-host': host,
       }
     });
-    site = response.data;
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    site = await response.json();
 
     if (site) {
       try {

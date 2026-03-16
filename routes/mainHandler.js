@@ -112,7 +112,7 @@ async function cssRegenerate(host) {
   
   if (hash != currentHash) {
     try {
-      const resp = await sendJSON(TWCSS_SERVER_ADDRESS + '/tw', {
+      const resp = await sendJSON(`http://${TWCSS_SERVER_ADDRESS}/tw`, {
         classes,
         responseType: 'string',
       });
