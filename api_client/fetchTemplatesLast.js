@@ -26,7 +26,7 @@ export async function fetchTemplatesLast(host) {
   try {
     const baseUrl = API_SERVER_ADDRESS + API_BASE_URL;
     const at = await getLastUpdatedTemplate(host);
-    
+
     const URL = `http://${baseUrl}/templates/${host}/${at}`;
     logger.debug('api_client request', 'URL', URL);
 
@@ -38,11 +38,10 @@ export async function fetchTemplatesLast(host) {
     }
 
     const response = await fetch(URL, options);
-    console.log(response)
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const templates = await response.json();
 
     logger.debug('Templates fetched from API successfully', 'host', host);
@@ -52,6 +51,7 @@ export async function fetchTemplatesLast(host) {
         item.data = JSON.parse(item.data || "{}")
         item.classes = getAllClasses(item.html || "")
       })
+      
       await saveTemplates(host, templates)
 
       return true

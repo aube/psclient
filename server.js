@@ -50,16 +50,20 @@ await initialize().catch(logger.error);
 
 await initRedis();
 
-await flushDb();
+// await flushDb();
 
 await fetchTemplatesLast("SHARED");
-
 
 const app = express();
 
 // Middleware для логирования запросов
 app.use((req, res, next) => {
-  if (req.path === "/health" || req.path === "/hot-reload") {
+  if (
+    req.path === "/health"
+    || req.path === "/hot-reload"
+    || req.path.startsWith("/static")
+  ) {
+    next();
     return;
   }
 

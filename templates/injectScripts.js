@@ -1,4 +1,4 @@
-export function addClientScript(finalHTML) {
+export function injectScriptsBody(finalHTML) {
   const clientScript = `
     <script src="/static/main.js" type="module"></script>
     <script type='module'>

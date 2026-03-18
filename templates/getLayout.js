@@ -1,7 +1,6 @@
 import { wrapHbVars } from '../static/wrapHbVars.js';
 import {
   dynamicIncludes2HTMLComments,
-  renderHandlebarsTemplate,
 } from './index.js'
 import { getTemplatesByCategory } from '../redis/index.js'
 
@@ -26,8 +25,12 @@ function getTemplate(tplsMap, html, prefix) {
 }
 
 export async function getLayout(host, {settings, meta}) {
-  const templates = await getTemplatesByCategory(host, 'layout')
-  let htmlLayout = getTemplate(templates, templates["HTML"].html, "HTML") || "empty template"
+  const templates = await getTemplatesByCategory(host, 'layout');
+
+  let htmlLayout = "empty template"
+  if (templates["HTML"]) {
+    htmlLayout = getTemplate(templates, templates["HTML"].html, "HTML");
+  }
   
   let layoutData = {
     settings,
@@ -37,8 +40,6 @@ export async function getLayout(host, {settings, meta}) {
 
   htmlLayout = dynamicIncludes2HTMLComments(htmlLayout)
   htmlLayout = wrapHbVars(htmlLayout)
-  htmlLayout = renderHandlebarsTemplate(htmlLayout, layoutData)
-  htmlLayout += "<pre>" + JSON.stringify(layoutData, null, 2) + "</pre>"
 
   return htmlLayout
 } 

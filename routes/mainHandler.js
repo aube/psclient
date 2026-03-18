@@ -4,20 +4,25 @@ import { fetchURL } from '../api_client/fetchURL.js';
 import { sendJSON } from '../api_client/sendJSON.js';
 import { sendStringAsFile } from '../api_client/sendStringAsFile.js';
 import { fetchTemplatesLast } from '../api_client/fetchTemplatesLast.js';
-import { addClientScript } from '../utils/addClientScript.js';
-import { addHotReloadScript } from '../utils/addHotReloadScript.js';
+import { addHotReloadScript } from '../templates/addHotReloadScript.js';
+import { TWCSS_HASH_KEY, STYLECSS_HASH_KEY } from "../const/index.js"
 
 import {
   getLayout,
   injectURLContent,
   injectSnippets,
+  injectScriptsBody,
+  injectStylesHead,
   renderURLContent,
 } from '../templates/index.js'
 
 import {
   getString,
   setString,
+  getStringCached,
+  setStringCached,
   getHostCSSClasses,
+  getHostCSSStyles,
 } from '../redis/index.js'
 
 import {
@@ -26,6 +31,7 @@ import {
 
 
 const TWCSS_SERVER_ADDRESS = process.env.TWCSS_SERVER_ADDRESS
+const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS
 
 async function fullLoad(req, res) {
   try {
@@ -35,9 +41,20 @@ async function fullLoad(req, res) {
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
     const site = await fetchSite(host);
+
     const content = await fetchURL(host, req.url, authToken);
 
-    const htmlLayout = await getLayout(host, site);
+    let htmlLayout = await getStringCached(`layouts:${host}`);
+
+    if (!htmlLayout) {
+      htmlLayout = await getLayout(host, site);
+
+      htmlLayout = injectScriptsBody(htmlLayout)
+
+      htmlLayout = await injectStylesHead(host, htmlLayout)
+
+      await setStringCached(`layouts:${host}`, htmlLayout);
+    }
 
     const dynamicData = {
       ...site.settings,
@@ -51,9 +68,10 @@ async function fullLoad(req, res) {
 
     finalHTML = await injectSnippets(host, finalHTML, dynamicData)
 
-    finalHTML = addClientScript(finalHTML)
-    
     if (process.env.NODE_ENV !== 'production') {
+      finalHTML += `
+      <pre>${JSON.stringify(dynamicData, null, 2)}</pre>
+      `
       finalHTML = addHotReloadScript(finalHTML)
     }
 
@@ -100,33 +118,80 @@ async function partialLoad(req, res) {
   }
 }
 
-async function cssRegenerate(host) {
-  const classes = await getHostCSSClasses(host)
+async function cssTWRegenerate(host) {
+  const classes = await getHostCSSClasses(host);
+  const hashKey = `templates:${host}:${TWCSS_HASH_KEY}`;
+
   if (!classes.length) {
-
-  }
-
-  const hash = hashString(classes.join())
-  const hashKey = `templates:${host}:CSSClassesHash`
-  const currentHash = await getString(hashKey)
+    await setString(hashKey, '');
+    return
+  } 
   
+  const hash = hashString(classes.join(','))
+  const currentHash = await getString(hashKey)
+
   if (hash != currentHash) {
     try {
-      const resp = await sendJSON(`http://${TWCSS_SERVER_ADDRESS}/tw`, {
+      const twstyle = await sendJSON(`http://${TWCSS_SERVER_ADDRESS}/tw`, {
         classes,
         responseType: 'string',
       });
-      console.log(resp)
-      await setString(hashKey, hash);
+
+      if (twstyle.success) {
+        await sendStringAsFile(
+          `http://${API_SERVER_ADDRESS}/api/v1/upload/client`,
+          twstyle.css,
+          "twstyle.css",
+          {headers: {
+            'x-host': host,
+          }}
+        );
+  
+        await setString(hashKey, hash);
+        return hash
+      }
 
     } catch (error) {
-      console.log(error);
-      logger.error('cssRegenerate',
+      logger.error('cssTWRegenerate',
         'message', error.message,
       );
     }
   }
+} 
 
+async function cssStylesRegenerate(host) {
+  const styles = await getHostCSSStyles(host);
+  const hashKey = `templates:${host}:${STYLECSS_HASH_KEY}`;
+
+if (!styles.length) {
+  await setString(hashKey, '');
+  return
+} 
+
+  const currentHash = await getString(hashKey)
+  const CSS = styles.join('\n');
+  const hash = hashString(CSS);
+
+  if (hash != currentHash) {
+    try {
+      await sendStringAsFile(
+        `http://${API_SERVER_ADDRESS}/api/v1/upload/client`,
+        CSS,
+        "style.css",
+        {headers: {
+          'x-host': host,
+        }}
+      );
+
+      await setString(hashKey, hash);
+      return hash
+
+    } catch (error) {
+      logger.error('cssStylesRegenerate',
+        'message', error.message,
+      );
+    }
+  }
 } 
 
 export const mainHandler = async (req, res) => {
@@ -143,13 +208,15 @@ export const mainHandler = async (req, res) => {
   const host = req.headers.host;
   const templatesUpdated = await fetchTemplatesLast(host);
 
-  if (templatesUpdated) {
-    cssRegenerate(host) 
-  }
-
   if (isPjax) {
     partialLoad(req, res)
   } else {
+
+    if (templatesUpdated) {
+      await cssTWRegenerate(host);
+      await cssStylesRegenerate(host);
+    }
+
     fullLoad(req, res)
   }
 };

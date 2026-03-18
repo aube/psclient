@@ -10,7 +10,7 @@ import {
 
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
-const API_CACHE_TTL_SECOUNDS = process.env.API_CACHE_TTL_SECOUNDS;
+const REDIS_CACHE_TTL_SECOUNDS = process.env.REDIS_CACHE_TTL_SECOUNDS;
 
 export async function fetchSite(host) {
   try {
@@ -18,7 +18,7 @@ export async function fetchSite(host) {
     const baseUrl = API_SERVER_ADDRESS+API_BASE_URL;
 
     const lastRequestTime = await getLastSiteRequestTime(host);
-    if (API_CACHE_TTL_SECOUNDS * 1000 + lastRequestTime > Date.now()) {
+    if (REDIS_CACHE_TTL_SECOUNDS * 1000 + lastRequestTime > Date.now()) {
       site = await getSite(host);
       if (site) {
         return site;
@@ -50,6 +50,11 @@ export async function fetchSite(host) {
         site.meta = JSON.parse(site.meta)
       } catch(e) {
         site.meta = {}
+      }
+      try {
+        site.settings = JSON.parse(site.settings)
+      } catch(e) {
+        site.settings = {}
       }
 
       await setSite(host, site);

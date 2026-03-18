@@ -1,7 +1,6 @@
 import logger from '../logger.pino.js';
 import { getRedisClient } from './index.js'
-
-const OLD_HOSTS_EXPIRE_TIME = 3600 * 240  // 10 days
+import { REDIS_DEFAULT_EXPIRE_TIME } from '../const/index.js';
 
 export async function getSite(host) {
   const client = getRedisClient();
@@ -21,7 +20,7 @@ export async function setSite(host, site) {
 
   try {
       await client.json.set(key, "$", site);
-      await client.expire(key, OLD_HOSTS_EXPIRE_TIME);
+      await client.expire(key, REDIS_DEFAULT_EXPIRE_TIME);
   } catch (error) {
     logger.error('Error writing to Redis', 'error', error.message, 'site', site );
   }
@@ -46,7 +45,7 @@ export async function setLastSiteRequestTime(host) {
   try {
     const key = `sites:${host}:lastRequest`;
     await client.set(key, Date.now(), {
-      EX: OLD_HOSTS_EXPIRE_TIME
+      EX: REDIS_DEFAULT_EXPIRE_TIME
     });
   } catch (error) {
     logger.error('Error writing to Redis', { error: error.message });

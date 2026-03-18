@@ -1,3 +1,5 @@
+const CLIENT_SERVICE_API_KEY = process.env.CLIENT_SERVICE_API_KEY;
+
 export async function sendJSON(url, data, method = 'POST') {
   const response = await fetch(url, {
     method,

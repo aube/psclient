@@ -24,7 +24,7 @@ export async function fetchURL(host, url, authToken) {
     }
     
     const data = await response.json();
-    
+
     logger.info(
       'Page data fetched successfully',
       'host', host,
@@ -40,6 +40,14 @@ export async function fetchURL(host, url, authToken) {
       "data", data
     );
     
+    if (data.ENTITY) {
+      try {
+        data.ENTITY.data = JSON.parse(data.ENTITY.data)
+      } catch(e) {
+        data.ENTITY.data = {}
+      }
+    }
+
     return data;
   } catch (error) {
     logger.error('Error fetching page data:', error.message);

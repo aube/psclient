@@ -1,25 +1,20 @@
 import logger from '../logger.pino.js';
 import { getRedisClient } from './index.js'
+import { REDIS_DEFAULT_EXPIRE_TIME } from '../const/index.js';
 
 export async function getHostCSSClasses(host) {
   const classes = new Set()
   const client = getRedisClient();
 
-  const mapSharedKey = `templates:${host}:_map`;
-  const mapHostKey = `templates:${host}:_map`;
-
-  const sharedTemplates = await client.zRange(mapSharedKey, 0, -1);
-  for (let tplName of sharedTemplates) {
-    const css = await client.json.get(`templates:SHARED:${tplName}_classes`);
-    css?.forEach(c => classes.add);
-  }
+  for (let h of ['SHARED', host]) {
+    const key = `templates:${h}:_map`;
+    const templates = await client.zRange(key, 0, -1);
+    for (let tplName of templates) {
+      const css = await client.zRange(`templates:${h}:${tplName}_classes`, 0, -1);
+        css?.forEach(c => classes.add(c));
+      }
+    }
   
-  const hostTemplates = await client.zRange(mapHostKey, 0, -1);
-  for (let tplName of hostTemplates) {
-    const css = await client.json.get(`templates:${host}:${tplName}_classes`);
-    css?.forEach(c => classes.add);
-  }
-
   return [...classes];
 }
 
@@ -27,41 +22,36 @@ export async function getHostCSSStyles(host) {
   const styles = new Array()
   const client = getRedisClient();
 
-  const mapSharedKey = `templates:${host}:_map`;
-  const mapHostKey = `templates:${host}:_map`;
+  for (let h of ['SHARED', host]) {
+    const key = `templates:${h}:_map`;
+    const templates = await client.zRange(key, 0, -1);
 
-  const sharedTemplates = await client.zRange(mapSharedKey, 0, -1);
-  for (let tplName of sharedTemplates) {
-    const css = await client.json.get(`templates:SHARED:${tplName}_classes`);
-    css.forEach(c => styles.push);
-  }
-  
-  const hostTemplates = await client.zRange(mapHostKey, 0, -1);
-  for (let tplName of hostTemplates) {
-    const css = await client.json.get(`templates:${host}:${tplName}_classes`);
-    css.forEach(c => styles.push);
+    for (let tplName of templates) {
+      const tpl = await client.json.get(`templates:${h}:${tplName}`);
+      if (tpl && tpl.css) {
+        styles.push(tpl.css);
+      }
+    }
   }
 
   return styles;
 }
 
 export async function getTemplatesByCategory(host, category) {
-  const templates = {}
+  const templates = {};
   const client = getRedisClient();
 
-  const sharedKey = `templates:SHARED:_cat_${category}`;
-  const hostKey = `templates:${host}:_cat_${category}`;
-
-  const sharedTemplates = await client.zRange(sharedKey, 0, -1);
-  for (let tplName of sharedTemplates) {
-    templates[tplName] = await client.json.get(`templates:SHARED:${tplName}`);
+  for (let h of ['SHARED', host]) {
+    const key = `templates:${h}:_cat_${category}`;
+    const tplNames = await client.zRange(key, 0, -1);
+    for (let tplName of tplNames) {
+      const tpl = await client.json.get(`templates:${h}:${tplName}`);
+      
+      if (tpl) {
+        templates[tpl.name] = tpl;
+      }
+    }
   }
-
-  const hostTemplates = await client.zRange(hostKey, 0, -1);
-  for (let tplName of hostTemplates) {
-    templates[tplName] = await client.json.get(`templates:${host}:${tplName}`);
-  }
-
   return templates;
 }
 
@@ -82,7 +72,6 @@ export async function getTemplateByName(host, name, category = "") {
   }
 }
 
-
 async function setTemplate(host, item) {
   const client = getRedisClient();
   const key = `templates:${host}:${item.name}`;
@@ -90,30 +79,21 @@ async function setTemplate(host, item) {
   const categoryKey = `templates:${host}:_cat_` + item.category;
   const classesKey = key + "_classes";
 
+  const map = await client.zRange(mapKey, 0, -1)
+  
   const promises = [
     client.zAdd(categoryKey, { score: 0, value: item.name }),
     client.zAdd(mapKey, { score: 0, value: item.name }),
   ]
-
-  try {
+  
   if (item.classes?.length) {
     for (let cls of item.classes) {
-      console.log(cls, classesKey)
-      const t = await client.zAdd(classesKey, { score: 0, value: cls })
-      console.log(t)
-
+      promises.push(client.zAdd(classesKey, { score: 0, value: cls }));
     }
-    // item.classes.forEach(async cls => {
-    //     // promises.push(t)
-    //   })
-    }
-  } catch(e)  {
-
-    console.log(classesKey, e)
   }
-    delete item.classes;
+  delete item.classes;
 
-  promises.push(client.json.set(key, "$", item))
+  promises.push(client.json.set(key, "$", item));
 
   return Promise.all(promises).catch(error => {
     logger.error('Error writing to Redis',
@@ -173,7 +153,9 @@ export async function saveLastUpdatedTemplate(host, dateString) {
   const client = getRedisClient();
   try {
     const key = `templates:${host}:lastTemplate`;
-    await client.set(key, dateString);
+    await client.set(key, dateString, {
+      EX: REDIS_DEFAULT_EXPIRE_TIME
+    });
   } catch (error) {
     logger.error('Error writing to Redis', { error: error.message });
   }
