@@ -21,13 +21,13 @@ export async function injectStylesHead(host, finalHTML) {
 
   if (twhash) {
     styles += `
-      <link href="/twstyle.css?h=${twhash}" rel="stylesheet">
+      <link rel="stylesheet" href="/twstyle.css?h=${twhash}">
     `;
   }
   
   if (csshash) {
     styles += `
-      <link href="/style.css?h=${csshash}" rel="stylesheet">
+      <link rel="stylesheet" href="/style.css?h=${csshash}">
     `;
   }
 

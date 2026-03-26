@@ -17,6 +17,9 @@ importers:
       handlebars:
         specifier: ^4.7.8
         version: 4.7.8
+      lodash:
+        specifier: ^4.17.23
+        version: 4.17.23
       pino:
         specifier: ^10.1.1
         version: 10.1.1
@@ -366,6 +369,9 @@ packages:
 
   kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
+
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   logform@2.7.0:
     resolution: {integrity: sha512-TFYA4jnP7PVbmlBIfhlSe+WKxs9dklXMTEGcBCIvLhE/Tn3H6Gk1norupVW7m5Cnd4bLcr08AytbyV/xj7f/kQ==}
@@ -999,6 +1005,8 @@ snapshots:
   joycon@3.1.1: {}
 
   kuler@2.0.0: {}
+
+  lodash@4.17.23: {}
 
   logform@2.7.0:
     dependencies:

@@ -1,6 +1,11 @@
 import {
+  wrapHbVars,
+} from '../static/wrapHbVars.js'
+
+import {
   injectHTML,
   renderHandlebarsTemplate,
+  dynamicIncludes2HTMLComments,
 } from './index.js'
 
 import {
@@ -17,6 +22,10 @@ export async function injectURLContent(host, finalHTML, content, dynamicData) {
 
     html = template.html
   }
+
+  html = dynamicIncludes2HTMLComments(html)
+  html = wrapHbVars(html)
+
   html = renderHandlebarsTemplate(html, {
     ...ENTITY,
     html: null,

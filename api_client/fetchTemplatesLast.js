@@ -25,6 +25,7 @@ function getAllClasses(html) {
 export async function fetchTemplatesLast(host) {
   try {
     const baseUrl = API_SERVER_ADDRESS + API_BASE_URL;
+    // const at = '2016-03-24T16:49:04.405781Z'
     const at = await getLastUpdatedTemplate(host);
 
     const URL = `http://${baseUrl}/templates/${host}/${at}`;
@@ -48,6 +49,7 @@ export async function fetchTemplatesLast(host) {
 
     if (templates) {
       templates.forEach(item => {
+        console.log(item.name)
         item.data = JSON.parse(item.data || "{}")
         item.classes = getAllClasses(item.html || "")
       })
