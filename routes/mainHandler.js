@@ -56,14 +56,13 @@ async function fullLoad(req, res, site) {
     const content = await fetchURL(host, req.url, authToken);
 
     let htmlLayout = await getStringCached(`layouts:${host}`);
-
     if (!htmlLayout) {
       htmlLayout = await getLayout(host, site);
-
+      
       htmlLayout = injectScriptsBody(htmlLayout)
-
+      
       htmlLayout = await injectStylesHead(host, htmlLayout)
-
+      
       await setStringCached(`layouts:${host}`, htmlLayout);
     }
 

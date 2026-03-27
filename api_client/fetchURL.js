@@ -25,13 +25,6 @@ export async function fetchURL(host, url, authToken) {
     
     const data = await response.json();
 
-    logger.info(
-      'Page data fetched successfully',
-      'host', host,
-      'url', url,
-      'dataSize', JSON.stringify(data).length,
-    );
-    
     logger.debug(
       'Page data fetched successfully',
       'host', host,

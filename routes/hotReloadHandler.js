@@ -5,7 +5,7 @@ const connections = new Set();
 
 // Function to broadcast reload event to all connected clients
 export function broadcastReloadEvent() {
-  logger.info('Detected file change', 'broadcasting', 'reload event');
+  logger.debug('Detected file change', 'broadcasting', 'reload event');
   connections.forEach(connection => {
     try {
       connection.write(`data: reload\n\n`);

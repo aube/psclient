@@ -49,7 +49,7 @@ export async function fetchTemplatesLast(host) {
 
     if (templates) {
       templates.forEach(item => {
-        console.log(item.name)
+        console.log("Loaded template:", item.name)
         item.data = JSON.parse(item.data || "{}")
         item.classes = getAllClasses(item.html || "")
       })

@@ -17,23 +17,26 @@ export async function injectURLContent(host, finalHTML, content, dynamicData) {
   const { ENTITY, CHILDREN} = content
 
   let html = ENTITY.html;
+  let template = {};
   if (!ENTITY.use_html) {
-    const template = await getTemplateByName(host, ENTITY.template)
+    template = await getTemplateByName(host, ENTITY.template)
 
     html = template.html
+    
   }
 
   html = dynamicIncludes2HTMLComments(html)
   html = wrapHbVars(html)
-
+  
   html = renderHandlebarsTemplate(html, {
+    ...(template?.data || {}),
     ...ENTITY,
     html: null,
     data: null,
     fields: null,
     ...dynamicData,
   });
-
+  
   return injectHTML('ENTITY', finalHTML, html)
 
   // TODO CHILDREN

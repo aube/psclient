@@ -61,7 +61,7 @@ export async function fetchSite(host) {
       await setLastSiteRequestTime(host);
     }
 
-    logger.info('Site fetched from API successfully', 'host', host, "site", site);
+    logger.debug('Site fetched from API successfully', 'host', host, "site", site);
     
     return site;
   } catch (error) {

@@ -23,12 +23,12 @@ async function initialize() {
     process.exit(1);
   }
 
-  logger.info("Server configuration",
+  logger.debug("Server configuration",
     "PORT", process.env.PORT,
     "API_SERVER_ADDRESS", process.env.API_SERVER_ADDRESS,
     "API_BASE_URL", process.env.API_BASE_URL
   )
-  logger.info("Hot reload enabled");
+  logger.debug("Hot reload enabled");
 
   // Constants
   PORT = process.env.PORT || 9000
@@ -67,14 +67,14 @@ app.use((req, res, next) => {
     return;
   }
 
-  logger.info("Request start", "Method", req.method, "URL", req.url, "ip", req.ip, "userAgent", req.get('User-Agent'), "contentType", req.get('Content-Type'));
+  logger.debug("Request start", "Method", req.method, "URL", req.url, "ip", req.ip, "userAgent", req.get('User-Agent'), "contentType", req.get('Content-Type'));
   
   // Логируем время выполнения запроса
  const start = Date.now();
   
   res.on('finish', () => {
     const duration = Date.now() - start;
-    logger.info("Request finish", "Method", req.method, "URL", req.url, "code", res.statusCode, "duration", duration + 'ms', "ip", req.ip, "userAgent", req.get('User-Agent'));
+    logger.debug("Request finish", "Method", req.method, "URL", req.url, "code", res.statusCode, "duration", duration + 'ms', "ip", req.ip, "userAgent", req.get('User-Agent'));
  });
   
   next();
@@ -118,7 +118,7 @@ function setupFileWatcher() {
           }
         }
       });
-      logger.info('Watching for changes', 'path', watchPath);
+      logger.debug('Watching for changes', 'path', watchPath);
     }
   });
 }
@@ -144,5 +144,5 @@ app.get('*', mainHandler);
 
 // Use the PORT constant
 app.listen(PORT, () => {
-  logger.info(`Proxy server listening at http://localhost:${PORT}`);
+  logger.debug(`Proxy server listening at http://localhost:${PORT}`);
 });

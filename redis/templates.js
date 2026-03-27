@@ -58,9 +58,8 @@ export async function getTemplatesByCategory(host, category) {
 export async function getTemplateByName(host, name, category = "") {
   const client = getRedisClient();
   const key = `templates:${host}:${name}`;
-
   try {
-    const value = await client.get(key);
+    const value = await client.json.get(key);
 
     if (!value && host !== "SHARED") {
       return await getTemplateByName("SHARED", name, category)
@@ -68,7 +67,7 @@ export async function getTemplateByName(host, name, category = "") {
       return value
     }
   } catch (error) {
-    logger.error('Error reading from Redis', { error: error.message });
+    logger.error('Error reading from Redis 1', { error: error.message });
   }
 }
 
@@ -132,7 +131,7 @@ export async function delTemplate(host, name) {
     await client.json.del(key, "$." + name);
     return true
   } catch (error) {
-    logger.error('Error reading from Redis', { error: error.message });
+    logger.error('Error reading from Redis 2', { error: error.message });
   }
 }
 
@@ -143,7 +142,7 @@ export async function getLastUpdatedTemplate(host) {
     const value = await client.get(key);
     return value || (new Date(0)).toISOString();
   } catch (error) {
-    logger.error('Error reading from Redis', { error: error.message });
+    logger.error('Error reading from Redis 3', { error: error.message });
   }
   
   return 0;

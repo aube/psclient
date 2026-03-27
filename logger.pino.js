@@ -14,7 +14,7 @@ const logger = pino({
 });
 
 // Store original log methods
-const originalInfo = logger.info;
+const originalInfo = logger.debug;
 const originalError = logger.error;
 const originalWarn = logger.warn;
 const originalDebug = logger.debug;
@@ -45,7 +45,7 @@ const logFn = fn => function (message, ...additionalParams) {
   fn.call(this, logObject);
 };
 
-logger.info = logFn(originalInfo)
+logger.debug = logFn(originalInfo)
 logger.error = logFn(originalError)
 logger.warn = logFn(originalWarn)
 logger.debug = logFn(originalDebug)

@@ -24,7 +24,7 @@ export async function initRedis() {
       await redisClient.connect();
       const modules = await redisClient.info('modules');
 
-      logger.info('Connected to Redis server',
+      logger.debug('Connected to Redis server',
         "config", { url: REDIS_SERVER_ADDRESS  },
         "modules", modules
       );
@@ -77,13 +77,13 @@ export async function getStringCached(key) {
   try {
     const cacheTime = await getString(key + "_cache");
     if (+cacheTime < Date.now()) {
-      delString(key_cache)
+      delString(key + "_cache")
       await delString(key)
       return null
     }
     return await getString(key)
   } catch (error) {
-    logger.error('Error getStringCached', { error: error.message });
+    logger.error('Error getStringCached', { error: error.message, key });
   }
   return "";
 }
