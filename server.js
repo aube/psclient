@@ -50,7 +50,7 @@ await initialize().catch(logger.error);
 
 await initRedis();
 
-// await flushDb();
+await flushDb();
 
 await fetchTemplatesLast("SHARED");
 

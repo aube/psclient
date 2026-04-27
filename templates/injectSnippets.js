@@ -9,25 +9,25 @@ import {
 
 const MAX_LEVEL = 3
 
-export async function injectSnippets(host, finalHTML, dynamicData, snippets, level = 0) {
+export async function injectSnippets(host, html, dynamicData, snippets, level = 0) {
 
   if (!snippets) {
     snippets = await getTemplatesByCategory(host, 'snippet');
   }
   
   for (const [name, snippet] of Object.entries(snippets)) {
-    if (finalHTML.includes(`<!--${name}-->`) || finalHTML.includes(`<!--!${name}-->`)) {
-      const html = renderHandlebarsTemplate(snippet.html, {
+    if (html.includes(`<!--${name}-->`) || html.includes(`<!--!${name}-->`)) {
+      const snippetHTML = renderHandlebarsTemplate(snippet.html, {
         ...snippet.data,
         ...dynamicData
       });
-      finalHTML = injectHTML(name, finalHTML, html)
+      html = injectHTML(name, html, snippetHTML)
     }
   }
 
   if (level < MAX_LEVEL) {
-    finalHTML = injectSnippets(host, finalHTML, dynamicData, snippets, ++level)
+    html = injectSnippets(host, html, dynamicData, snippets, ++level)
   }
 
-  return finalHTML
+  return html
 }

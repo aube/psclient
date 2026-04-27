@@ -33,7 +33,7 @@ export const TW_DEFAULT_THEME = () => ({
 export const TW_BASE_THEME = () => ({
   extend: {
     // ============================================
-    // 1. ИСХОДНАЯ ПАЛИТРА (источник истины)
+    // 1. ИСХОДНАЯ ПАЛИТРА 
     // ============================================
     colors: {
       primary: {
@@ -130,7 +130,7 @@ export const TW_BASE_THEME = () => ({
     },
 
     // ============================================
-    // 5. ОТСТУПЫ (спейсинг)
+    // 5. ОТСТУПЫ
     // ============================================
     spacing: {
       '18': '4.5rem',
@@ -194,6 +194,7 @@ export const TW_CLASSES_SAFELIST = () => ([
   'border-secondary',
   'border-border-secondary',
   'bg-secondary/10',
+  'bg-surface-contrast/20',
   'text-secondary',
 ])
 
@@ -910,4 +911,69 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   }
 }
  
+
+@layer components {
+  /* ============================================
+     SPLIT SECTION — Двухколоночная секция
+     ============================================ */
+  .split-section {
+    @apply w-full;
+    @apply bg-surface-main;
+  }
+  
+  .split-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2;
+    @apply min-h-[600px] lg:min-h-[700px];
+  }
+  
+  /* Левая колонка: Изображение */
+  .split-image-wrapper {
+    @apply relative w-full h-full min-h-[400px] lg:min-h-0;
+    @apply overflow-hidden;
+  }
+  
+  .split-image {
+    @apply w-full h-full object-cover;
+    @apply transition-transform duration-500;
+  }
+  
+  .split-image-wrapper:hover .split-image {
+    @apply scale-105;
+  }
+  
+  /* Правая колонка: Контент */
+  .split-content {
+    @apply flex items-center;
+    @apply bg-surface-main;
+    @apply px-6 sm:px-10 lg:px-16 xl:px-24;
+    @apply py-16 lg:py-24;
+  }
+  
+  .split-content-inner {
+    @apply max-w-xl;
+  }
+  
+  .split-grid.reverse {
+    @apply lg:grid-flow-col-dense;
+  }
+  
+  .split-grid.reverse .split-image-wrapper {
+    @apply lg:col-start-2;
+  }
+  
+  .split-grid.reverse .split-content {
+    @apply lg:justify-end;
+  }
+
+  /* Адаптив: изображение сверху на мобильных */
+  @media (max-width: 1023px) {
+    .split-grid {
+      @apply grid-cols-1;
+    }
+    .split-image-wrapper {
+      @apply min-h-[300px];
+    }
+  }
+}
+
 `)

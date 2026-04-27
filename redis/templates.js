@@ -2,7 +2,7 @@ import logger from '../logger.pino.js';
 import { getRedisClient } from './index.js'
 import { REDIS_DEFAULT_EXPIRE_TIME } from '../const/index.js';
 
-export async function getHostCSSClasses(host) {
+export async function getHostTemplatesCSSClasses(host) {
   const classes = new Set()
   const client = getRedisClient();
 
@@ -18,7 +18,7 @@ export async function getHostCSSClasses(host) {
   return [...classes];
 }
 
-export async function getHostCSSStyles(host) {
+export async function getHostTemplatesCSS(host) {
   const styles = new Array()
   const client = getRedisClient();
 
@@ -58,6 +58,8 @@ export async function getTemplatesByCategory(host, category) {
 export async function getTemplateByName(host, name, category = "") {
   const client = getRedisClient();
   const key = `templates:${host}:${name}`;
+  name = name.startsWith('~') ? name.substring(1) : name;
+
   try {
     const value = await client.json.get(key);
 

@@ -9,18 +9,20 @@ import merge from 'lodash/merge.js'
 
 import {
   TWCSS_HASH_KEY,
-  STYLECSS_HASH_KEY,
+  TEMPLATESCSS_HASH_KEY,
   SITE_THEME_HASH_KEY,
 } from "../const/index.js"
 
 import {
   getLayout,
-  injectURLContent,
+  injectENTITY,
   injectSnippets,
   injectSections,
   injectScriptsBody,
   injectStylesHead,
   renderURLContent,
+  renderHandlebarsTemplate,
+  buildTemplatesTree,
 } from '../templates/index.js'
 
 import {
@@ -28,8 +30,8 @@ import {
   setString,
   getStringCached,
   setStringCached,
-  getHostCSSClasses,
-  getHostCSSStyles,
+  getHostTemplatesCSSClasses,
+  getHostTemplatesCSS,
 } from '../redis/index.js'
 
 import {
@@ -45,6 +47,8 @@ import {
 
 const TWCSS_SERVER_ADDRESS = process.env.TWCSS_SERVER_ADDRESS
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS
+const isDev = process.env.NODE_ENV === 'development'
+
 
 async function fullLoad(req, res, site) {
   try {
@@ -53,9 +57,10 @@ async function fullLoad(req, res, site) {
 
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
-    const content = await fetchURL(host, req.url, authToken);
+    const {ENTITY, CHILDREN} = await fetchURL(host, req.url, authToken);
 
     let htmlLayout = await getStringCached(`layouts:${host}`);
+
     if (!htmlLayout) {
       htmlLayout = await getLayout(host, site);
       
@@ -69,21 +74,21 @@ async function fullLoad(req, res, site) {
     const dynamicData = {
       ...site.settings,
       ...site.meta,
-      ...content.ENTITY.data,
     }
 
-    let finalHTML = htmlLayout
+    let entityTree = await buildTemplatesTree(host, ENTITY)
+    
+    let finalHTML = ''// await injectENTITY(host, htmlLayout, ENTITY, dynamicData)
 
-    finalHTML = await injectURLContent(host, finalHTML, content, dynamicData)
+    // finalHTML = await injectSnippets(host, finalHTML, dynamicData)
+    
+    finalHTML = renderHandlebarsTemplate(finalHTML, {
+      ...dynamicData
+    });
 
-    finalHTML = await injectSections(host, finalHTML, dynamicData)
-
-    finalHTML = await injectSnippets(host, finalHTML, dynamicData)
-
-    if (process.env.NODE_ENV !== 'production') {
-      finalHTML += `
-      <pre>${JSON.stringify(dynamicData, null, 2)}</pre>
-      `
+    if (isDev) {
+      //finalHTML += `<pre>${JSON.stringify(dynamicData, null, 2)}</pre>`
+      finalHTML += `<pre>${JSON.stringify(entityTree, null, 2)}</pre>`
       finalHTML = addHotReloadScript(finalHTML)
     }
 
@@ -131,14 +136,14 @@ async function partialLoad(req, res, site) {
 }
 
 async function cssTWRegenerate(host, theme = {}) {
-  const templatesClasses = await getHostCSSClasses(host);
+  const templatesClasses = await getHostTemplatesCSSClasses(host);
   const hashKey = `templates:${host}:${TWCSS_HASH_KEY}`;
   
   const classes = [...templatesClasses, ...TW_CLASSES_SAFELIST()];
     
   theme = merge(TW_BASE_THEME(), TW_DEFAULT_THEME(), {extend: theme})
 
-  const hash = hashString(classes.join(',') + JSON.stringify(theme))
+  const hash = hashString(classes.join(',') + JSON.stringify(theme) + TW_BASE_CSS())
   const currentHash = await getString(hashKey)
   
   if (hash != currentHash) {
@@ -150,7 +155,7 @@ async function cssTWRegenerate(host, theme = {}) {
         safelist: TW_CLASSES_SAFELIST(),
         responseType: 'string',
       });
-
+      
       if (twstyle.success) {
         await sendStringAsFile(
           `http://${API_SERVER_ADDRESS}/api/v1/upload/client`,
@@ -163,7 +168,7 @@ async function cssTWRegenerate(host, theme = {}) {
             mimeType: 'text/css',
           }
         );
-  
+
         await setString(hashKey, hash);
         return hash
       }
@@ -176,9 +181,9 @@ async function cssTWRegenerate(host, theme = {}) {
   }
 } 
 
-async function cssStylesRegenerate(host) {
-  const styles = await getHostCSSStyles(host);
-  const hashKey = `templates:${host}:${STYLECSS_HASH_KEY}`;
+async function cssTemplatesRegenerate(host) {
+  const styles = await getHostTemplatesCSS(host);
+  const hashKey = `templates:${host}:${TEMPLATESCSS_HASH_KEY}`;
 
   if (!styles.length) {
     await setString(hashKey, '');
@@ -194,7 +199,7 @@ async function cssStylesRegenerate(host) {
       await sendStringAsFile(
         `http://${API_SERVER_ADDRESS}/api/v1/upload/client`,
         CSS,
-        "style.css",
+        "templates.css",
         {
           headers: {
             'x-host': host,
@@ -207,7 +212,7 @@ async function cssStylesRegenerate(host) {
       return hash
 
     } catch (error) {
-      logger.error('cssStylesRegenerate',
+      logger.error('cssTemplatesRegenerate',
         'message', error.message,
       );
     }
@@ -255,9 +260,9 @@ export const mainHandler = async (req, res) => {
     partialLoad(req, res, site)
   } else {
 
-    if (templatesUpdated || siteThemeUpdated) {
+    if (templatesUpdated || siteThemeUpdated || isDev) {
       await cssTWRegenerate(host, site.settings.theme);
-      await cssStylesRegenerate(host);
+      await cssTemplatesRegenerate(host);
     }
 
     fullLoad(req, res, site)

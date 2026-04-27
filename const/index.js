@@ -1,6 +1,6 @@
 export const TWCSS_HASH_KEY = 'TWCSSHash'
 
-export const STYLECSS_HASH_KEY = 'StyleCSSHash'
+export const TEMPLATESCSS_HASH_KEY = 'TemplatesCSSHash'
 
 export const SITE_THEME_HASH_KEY = 'SiteThemeHash'
 
