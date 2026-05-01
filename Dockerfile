@@ -1,30 +1,34 @@
-FROM node:22-alpine
+# --- Этап 1: База ---
+FROM node:22-alpine AS base
+RUN npm install -g pnpm
+WORKDIR /app
+COPY package.json pnpm-lock.yaml* ./
 
-# Set working directory
+# --- Этап 2: Разработка (dev) ---
+FROM base AS dev
+RUN pnpm install
+COPY . .
+# 24677 - HMR/LiveReload, 9229 - Node Debugger
+EXPOSE 8070 24677 9229
+CMD ["pnpm", "run", "dev"]
+
+# --- Этап 3: Продакшн (release) ---
+FROM node:22-alpine AS release
+RUN npm install -g pnpm
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Сертификаты для внешних запросов и системный пользователь
+RUN apk add --no-cache ca-certificates \
+    && addgroup -g 1001 -S nodejs \
+    && adduser -S client -u 1001 -G nodejs
 
-# Install dependencies
-RUN npm install -g pnpm && pnpm install
-RUN pnpm prune --prod
+COPY --from=dev /app/package.json ./package.json
+# Устанавливаем только чистые продакшн-зависимости
+RUN pnpm install --prod
 
-# Copy source code
 COPY . .
-
-# Создаем непривилегированного пользователя для безопасности
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S client -u 1001
 RUN chown -R client:nodejs /app
+
 USER client
-
-# Expose port (from server.js and docker-compose.yml we can see it runs on port 9000)
-EXPOSE 9000
-
-# Define health check endpoint
-#HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-#  CMD wget -q -O- http://localhost:9000/health | grep -q '"status":"ok"' || exit 1
-
-# Start the application
+EXPOSE 8070
 CMD ["pnpm", "start"]
