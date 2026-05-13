@@ -9,5 +9,11 @@ export async function sendJSON(url, data, method = 'POST') {
     body: JSON.stringify(data)
   });
   
-  return await response.json();
+  const result = await response.json();
+
+  if (result.error) {
+    throw new Error(result.message)
+  }
+
+  return result
 }

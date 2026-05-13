@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash-es'
 const SEED = 0x888;
 
 
-export function extractTemplateIncludes(html, hashPrefix, use_html = false) {
+export function extractTemplateIncludes(html, hashPrefix) {
   const regex = /(\[[\[\{](?:[^}\]]+)[\}\]]\])/g;
   const result = [];
   let match;
@@ -17,17 +17,17 @@ export function extractTemplateIncludes(html, hashPrefix, use_html = false) {
 
     if (starts === '[[' && ends === '}]' || starts === '[{' && ends === ']]') continue
 
-    const content = placeholder.substring(2, placeholder.length - 2)
+    const placeholderText = placeholder.substring(2, placeholder.length - 2).replaceAll(/[\s\[\]{}]/g, '')
 
-    const uid = xxhash.h32(hashPrefix + content.trim(), SEED).toString(16)
-    const [name, id = ''] = content.trim().split('#')
+    const uid = xxhash.h32(hashPrefix + placeholderText, SEED).toString(16)
+    const [name, id = ''] = placeholderText.split('#')
     const mark = {
       placeholder,
       name: name.trim(),
       id: id.trim(),
       uid,
       multiple: starts === '[[',
-      changable: use_html && name.startsWith('~'),
+      changable: name.startsWith('~'),
     }
     result.push(mark)
   }

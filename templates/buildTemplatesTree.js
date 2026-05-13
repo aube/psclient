@@ -1,31 +1,15 @@
-// import {
-//   wrapHbVars,
-// } from '../static/wrapHbVars.js'
-
-// import {
-//   injectHTML3,
-//   renderHandlebarsTemplate,
-//   dynamicIncludes2HTMLComments,
-// } from './index.js'
-
 import {
   getTemplateByName,
 } from '../redis/index.js'
 
-
-// export async function injectENTITY(host, layoutHTML, ENTITY) {
-//   var templatesTree = await getTemplatesTree(host, ENTITY);
-//   var html = buildHTML(templatesTree)
-//   return layoutHTML.replace('<!--ENTITY--><!--/ENTITY-->', `<!--ENTITY-->${html}<!--/ENTITY-->`)
-//   // TODO CHILDREN
-// }
+import {
+  extractTemplateIncludes,
+  dataAttributesInjector,
+  handlebarsRender
+} from './utils.js'
 
 
-
-import {extractTemplateIncludes, dataAttributesInjector, handlebarsRender} from './utils.js'
-
-
-export async function buildTemplatesTree(host, page) {
+export async function buildTemplatesTree(host, page, site) {
   let defaultValues = {}
   let fields = page.fields || []
   let html = page.html || ""
@@ -44,9 +28,23 @@ export async function buildTemplatesTree(host, page) {
     name = page.template;
   }
 
-  const templateMarkers = extractTemplateIncludes(html, 'page' + page.id, page.use_html)
+  const templateMarkers = extractTemplateIncludes(html, site.uuid, page.use_html)
   const templatesData = page.data?.templates || {}
   const nodes = await getEntityRootBranches(host, templateMarkers|| [], templatesData)
+
+  templateMarkers.forEach(marker => {
+    if (marker.multiple) {
+      const node = nodes.find(n => n.uid === marker.uid)
+      const nodeMarkers = extractTemplateIncludes(node.html, node.uid)
+      html = html.replace(marker.placeholder, node.html)
+
+      nodeMarkers.forEach(marker2 => {
+        html = html.replace(marker2.placeholder, `<!--${marker2.uid}--><!--/${marker2.uid}-->`)
+      })
+    } else {
+      html = html.replace(marker.placeholder, `<!--${marker.uid}--><!--/${marker.uid}-->`)
+    }
+  })
 
   return {
     id: name,
@@ -83,6 +81,7 @@ async function getEntityRootBranches(host, markers, templatesData) {
       })
     } else {
       const branch = await getTemplateBranch(host, marker, marker.uid, templatesData)
+      
       nodes.push({
         ...branch,
         multiple: false,
@@ -104,13 +103,15 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
     // Для динамического слота [{~NAME}] в интерфейсе может быть выбран другой шаблон, а не NAME
     // Поэтому приоритетно проверяем выбраный блок из данных страницы
     const nodeName = tplData?.name
+
     if (nodeName && nodeName !== name) {
       template = await getTemplateByName(host, nodeName)
     }
   }
 
-  if (!template)
+  if (!template) {
     template = await getTemplateByName(host, name)
+  }
 
   if (!template) {
     throw new Error('Template not found: ' + name)
@@ -122,6 +123,7 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
     ...template.values, // default template values
     ...(tplData?.values || {}),
   }
+  
   template.html = handlebarsRender(template.html, values)
 
   const nodes = []

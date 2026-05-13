@@ -1,5 +1,5 @@
-export * from './getLayout.js'
-export * from './injectENTITY.js'
+export * from './buildLayoutHTML.js'
+export * from './injectEntityTreeNodes.js'
 export * from './injectHTML.js'
 export * from './injectSnippets.js'
 export * from './injectSections.js'

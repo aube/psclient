@@ -62,8 +62,11 @@ export async function fetchSite(host) {
     }
 
     logger.debug('Site fetched from API successfully', 'host', host, "site", site);
-    
-    return site;
+
+    return {
+      site,
+      cookies: response.headers.getSetCookie()
+    };
   } catch (error) {
     throw error;
  }

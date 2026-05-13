@@ -18,7 +18,7 @@ export class PJAXClient {
       containerSelectors: {},
       loadingClass: 'pjax-loading',
       errorClass: 'pjax-error',
-      excludePatterns: [/^javascript:/, /^mailto:/, /^tel:/],
+      excludePatterns: [/^javascript:/, /^mailto:/, /^tel:/, /\/#/],
       ...options
     };
 
@@ -108,6 +108,7 @@ export class PJAXClient {
    * Check if a link should be processed by PJAX
    */
   shouldProcessLink(link) {
+
     // Check if link has href
     if (!link.href) return false;
 
@@ -117,7 +118,7 @@ export class PJAXClient {
 
     // Check exclusion patterns
     for (const pattern of this.config.excludePatterns) {
-      if (pattern.test(link.href)) return false;
+      if (pattern.test(link.href)) return false;        
     }
 
     // Check for data-pjax-exclude attribute

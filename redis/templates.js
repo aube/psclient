@@ -56,12 +56,16 @@ export async function getTemplatesByCategory(host, category) {
 }
 
 export async function getTemplateByName(host, name, category = "") {
+  name = name.startsWith('~') ? name.substring(1) : name;
+
   const client = getRedisClient();
   const key = `templates:${host}:${name}`;
-  name = name.startsWith('~') ? name.substring(1) : name;
 
   try {
     const value = await client.json.get(key);
+
+    if (name.startsWith('HEAD')) {
+    }
 
     if (!value && host !== "SHARED") {
       return await getTemplateByName("SHARED", name, category)

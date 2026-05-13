@@ -1,0 +1,9 @@
+.icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor; /* Иконка будет цвета текста */
+  mask-image: var(--icon-url);
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}

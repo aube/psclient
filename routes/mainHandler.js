@@ -14,8 +14,9 @@ import {
 } from "../const/index.js"
 
 import {
-  getLayout,
-  injectENTITY,
+  buildLayoutHTML,
+  injectEntityTreeNodes,
+  injectHTML,
   injectSnippets,
   injectSections,
   injectScriptsBody,
@@ -59,26 +60,19 @@ async function fullLoad(req, res, site) {
 
     const {ENTITY, CHILDREN} = await fetchURL(host, req.url, authToken);
 
-    let htmlLayout = await getStringCached(`layouts:${host}`);
-
-    if (!htmlLayout) {
-      htmlLayout = await getLayout(host, site);
-      
-      htmlLayout = injectScriptsBody(htmlLayout)
-      
-      htmlLayout = await injectStylesHead(host, htmlLayout)
-      
-      await setStringCached(`layouts:${host}`, htmlLayout);
-    }
+    let htmlLayout = await buildLayoutHTML(host, site);
 
     const dynamicData = {
       ...site.settings,
       ...site.meta,
     }
 
-    let entityTree = await buildTemplatesTree(host, ENTITY)
-    
-    let finalHTML = ''// await injectENTITY(host, htmlLayout, ENTITY, dynamicData)
+    let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site)
+
+    htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
+
+    // let finalHTML = htmlLayout// await injectENTITY(host, htmlLayout, ENTITY, dynamicData)
+    let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
 
     // finalHTML = await injectSnippets(host, finalHTML, dynamicData)
     
@@ -87,8 +81,8 @@ async function fullLoad(req, res, site) {
     });
 
     if (isDev) {
-      //finalHTML += `<pre>${JSON.stringify(dynamicData, null, 2)}</pre>`
-      finalHTML += `<pre>${JSON.stringify(entityTree, null, 2)}</pre>`
+      // finalHTML += `<pre>${JSON.stringify(entityTemplatesTree.nodes, null, 2)}</pre>`
+      // finalHTML += `<pre>${JSON.stringify(ENTITY.data.templates, null, 2)}</pre>`
       finalHTML = addHotReloadScript(finalHTML)
     }
 
@@ -155,7 +149,7 @@ async function cssTWRegenerate(host, theme = {}) {
         safelist: TW_CLASSES_SAFELIST(),
         responseType: 'string',
       });
-      
+
       if (twstyle.success) {
         await sendStringAsFile(
           `http://${API_SERVER_ADDRESS}/api/v1/upload/client`,
@@ -248,7 +242,11 @@ export const mainHandler = async (req, res) => {
   }
 
   const host = req.headers.host;
-  const site = await fetchSite(host);
+  const {site, cookies} = await fetchSite(host);
+
+  if (cookies) {
+    res.setHeader('Set-Cookie', cookies);
+  }
 
   const requestedWith = req.headers['x-requested-with'];
   const isPjax = requestedWith && requestedWith.toLowerCase() === 'partial';

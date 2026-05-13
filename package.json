@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "debug": "node server.js --inspect=0.0.0.0:9229"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
