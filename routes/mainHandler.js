@@ -71,10 +71,7 @@ async function fullLoad(req, res, site) {
 
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
 
-    // let finalHTML = htmlLayout// await injectENTITY(host, htmlLayout, ENTITY, dynamicData)
     let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
-
-    // finalHTML = await injectSnippets(host, finalHTML, dynamicData)
     
     finalHTML = renderHandlebarsTemplate(finalHTML, {
       ...dynamicData
@@ -118,9 +115,22 @@ async function partialLoad(req, res, site) {
       ...content.ENTITY.data,
     }
 
-    const renderedContent = await renderURLContent(host, content, dynamicData)
+    // const renderedContent = await renderURLContent(host, content, dynamicData)
 
-    res.json(renderedContent);
+
+    let entityTemplatesTree = await buildTemplatesTree(host, content.ENTITY, site)
+
+    let finalHTML = await injectEntityTreeNodes(host, entityTemplatesTree.html, entityTemplatesTree.nodes)
+    
+    finalHTML = renderHandlebarsTemplate(finalHTML, {
+      ...dynamicData
+    });
+
+    // TODO: оптимизация - отправлять данные по секциям/блокам,
+    // клиент найдёт изменённые секции, блоки и обновит только их
+    res.json({
+      ENTITY:finalHTML
+    });
 
   } catch (error) {
     console.log(error)
