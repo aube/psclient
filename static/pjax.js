@@ -364,6 +364,10 @@ export class PJAXClient {
       // since the content should already be in the browser cache
       // Just update the current URL
       this.currentUrl = state.url;
+
+      // TODO: Внезапно взяли и захотели делать полноценный апдэйт
+      // чтобы страница обновлялась. Потом можно оптимизировать
+      this.navigate(state.url)
     }
   }
 
