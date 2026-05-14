@@ -4,10 +4,12 @@ import {
 
 import {
   extractTemplateIncludes,
-  dataAttributesInjector,
-  handlebarsRender
+  dataAttributesInjector
 } from './utils.js'
 
+import {
+  renderHandlebarsTemplate,
+} from '../templates/index.js'
 
 export async function buildTemplatesTree(host, page, site) {
   let defaultValues = {}
@@ -124,7 +126,7 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
     ...(tplData?.values || {}),
   }
   
-  template.html = handlebarsRender(template.html, values)
+  template.html = renderHandlebarsTemplate(template.html, values)
 
   const nodes = []
   const includes = extractTemplateIncludes(template.html, parentId)

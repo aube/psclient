@@ -48,11 +48,3 @@ export function dataAttributesInjector(html, values) {
 
   return html.replace(firstTagMatch[0], newTag);
 }
-
-
-export function handlebarsRender(html, v) {
-  const values = cloneDeep(v)
-  const template = Handlebars.compile(html);
-  const result = template(values)
-  return result;
-}
