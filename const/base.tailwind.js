@@ -976,4 +976,120 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   }
 }
 
+@layer components {
+  /* ============================================
+     INVERTED MODIFIER
+     Переключает секцию/компонент на инвертированную
+     цветовую схему (тёмный фон, светлый текст).
+     Использование: <section class="section inverted">
+     Цвета берутся из colors.inverted.{group}.{key}.
+     ============================================ */
+  .inverted {
+    background-color: theme('colors.inverted.surface.main');
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .section.inverted,
+  .hero.inverted,
+  .features.inverted,
+  .features-alt.inverted,
+  .features-minimal.inverted,
+  .features-stats.inverted,
+  .pricing.inverted,
+  .gallery.inverted,
+  .contact.inverted,
+  .split-section.inverted {
+    background-color: theme('colors.inverted.surface.main');
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .card.inverted,
+  .card-feature.inverted,
+  .card-pricing.inverted,
+  .card-team.inverted {
+    background-color: theme('colors.inverted.surface.card');
+    color: theme('colors.inverted.content.primary');
+    border-color: theme('colors.inverted.border.subtle');
+  }
+
+  .inverted .card,
+  .inverted .card-feature,
+  .inverted .card-pricing,
+  .inverted .card-team {
+    background-color: theme('colors.inverted.surface.card');
+    color: theme('colors.inverted.content.primary');
+    border-color: theme('colors.inverted.border.subtle');
+  }
+
+  .header.inverted,
+  .footer.inverted {
+    background-color: theme('colors.inverted.surface.main');
+    color: theme('colors.inverted.content.primary');
+    border-color: theme('colors.inverted.border.subtle');
+  }
+
+  .inverted .nav-link {
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted .nav-link:hover {
+    color: theme('colors.inverted.action.primary');
+  }
+
+  .inverted .btn-primary {
+    background-color: theme('colors.inverted.action.primary');
+    color: theme('colors.inverted.content.inverted');
+  }
+
+  .inverted .btn-secondary {
+    background-color: transparent;
+    border-color: theme('colors.inverted.border.subtle');
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted .btn-secondary:hover {
+    border-color: theme('colors.inverted.action.primary');
+  }
+
+  .inverted .footer-link,
+  .inverted .footer-link-inline,
+  .inverted .footer-link-legal {
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted .footer-heading {
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted .social-link {
+    background-color: theme('colors.inverted.surface.card');
+    border-color: theme('colors.inverted.border.subtle');
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted .social-link:hover {
+    color: theme('colors.inverted.action.primary');
+    border-color: theme('colors.inverted.action.primary');
+  }
+
+  .inverted .form-input {
+    background-color: theme('colors.inverted.surface.main');
+    border-color: theme('colors.inverted.border.subtle');
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted .form-label {
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted [class*="text-content-primary"] {
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .inverted [class*="text-content-secondary"] {
+    color: theme('colors.inverted.content.primary');
+    opacity: 0.7;
+  }
+}
+
 `)
