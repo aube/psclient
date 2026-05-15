@@ -1,5 +1,4 @@
 import xxhash from 'xxhashjs';
-import Handlebars from 'handlebars';
 import { cloneDeep } from 'lodash-es'
 
 const SEED = 0x888;
