@@ -104,6 +104,7 @@ export const TW_BASE_THEME = () => ({
         primary: '#4f46e5',       // bg-action-primary (кнопки)
         primaryHover: '#4338ca',  // hover:bg-action-primaryHover
         secondary: '#ffffff',     // bg-action-secondary
+        borderHover: '#4338ca',   // border-action-borderHover (рамка при ховере)
       },
       transparent: 'transparent',
     },
@@ -133,10 +134,10 @@ export const TW_BASE_THEME = () => ({
     // 5. ОТСТУПЫ
     // ============================================
     spacing: {
-      '18': '4.5rem',
-      '88': '22rem',
-      '128': '32rem',
-      '144': '36rem',
+      'air-block':      'clamp(1rem, 0.8rem + 1vw, 1.5rem)',
+      'air-section-sm': 'clamp(2rem, 1.4rem + 3vw, 3.5rem)',
+      'air-section':    'clamp(3rem, 1.6rem + 5vw, 6rem)',
+      'air-hero':       'clamp(4rem, 2.5rem + 7.5vw, 9rem)',
     },
 
     // ============================================
@@ -189,6 +190,7 @@ export const TW_CLASSES_SAFELIST = () => ([
   'text-content-primary', 'text-content-secondary', 'text-content-inverted',
   'border-border-subtle', 'border-border-focus',
   'bg-action-primary', 'hover:bg-action-primaryHover',
+  'border-action-borderHover', 'hover:border-action-borderHover',
   'border-transparent',
   'focus:border-transparent',
   'border-secondary',
@@ -275,7 +277,7 @@ export const TW_BASE_CSS = () => (`@tailwind base;
      HERO SECTION
      ============================================ */
   .hero {
-    @apply py-18 lg:py-24;
+    @apply pt-0 lg:pt-air-hero pb-air-hero;
     @apply bg-surface-main;
   }
   
@@ -310,13 +312,18 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2;
     @apply px-6 py-3 rounded-action font-semibold;
-    @apply bg-surface-card text-content-primary;
-    @apply border border-border-subtle hover:border-action-primary;
+    @apply text-content-primary;
+    @apply border border-border-subtle;
     @apply transition-all duration-200;
+    background-color: theme('colors.action.secondary');
+  }
+  .btn-secondary:hover {
+    background-color: theme('colors.action.secondaryHover');
+    border-color: theme('colors.action.borderHover');
   }
 
   .section {
-    @apply py-18 lg:py-24;
+    @apply py-air-section;
   }
 }
 
@@ -324,14 +331,14 @@ export const TW_BASE_CSS = () => (`@tailwind base;
 @layer components { 
   /* Базовый класс карточки */
   .card {
-    @apply bg-surface-card rounded-2xl shadow-card p-6;
+    @apply bg-surface-card rounded-2xl shadow-card p-air-block;
     @apply border border-border-subtle/50;
     @apply hover:shadow-card-hover transition-all duration-300;
   }
 
   /* Сетка для карточек (адаптивная) */
   .card-grid {
-    @apply grid gap-6;
+    @apply grid gap-air-block;
     @apply sm:grid-cols-2;
     @apply lg:grid-cols-3;
     @apply xl:grid-cols-4;
@@ -357,24 +364,18 @@ export const TW_BASE_CSS = () => (`@tailwind base;
 
 @layer components {
   /* ============================================
-     PRICING SECTION
+     PRICING
      ============================================ */
-  .pricing {
-    @apply py-18 lg:py-24;
-    @apply bg-surface-main;
-  }
   
   /* Карточка тарифа */
   .card-pricing {
-    @apply relative bg-surface-card rounded-2xl shadow-card;
-    @apply border border-border-subtle;
-    @apply hover:shadow-elevated transition-all duration-300;
+    @apply border-2 border-border-subtle;
     @apply flex flex-col;
   }
   
   /* Выделенный (популярный) тариф */
   .card-pricing-popular {
-    @apply border-2 border-action-primary shadow-elevated;
+    @apply border-2 border-action-primary;
     @apply scale-105 z-10;
   }
   
@@ -412,12 +413,12 @@ export const TW_BASE_CSS = () => (`@tailwind base;
      CONTACT SECTION
      ============================================ */
   .contact {
-    @apply py-18 lg:py-24;
+    @apply py-air-section;
     @apply bg-surface-main;
   }
   
   .contact-form-wrapper {
-    @apply bg-surface-card rounded-2xl shadow-card p-6 lg:p-8;
+    @apply bg-surface-card rounded-2xl shadow-card p-air-block;
     @apply border border-border-subtle;
   }
   
@@ -604,7 +605,7 @@ export const TW_BASE_CSS = () => (`@tailwind base;
      GALLERY SECTION
      ============================================ */
   .gallery {
-    @apply py-18 lg:py-24;
+    @apply py-air-section;
     @apply bg-surface-main;
   }
   
@@ -673,16 +674,10 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   /* ============================================
      FEATURES SECTION — Grid Cards
      ============================================ */
-  .features {
-    @apply py-18 lg:py-24;
-    @apply bg-surface-main;
-  }
   
-  .card-feature {
-    @apply bg-surface-card rounded-2xl p-6;
+  .card.card-feature {
     @apply border border-border-subtle;
-    @apply hover:shadow-card-hover hover:border-action-primary/30;
-    @apply transition-all duration-300;
+    @apply hover:border-action-primary/30;
   }
   
   .feature-icon {
@@ -696,7 +691,7 @@ export const TW_BASE_CSS = () => (`@tailwind base;
      FEATURES SECTION — Alternating
      ============================================ */
   .features-alt {
-    @apply py-18 lg:py-24;
+    @apply py-air-section;
     @apply bg-surface-main;
   }
   
@@ -750,7 +745,7 @@ export const TW_BASE_CSS = () => (`@tailwind base;
      FEATURES SECTION — Stats
      ============================================ */
   .features-stats {
-    @apply py-18 lg:py-24;
+    @apply py-air-section;
     @apply bg-surface-main;
   }
   
@@ -946,7 +941,7 @@ export const TW_BASE_CSS = () => (`@tailwind base;
     @apply flex items-center;
     @apply bg-surface-main;
     @apply px-6 sm:px-10 lg:px-16 xl:px-24;
-    @apply py-16 lg:py-24;
+    @apply py-air-section;
   }
   
   .split-content-inner {
@@ -1042,13 +1037,14 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   }
 
   .inverted .btn-secondary {
-    background-color: transparent;
+    background-color: theme('colors.inverted.action.secondary');
     border-color: theme('colors.inverted.border.subtle');
     color: theme('colors.inverted.content.primary');
   }
 
   .inverted .btn-secondary:hover {
-    border-color: theme('colors.inverted.action.primary');
+    background-color: theme('colors.inverted.action.secondaryHover');
+    border-color: theme('colors.inverted.action.borderHover');
   }
 
   .inverted .footer-link,
@@ -1089,6 +1085,38 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   .inverted [class*="text-content-secondary"] {
     color: theme('colors.inverted.content.primary');
     opacity: 0.7;
+  }
+
+  .inverted [class*="bg-surface-card"] {
+    background-color: theme('colors.inverted.surface.card');
+  }
+
+  .inverted [class*="bg-surface-main"] {
+    background-color: theme('colors.inverted.surface.main');
+  }
+
+  .inverted [class*="bg-surface-contrast"] {
+    background-color: theme('colors.inverted.surface.contrast');
+  }
+
+  .inverted [class*="border-border-subtle"] {
+    border-color: theme('colors.inverted.border.subtle');
+  }
+
+  .inverted [class*="border-border-focus"] {
+    border-color: theme('colors.inverted.border.focus');
+  }
+
+  .inverted [class*="text-action-primary"] {
+    color: theme('colors.inverted.action.primary');
+  }
+
+  .inverted [class*="border-action-primary"] {
+    border-color: theme('colors.inverted.action.primary');
+  }
+
+  .inverted .nav-link::after {
+    background-color: theme('colors.inverted.action.primary');
   }
 }
 

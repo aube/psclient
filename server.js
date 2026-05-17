@@ -13,7 +13,7 @@ import { fetchTemplatesLast } from './api_client/fetchTemplatesLast.js';
 
 // Initialize environment and constants
 let packageJson;
-let PORT, API_SERVER_ADDRESS, API_BASE_URL;
+let PORT, API_SERVER_ADDRESS, API_BASE_URL, ADMIN_ADDRESS;
 
 async function initialize() {
   try {
@@ -34,6 +34,7 @@ async function initialize() {
   PORT = process.env.PORT || 9000
   API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS
   API_BASE_URL = process.env.API_BASE_URL
+  ADMIN_ADDRESS = process.env.ADMIN_ADDRESS
 
   if (!API_SERVER_ADDRESS || !API_BASE_URL) {
     logger.warn('API base URL is not configured properly',
@@ -99,7 +100,10 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from ./static directory
-app.use('/static', express.static('./static'));
+app.use('/static', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', ADMIN_ADDRESS);
+  next();
+}, express.static('./static'));
 
 // Hot Reload functionality is now handled in routes/hotReload.js
 // Import the connections set from the hotReload module

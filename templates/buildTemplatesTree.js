@@ -128,6 +128,10 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
   
   template.html = renderHandlebarsTemplate(template.html, values)
 
+  if (template.js) {
+    template.html += '<script>(function() {' + template.js + '})()</script>'
+  }
+
   const nodes = []
   const includes = extractTemplateIncludes(template.html, parentId)
 
