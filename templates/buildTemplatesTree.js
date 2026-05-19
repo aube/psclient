@@ -12,9 +12,9 @@ import {
 } from '../templates/index.js'
 
 export async function buildTemplatesTree(host, page, site) {
-  let defaultValues = {}
   let fields = page.fields || []
   let html = page.html || ""
+  let data = page.data || ""
   let name = "page" + page.id
 
   if (!page.use_html) {
@@ -23,10 +23,12 @@ export async function buildTemplatesTree(host, page, site) {
       console.error(page.template)
       throw new Error("No found Page template:")
     }
-
+    data = {
+      ...template.values,
+      ...data,
+    }
     html = template.html || ""
     fields = template.fields || []
-    defaultValues = template.values || defaultValues;
     name = page.template;
   }
 
@@ -54,9 +56,9 @@ export async function buildTemplatesTree(host, page, site) {
     name,
     changable: true,
     category: "template",
-    html,
+    html: renderHandlebarsTemplate(html, data),
     fields,
-    defaultValues,
+    defaultValues: data,
     nodes,
   }
 }
