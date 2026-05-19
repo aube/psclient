@@ -198,6 +198,17 @@ export const TW_CLASSES_SAFELIST = () => ([
   'bg-secondary/10',
   'bg-surface-contrast/20',
   'text-secondary',
+  'shadow-elevated',
+  'fixed',
+  'left-4', 'right-4', 'bottom-4',
+  'left-1/2',
+  '-translate-x-1/2',
+  'z-50',
+  'items-center',
+  'justify-between',
+  'shrink-0', 'break-all', 'break-keep', 'block',
+  'text-justify', 'text-right', 'text-left',
+  'whitespace-nowrap', 'break-normal',
 ])
 
 
@@ -205,6 +216,11 @@ export const TW_BASE_CSS = () => (`@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --color-surface-main: theme('colors.surface.main');
+  }
+}
 
 /* ============================================
    БАЗОВЫЕ КОМПОНЕНТЫ

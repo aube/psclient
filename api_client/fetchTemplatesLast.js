@@ -47,7 +47,7 @@ export async function fetchTemplatesLast(host) {
 
     logger.debug('Templates fetched from API successfully', 'host', host);
 
-    if (templates) {
+    if (Array.isArray(templates) && templates.length > 0) {
       templates.forEach(item => {
         console.log("Loaded template:", item.name)
 

@@ -15,6 +15,7 @@ import {
 
 import {
   buildLayoutHTML,
+  injectSiteSettings,
   injectEntityTreeNodes,
   injectHTML,
   injectScriptsBody,
@@ -58,6 +59,7 @@ async function fullLoad(req, res, site) {
     const {ENTITY, CHILDREN} = await fetchURL(host, req.url, authToken);
 
     let htmlLayout = await buildLayoutHTML(host, site);
+    htmlLayout = injectSiteSettings(htmlLayout, site.settings);
 
     const dynamicData = {
       ...site.settings,
