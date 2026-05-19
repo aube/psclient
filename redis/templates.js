@@ -127,20 +127,6 @@ export async function saveTemplates(host, templates = []) {
   }
 }
 
-export async function delTemplate(host, name) {
-  const client = getRedisClient();
-  const keyMap = `templates:${host}:_map`;
-  const category = await client.json.get(keyMap, "$." + name);
-  const key = `templates:${host}:${category}`;
-
-  try {
-    await client.json.del(key, "$." + name);
-    return true
-  } catch (error) {
-    logger.error('Error reading from Redis 2', { error: error.message });
-  }
-}
-
 export async function getLastUpdatedTemplate(host) {
   const client = getRedisClient();
   try {

@@ -17,11 +17,8 @@ import {
   buildLayoutHTML,
   injectEntityTreeNodes,
   injectHTML,
-  injectSnippets,
-  injectSections,
   injectScriptsBody,
   injectStylesHead,
-  renderURLContent,
   renderHandlebarsTemplate,
   buildTemplatesTree,
 } from '../templates/index.js'
@@ -114,9 +111,6 @@ async function partialLoad(req, res, site) {
       ...site.meta,
       ...content.ENTITY.data,
     }
-
-    // const renderedContent = await renderURLContent(host, content, dynamicData)
-
 
     let entityTemplatesTree = await buildTemplatesTree(host, content.ENTITY, site)
 
