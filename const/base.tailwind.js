@@ -135,7 +135,7 @@ export const TW_BASE_THEME = () => ({
     // ============================================
     spacing: {
       'air-block':      'clamp(1rem, 0.8rem + 1vw, 1.5rem)',
-      'air-section-sm': 'clamp(2rem, 1.4rem + 3vw, 3.5rem)',
+      'air-section-sm': 'clamp(1rem, 1rem + 1vw, 1.5rem)',
       'air-section':    'clamp(3rem, 1.6rem + 5vw, 6rem)',
       'air-hero':       'clamp(4rem, 2.5rem + 7.5vw, 9rem)',
     },
@@ -324,6 +324,10 @@ export const TW_BASE_CSS = () => (`@tailwind base;
 
   .section {
     @apply py-air-section;
+  }
+
+  .section-sm {
+    @apply py-air-section-sm;
   }
 }
 

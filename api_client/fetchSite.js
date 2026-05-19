@@ -56,6 +56,11 @@ export async function fetchSite(host) {
       } catch(e) {
         site.settings = {}
       }
+      try {
+        site.theme = JSON.parse(site.theme)
+      } catch(e) {
+        site.theme = {}
+      }
 
       await setSite(host, site);
       await setLastSiteRequestTime(host);

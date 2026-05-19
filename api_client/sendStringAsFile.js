@@ -1,3 +1,5 @@
+import logger from '../logger.pino.js';
+
 const CLIENT_SERVICE_API_KEY = process.env.CLIENT_SERVICE_API_KEY;
 
 export async function sendStringAsFile(
@@ -9,6 +11,11 @@ export async function sendStringAsFile(
   if (!filename) {
     throw Error("filename is empty")
   }
+
+  logger.debug('sendStringAsFile',
+    'url', url,
+    'filename', filename
+  );
   
   const mimeType = options?.mimeType || 'text/plain'
   const method = options?.method || 'POST'

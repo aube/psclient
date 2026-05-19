@@ -60,6 +60,8 @@ export async function fetchTemplatesLast(host) {
       return true
     }
     
+    logger.debug('Templates fetched from API successfully2', 'host', host);
+
     return false
   } catch (error) {
     throw error;

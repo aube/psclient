@@ -159,8 +159,19 @@ async function cssTWRegenerate(host, theme = {}) {
         safelist: TW_CLASSES_SAFELIST(),
         responseType: 'string',
       });
+    
+      logger.debug('cssTWRegenerate responce',
+        'twstyle', twstyle,
+        'x-host', host
+      );
 
       if (twstyle.success) {
+        
+        logger.debug('cssTWRegenerate success',
+          'twstyle.success', twstyle.success,
+          'x-host', host
+        );
+
         await sendStringAsFile(
           `http://${API_SERVER_ADDRESS}/api/v1/upload/client`,
           twstyle.css,
@@ -224,12 +235,18 @@ async function cssTemplatesRegenerate(host) {
 } 
 
 async function isSiteThemeUpdated(host, site) {
-  const theme = site.settings.theme || ""
+  const theme = site.theme || ""
 
   const hashKey = `templates:${host}:${SITE_THEME_HASH_KEY}`;
   const currentHash = await getString(hashKey);
   const hash = hashString(JSON.stringify(theme));
-
+  
+  logger.debug('isSiteThemeUpdated',
+    'hashKey', hashKey,
+    'currentHash', currentHash,
+    'hash', hash,
+  );
+  
   if (hash != currentHash) {
     try {
       await setString(hashKey, hash);
@@ -261,15 +278,16 @@ export const mainHandler = async (req, res) => {
   const requestedWith = req.headers['x-requested-with'];
   const isPjax = requestedWith && requestedWith.toLowerCase() === 'partial';
 
-  const templatesUpdated = await fetchTemplatesLast(host);
-  const siteThemeUpdated = await isSiteThemeUpdated(host, site);
-
+  
   if (isPjax) {
     partialLoad(req, res, site)
   } else {
 
+    const templatesUpdated = await fetchTemplatesLast(host);
+    const siteThemeUpdated = await isSiteThemeUpdated(host, site);
+
     if (templatesUpdated || siteThemeUpdated || isDev) {
-      await cssTWRegenerate(host, site.settings.theme);
+      await cssTWRegenerate(host, site.theme);
       await cssTemplatesRegenerate(host);
     }
 
