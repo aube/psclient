@@ -1,0 +1,252 @@
+[
+  {
+    "type": "input",
+    "name": "section_personal",
+    "label": "Заголовок раздела «О себе»"
+  },
+  {
+    "type": "input",
+    "name": "section_contacts",
+    "label": "Заголовок раздела «Контакты и формат работы»"
+  },
+  {
+    "type": "input",
+    "name": "section_pricing",
+    "label": "Заголовок раздела «Цены и условия»"
+  },
+  {
+    "type": "input",
+    "name": "labels_full_name",
+    "label": "Метка для поля «ФИО»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_full_name",
+    "label": "Подсказка для поля «ФИО»"
+  },
+  {
+    "type": "input",
+    "name": "labels_display_name",
+    "label": "Метка для поля «Формат отображения»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_display_name",
+    "label": "Подсказка для поля «Формат отображения»"
+  },
+  {
+    "type": "textarea",
+    "name": "descriptions_display_name",
+    "label": "Подсказка под полем «Формат отображения»"
+  },
+  {
+    "type": "input",
+    "name": "labels_specialization",
+    "label": "Метка для поля «Специализация»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_specialization",
+    "label": "Подсказка для поля «Специализация»"
+  },
+  {
+    "type": "input",
+    "name": "labels_problems",
+    "label": "Метка для поля «Проблемы, с которыми работаете»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_problems",
+    "label": "Подсказка для поля «Проблемы»"
+  },
+  {
+    "type": "textarea",
+    "name": "descriptions_problems",
+    "label": "Подсказка под полем «Проблемы»"
+  },
+  {
+    "type": "input",
+    "name": "labels_not_working_with",
+    "label": "Метка для поля «С кем НЕ работаете»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_not_working_with",
+    "label": "Подсказка для поля «С кем НЕ работаете»"
+  },
+  {
+    "type": "input",
+    "name": "labels_diplomas",
+    "label": "Метка для поля «Образование, дипломы и сертификаты»"
+  },
+  {
+    "type": "textarea",
+    "name": "descriptions_diplomas",
+    "label": "Описание поля «Образование, дипломы и сертификаты»"
+  },
+  {
+    "type": "input",
+    "name": "labels_experience",
+    "label": "Метка для поля «Опыт работы»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_experience",
+    "label": "Подсказка для поля «Опыт работы»"
+  },
+  {
+    "type": "input",
+    "name": "labels_associations",
+    "label": "Метка для поля «Членство в ассоциациях»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_associations",
+    "label": "Подсказка для поля «Членство в ассоциациях»"
+  },
+  {
+    "type": "input",
+    "name": "labels_city",
+    "label": "Метка для поля «Город»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_city",
+    "label": "Подсказка для поля «Город»"
+  },
+  {
+    "type": "input",
+    "name": "labels_address",
+    "label": "Метка для поля «Адрес кабинета»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_address",
+    "label": "Подсказка для поля «Адрес кабинета»"
+  },
+  {
+    "type": "input",
+    "name": "labels_phone",
+    "label": "Метка для поля «Телефон»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_phone",
+    "label": "Подсказка для поля «Телефон»"
+  },
+  {
+    "type": "input",
+    "name": "labels_messengers",
+    "label": "Метка для поля «Мессенджеры»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_messengers",
+    "label": "Подсказка для поля «Мессенджеры»"
+  },
+  {
+    "type": "textarea",
+    "name": "descriptions_messengers",
+    "label": "Подсказка под полем «Мессенджеры»"
+  },
+  {
+    "type": "input",
+    "name": "labels_social",
+    "label": "Метка для поля «Социальные сети»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_social",
+    "label": "Подсказка для поля «Социальные сети»"
+  },
+  {
+    "type": "input",
+    "name": "labels_consultation_types",
+    "label": "Метка для группы чекбоксов «Виды консультаций»"
+  },
+  {
+    "type": "input",
+    "name": "options_consultation_individual",
+    "label": "Текст опции «Индивидуальная консультация»"
+  },
+  {
+    "type": "input",
+    "name": "options_consultation_family",
+    "label": "Текст опции «Семейная консультация»"
+  },
+  {
+    "type": "input",
+    "name": "options_consultation_group",
+    "label": "Текст опции «Групповая консультация»"
+  },
+  {
+    "type": "input",
+    "name": "labels_duration",
+    "label": "Метка для поля «Длительность сессии»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_duration",
+    "label": "Подсказка для поля «Длительность сессии»"
+  },
+  {
+    "type": "input",
+    "name": "labels_cost",
+    "label": "Метка для поля «Стоимость»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_cost",
+    "label": "Подсказка для поля «Стоимость»"
+  },
+  {
+    "type": "input",
+    "name": "labels_cancellation",
+    "label": "Метка для поля «Правила отмены»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_cancellation",
+    "label": "Подсказка для поля «Правила отмены»"
+  },
+  {
+    "type": "input",
+    "name": "labels_privacy_consent",
+    "label": "Текст чекбокса «Согласие с политикой конфиденциальности»"
+  },
+  {
+    "type": "input",
+    "name": "link_privacy_policy",
+    "label": "Ссылка на страницу политики конфиденциальности"
+  },
+  {
+    "type": "input",
+    "name": "link_privacy_policy_text",
+    "label": "Текст ссылки на политику конфиденциальности"
+  },
+  {
+    "type": "input",
+    "name": "labels_personal_data_consent",
+    "label": "Текст чекбокса «Согласие на обработку персональных данных»"
+  },
+  {
+    "type": "input",
+    "name": "link_personal_data",
+    "label": "Ссылка на страницу с правилами обработки персональных данных"
+  },
+  {
+    "type": "input",
+    "name": "link_personal_data_text",
+    "label": "Текст ссылки на правила обработки персональных данных"
+  },
+  {
+    "type": "input",
+    "name": "labels_consent_error",
+    "label": "Текст ошибки, если чекбоксы не отмечены"
+  },
+  {
+    "type": "input",
+    "name": "buttons_submit",
+    "label": "Текст на кнопке отправки формы"
+  }
+]

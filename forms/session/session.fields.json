@@ -51,6 +51,41 @@
   },
   {
     "type": "input",
+    "name": "labels_privacy_consent",
+    "label": "Текст чекбокса «Согласие с политикой конфиденциальности»"
+  },
+  {
+    "type": "input",
+    "name": "link_privacy_policy",
+    "label": "Ссылка на страницу политики конфиденциальности"
+  },
+  {
+    "type": "input",
+    "name": "link_privacy_policy_text",
+    "label": "Текст ссылки на политику конфиденциальности"
+  },
+  {
+    "type": "input",
+    "name": "labels_personal_data_consent",
+    "label": "Текст чекбокса «Согласие на обработку персональных данных»"
+  },
+  {
+    "type": "input",
+    "name": "link_personal_data",
+    "label": "Ссылка на страницу с правилами обработки персональных данных"
+  },
+  {
+    "type": "input",
+    "name": "link_personal_data_text",
+    "label": "Текст ссылки на правила обработки персональных данных"
+  },
+  {
+    "type": "input",
+    "name": "labels_consent_error",
+    "label": "Текст ошибки, если чекбоксы не отмечены"
+  },
+  {
+    "type": "input",
     "name": "buttons_submit",
     "label": "Текст на кнопке отправки формы"
   }

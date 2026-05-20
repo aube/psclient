@@ -9,5 +9,12 @@
   "options_consultation_offline": "Очная консультация",
   "options_consultation_online": "Онлайн консультация",
   "placeholders_question": "По какому вопросу Вы хотите получить консультацию?",
+  "labels_privacy_consent": "Я согласен с",
+  "link_privacy_policy": "/policy",
+  "link_privacy_policy_text": "Политикой конфиденциальности",
+  "labels_personal_data_consent": "Я ознакомлен с",
+  "link_personal_data": "/personal-agreement",
+  "link_personal_data_text": "правилами обработки персональных данных",
+  "labels_consent_error": "Пожалуйста, отметьте оба чекбокса для отправки формы",
   "buttons_submit": "Записаться"
 }

@@ -198,6 +198,7 @@ export const TW_CLASSES_SAFELIST = () => ([
   'bg-secondary/10',
   'bg-surface-contrast/20',
   'text-secondary',
+  'text-action-primary',
   'shadow-elevated',
   'fixed',
   'left-4', 'right-4', 'bottom-4',
@@ -206,9 +207,11 @@ export const TW_CLASSES_SAFELIST = () => ([
   'z-50',
   'items-center',
   'justify-between',
-  'shrink-0', 'space-y-3', 'break-all', 'break-keep', 'block',
-  'text-justify', 'text-right', 'text-left',
-  'whitespace-nowrap', 'break-normal',
+  'shrink-0', 'space-y-3', 'space-y-6', 'break-all', 'break-keep', 'block',
+  'text-justify', 'text-right', 'text-left', 'text-base', 'text-xs',
+  'whitespace-nowrap', 'break-normal', 'underline',
+  'font-medium',
+  'mt-1',
 ])
 
 
