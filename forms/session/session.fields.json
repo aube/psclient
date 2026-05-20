@@ -1,0 +1,57 @@
+[
+  {
+    "type": "input",
+    "name": "labels_name",
+    "label": "Метка для поля «Имя»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_name",
+    "label": "Подсказка для поля «Имя»"
+  },
+  {
+    "type": "input",
+    "name": "labels_email",
+    "label": "Метка для поля «E-mail»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_email",
+    "label": "Подсказка для поля «E-mail»"
+  },
+  {
+    "type": "input",
+    "name": "labels_phone",
+    "label": "Метка для поля «Телефон»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_phone",
+    "label": "Подсказка для поля «Телефон»"
+  },
+  {
+    "type": "input",
+    "name": "labels_consultation_type",
+    "label": "Метка для группы чекбоксов «Тип консультации»"
+  },
+  {
+    "type": "input",
+    "name": "options_consultation_offline",
+    "label": "Текст опции «Очная консультация»"
+  },
+  {
+    "type": "input",
+    "name": "options_consultation_online",
+    "label": "Текст опции «Онлайн-консультация»"
+  },
+  {
+    "type": "input",
+    "name": "placeholders_question",
+    "label": "Подсказка для текстового поля «Вопрос»"
+  },
+  {
+    "type": "input",
+    "name": "buttons_submit",
+    "label": "Текст на кнопке отправки формы"
+  }
+]

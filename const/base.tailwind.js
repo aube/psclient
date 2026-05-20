@@ -206,7 +206,7 @@ export const TW_CLASSES_SAFELIST = () => ([
   'z-50',
   'items-center',
   'justify-between',
-  'shrink-0', 'break-all', 'break-keep', 'block',
+  'shrink-0', 'space-y-3', 'break-all', 'break-keep', 'block',
   'text-justify', 'text-right', 'text-left',
   'whitespace-nowrap', 'break-normal',
 ])

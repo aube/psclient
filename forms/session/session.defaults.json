@@ -1,0 +1,13 @@
+{
+  "labels_name": "Ваше имя",
+  "placeholders_name": "Как к Вам обращаться",
+  "labels_email": "E-mail",
+  "placeholders_email": "",
+  "labels_phone": "Номер телефона",
+  "placeholders_phone": "",
+  "labels_consultation_type": "Выберите тип консультации",
+  "options_consultation_offline": "Очная консультация",
+  "options_consultation_online": "Онлайн консультация",
+  "placeholders_question": "По какому вопросу Вы хотите получить консультацию?",
+  "buttons_submit": "Записаться"
+}
