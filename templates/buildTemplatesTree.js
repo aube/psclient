@@ -14,8 +14,14 @@ import {
 export async function buildTemplatesTree(host, page, site) {
   let fields = page.fields || []
   let html = page.html || ""
-  let data = page.data || ""
+  let data = {}
   let name = "page" + page.id
+
+  for (const [key, value] of Object.entries(page.data || {})) {
+    if (key !== 'templates' && value !== '') {
+      data[key] = value
+    }
+  }
 
   if (!page.use_html) {
     let template = await getTemplateByName(host, page.template)
@@ -123,11 +129,18 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
 
   template.html = dataAttributesInjector(template.html, { uid: marker.uid, cat: template.category })
 
-  const values = {
-    ...template.values, // default template values
-    ...(tplData?.values || {}),
+  let values = {}
+  for (const [key, value] of Object.entries(tplData?.values || {})) {
+    if (value !== '') {
+      values[key] = value
+    }
   }
-  
+
+  values = {
+    ...template.values, // default template values
+    ...values,
+  }
+
   template.html = renderHandlebarsTemplate(template.html, values)
 
   if (template.js) {
