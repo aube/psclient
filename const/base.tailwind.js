@@ -186,7 +186,7 @@ export const TW_BASE_THEME = () => ({
 })
 
 export const TW_CLASSES_SAFELIST = () => ([
-  'bg-surface-main', 'bg-surface-card', 'bg-surface-contrast',
+  'bg-surface-main', 'bg-inverted-surface-main', 'bg-surface-card', 'bg-surface-contrast',
   'text-content-primary', 'text-content-secondary', 'text-content-inverted',
   'border-border-subtle', 'border-border-focus',
   'bg-action-primary', 'hover:bg-action-primaryHover',
@@ -204,7 +204,7 @@ export const TW_CLASSES_SAFELIST = () => ([
   'left-4', 'right-4', 'bottom-4',
   'left-1/2',
   '-translate-x-1/2',
-  'z-50',
+  'z-50', 'z-20',
   'items-center',
   'justify-between',
   'shrink-0', 'space-y-3', 'space-y-6', 'break-all', 'break-keep', 'block',
@@ -297,11 +297,20 @@ export const TW_BASE_CSS = () => (`@tailwind base;
      ============================================ */
   .hero {
     @apply pt-0 lg:pt-air-hero pb-air-hero;
-    @apply bg-surface-main;
+    @apply relative overflow-hidden z-10 min-h-[75vh] lg:min-h-screen flex items-center;
   }
   
   .hero-content {
-    @apply animate-fade-in;
+    @apply w-full animate-fade-in;
+    @apply flex flex-col w-full;
+  }
+
+  .hero-content.right {
+    @apply lg:w-1/2 lg:ml-auto;
+  }
+
+  .hero-content.left {
+    @apply lg:w-1/2;
   }
   
   /* Плавающие карточки (анимация) */
@@ -932,11 +941,16 @@ export const TW_BASE_CSS = () => (`@tailwind base;
 
 @layer components {
   /* ============================================
-     SPLIT SECTION — Двухколоночная секция
+     SPLIT SECTION — Двухколоночная секция во весь экран (hero or map section)
      ============================================ */
   .split-section {
     @apply w-full;
     @apply bg-surface-main;
+  }
+
+  .split-section.map,
+  .split-section.hero {
+    @apply py-0;
   }
   
   .split-grid {
@@ -962,7 +976,6 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   /* Правая колонка: Контент */
   .split-content {
     @apply flex items-center;
-    @apply bg-surface-main;
     @apply px-6 sm:px-10 lg:px-16 xl:px-24;
     @apply py-air-section;
   }
@@ -1008,7 +1021,6 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   }
 
   .section.inverted,
-  .hero.inverted,
   .features.inverted,
   .features-alt.inverted,
   .features-minimal.inverted,
@@ -1018,6 +1030,11 @@ export const TW_BASE_CSS = () => (`@tailwind base;
   .contact.inverted,
   .split-section.inverted {
     background-color: theme('colors.inverted.surface.main');
+    color: theme('colors.inverted.content.primary');
+  }
+
+  .hero.inverted {
+    background-color: transparent;
     color: theme('colors.inverted.content.primary');
   }
 
