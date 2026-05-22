@@ -182,11 +182,20 @@ export const TW_BASE_THEME = () => ({
         '100%': { transform: 'translateY(0)', opacity: '1' },
       },
     },
+
   },
 })
 
-export const TW_CLASSES_SAFELIST = () => ([
-  'bg-surface-main', 'bg-inverted-surface-main', 'bg-surface-card', 'bg-surface-contrast',
+export const TW_CLASSES_SAFELIST = () => {
+  const cols = Array.from({ length: 6 }, (_, i) => `grid-cols-${i + 1}`);
+  const screens = ['md']; //['sm', 'md', 'lg', 'xl', '2xl'];
+  const responsiveCols = screens.flatMap(s => cols.map(c => `${s}:${c}`));
+  return [
+    ...cols, ...responsiveCols,
+    'rounded-xl',
+    'rounded-2xl',
+    'bg-surface-main/50', 'bg-inverted-surface-main/50',
+    'bg-surface-main', 'bg-inverted-surface-main', 'bg-surface-card', 'bg-surface-contrast',
   'text-content-primary', 'text-content-secondary', 'text-content-inverted',
   'border-border-subtle', 'border-border-focus',
   'bg-action-primary', 'hover:bg-action-primaryHover',
@@ -212,7 +221,7 @@ export const TW_CLASSES_SAFELIST = () => ([
   'whitespace-nowrap', 'break-normal', 'underline',
   'font-medium',
   'mt-1',
-])
+]}
 
 
 export const TW_BASE_CSS = () => (`@tailwind base;
