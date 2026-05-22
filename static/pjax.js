@@ -154,6 +154,7 @@ export class PJAXClient {
       
       // Update the content
       this.updateContent(data, url);
+      window.scrollTo(0, 0);
       
       // Update browser history
       this.addHistoryState(url, data.title || '');
