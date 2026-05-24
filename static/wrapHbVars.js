@@ -96,7 +96,7 @@ export function wrapHbVars(html) {
 
 // const test = `<nav class="fixed top-0 left-0 right-0 z-50 flex justify-center p-6"  aria-label="Основная навигация" test="{{test}}">
 //     <div class="w-full max-w-7xl flex justify-between items-center font-display">
-//         <div class="text-2xl font-medium tracking-tighter">d404<span class="opacity-30">.ru</span></div>
+//         <div class="text-2xl font-medium tracking-tighter">psy<span class="opacity-30">.ru</span></div>
 //         <div class="hidden md:flex space-x-12 text-[10px] uppercase tracking-[0.4em] font-medium">
 //             <a href="#" class="hover:opacity-50 transition">Кейсы</a>
 //             <a href="#" class="hover:opacity-50 transition">Студия</a>
@@ -105,7 +105,7 @@ export function wrapHbVars(html) {
 //   {{/each}}
 //         </div>
 // {{settings.logo}}
-//         <a href="mailto:hello@d404.ru" class="hover:scale-110 transition-transform">
+//         <a href="mailto:hello@psy.rest" class="hover:scale-110 transition-transform">
 //             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><path d="M22 6l-10 7L2 6"></path></svg>
 //         </a>
 //     </div>

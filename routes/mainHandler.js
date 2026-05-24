@@ -283,7 +283,7 @@ export const mainHandler = async (req, res) => {
     const siteThemeUpdated = await isSiteThemeUpdated(host, site);
 
     if (templatesUpdated || siteThemeUpdated || isDev) {
-      await cssTWRegenerate(host, site.theme);
+      // await cssTWRegenerate(host, site.theme);
       await cssTemplatesRegenerate(host);
     }
 

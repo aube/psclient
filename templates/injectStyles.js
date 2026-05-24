@@ -5,13 +5,13 @@ import {
 import { TWCSS_HASH_KEY, TEMPLATESCSS_HASH_KEY } from "../const/index.js"
 
 
-export async function injectStylesHead(host, finalHTML) {
+export async function injectStylesHead(hashes = {}, finalHTML = '') {
   if (!finalHTML.includes('</head>')) {
     return
   }
 
-  const twhash = await getString(`templates:${host}:${TWCSS_HASH_KEY}`);
-  const tplcsshash = await getString(`templates:${host}:${TEMPLATESCSS_HASH_KEY}`);
+  const twhash = hashes['twstyle.css'];
+  const tplcsshash = hashes['templates.css'];
 
   if (!twhash && !tplcsshash) {
     return finalHTML
