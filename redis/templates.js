@@ -2,41 +2,6 @@ import logger from '../logger.pino.js';
 import { getRedisClient } from './index.js'
 import { REDIS_DEFAULT_EXPIRE_TIME } from '../const/index.js';
 
-export async function getHostTemplatesCSSClasses(host) {
-  const classes = new Set()
-  const client = getRedisClient();
-
-  for (let h of ['SHARED', host]) {
-    const key = `templates:${h}:_map`;
-    const templates = await client.zRange(key, 0, -1);
-    for (let tplName of templates) {
-      const css = await client.zRange(`templates:${h}:${tplName}_classes`, 0, -1);
-        css?.forEach(c => classes.add(c));
-      }
-    }
-  
-  return [...classes];
-}
-
-export async function getHostTemplatesCSS(host) {
-  const styles = new Array()
-  const client = getRedisClient();
-
-  for (let h of ['SHARED', host]) {
-    const key = `templates:${h}:_map`;
-    const templates = await client.zRange(key, 0, -1);
-
-    for (let tplName of templates) {
-      const tpl = await client.json.get(`templates:${h}:${tplName}`);
-      if (tpl && tpl.css) {
-        styles.push(tpl.css);
-      }
-    }
-  }
-
-  return styles;
-}
-
 export async function getTemplatesByCategory(host, category) {
   const templates = {};
   const client = getRedisClient();
@@ -82,7 +47,6 @@ async function setTemplate(host, item) {
   const key = `templates:${host}:${item.name}`;
   const mapKey = `templates:${host}:_map`;
   const categoryKey = `templates:${host}:_cat_` + item.category;
-  const classesKey = key + "_classes";
 
   const map = await client.zRange(mapKey, 0, -1)
   
@@ -90,12 +54,6 @@ async function setTemplate(host, item) {
     client.zAdd(categoryKey, { score: 0, value: item.name }),
     client.zAdd(mapKey, { score: 0, value: item.name }),
   ]
-  
-  if (item.classes?.length) {
-    for (let cls of item.classes) {
-      promises.push(client.zAdd(classesKey, { score: 0, value: cls }));
-    }
-  }
   delete item.classes;
 
   promises.push(client.json.set(key, "$", item));

@@ -8,20 +8,6 @@ const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
 
 
-function getAllClasses(html) {
-  const classRegex = /\bclass=["']([^"']*)["']/g;
-  const classes = new Set();
-  let match;
-  
-  while ((match = classRegex.exec(html)) !== null) {
-    match[1].split(/\s+/).forEach(cls => {
-      if (cls) classes.add(cls);
-    });
-  }
-  
-  return [...classes];
-}
-
 export async function fetchTemplatesLast(host) {
   try {
     const baseUrl = API_SERVER_ADDRESS + API_BASE_URL;
@@ -52,7 +38,6 @@ export async function fetchTemplatesLast(host) {
         console.log("Loaded template:", item.name)
 
         item.values = JSON.parse(item.values || "{}")
-        item.classes = getAllClasses(item.html || "")
       })
       
       await saveTemplates(host, templates)

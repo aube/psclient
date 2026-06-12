@@ -1,10 +1,3 @@
-import {
-  getString,
-} from '../redis/index.js'
-
-import { TWCSS_HASH_KEY, TEMPLATESCSS_HASH_KEY } from "../const/index.js"
-
-
 export async function injectStylesHead(hashes = {}, finalHTML = '') {
   if (!finalHTML.includes('</head>')) {
     return
@@ -12,11 +5,6 @@ export async function injectStylesHead(hashes = {}, finalHTML = '') {
 
   const twhash = hashes['twstyle.css'];
   const tplcsshash = hashes['templates.css'];
-
-  if (!twhash && !tplcsshash) {
-    return finalHTML
-  }
-
 
   // TODO: /style.css - пишется из формы настроек сайта в админке
   // нужно получить его время последнего изменения и использовать в хэше
