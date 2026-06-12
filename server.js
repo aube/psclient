@@ -5,6 +5,7 @@ import logger from './logger.pino.js';
 import { healthHandler } from './routes/healthHandler.js';
 import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
 import { mainHandler } from './routes/mainHandler.js';
+import { innerSpaceHandler } from './routes/innerSpaceHandler.js';
 import { initRedis, flushDb } from './redis/index.js';
 import { fetchTemplatesLast } from './api_client/fetchTemplatesLast.js';
 
@@ -135,6 +136,8 @@ app.get('/hot-reload', hotReloadHandler);
 
 // Health check endpoint
 app.get('/health', healthHandler);
+
+app.get('/inner-space', innerSpaceHandler);
 
 // Main request handler
 app.get('*', mainHandler);
