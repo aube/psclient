@@ -31,19 +31,16 @@ async function fullLoad(req, res, site) {
     htmlLayout = injectSiteSettings(htmlLayout, site.settings);
 
     const dynamicData = {
-      ...site.settings,
-      ...site.meta,
+      settings: { ...site.settings},
+      meta: { ...site.meta},
     }
-
+    
     let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site)
-
+    
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
-
     let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
     
-    finalHTML = renderHandlebarsTemplate(finalHTML, {
-      ...dynamicData
-    });
+    finalHTML = renderHandlebarsTemplate(finalHTML, dynamicData);
 
     if (isDev) {
       // finalHTML += `<pre>${JSON.stringify(entityTemplatesTree.nodes, null, 2)}</pre>`
@@ -87,9 +84,7 @@ async function partialLoad(req, res, site) {
 
     let finalHTML = await injectEntityTreeNodes(host, entityTemplatesTree.html, entityTemplatesTree.nodes)
     
-    finalHTML = renderHandlebarsTemplate(finalHTML, {
-      ...dynamicData
-    });
+    finalHTML = renderHandlebarsTemplate(finalHTML, dynamicData );
 
     // TODO: оптимизация - отправлять данные по секциям/блокам,
     // клиент найдёт изменённые секции, блоки и обновит только их
@@ -114,7 +109,7 @@ export const mainHandler = async (req, res) => {
 
   const host = req.headers.host;
   const {site, cookies} = await fetchSite(host);
-console.log(site)
+
   if (cookies) {
     res.setHeader('Set-Cookie', cookies);
   }

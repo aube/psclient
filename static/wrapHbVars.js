@@ -10,7 +10,7 @@
 // <p>Hello, <!--var:userName-->{{userName}}<!--/var:userName-->!</p>
 
 export function wrapHbVars(html) {
-  const ignoredTags = ['textarea', 'script', 'style', 'noscript'];
+  const ignoredTags = ['textarea', 'script', 'style', 'noscript', 'title'];
   
   let result = '';
   let buffer = '';
