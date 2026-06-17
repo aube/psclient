@@ -114,7 +114,7 @@ export const mainHandler = async (req, res) => {
 
   const host = req.headers.host;
   const {site, cookies} = await fetchSite(host);
-
+console.log(site)
   if (cookies) {
     res.setHeader('Set-Cookie', cookies);
   }

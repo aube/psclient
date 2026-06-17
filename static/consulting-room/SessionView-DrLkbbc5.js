@@ -1,0 +1,1 @@
+import{h as e,l as t,s as n}from"./index-9U66rCsh.js";var r=(e,t)=>{let n=e.__vccOpts||e;for(let[e,r]of t)n[e]=r;return n},i={},a={class:`p-4 text-center text-content-secondary`};function o(r,i){return e(),t(`div`,a,[...i[0]||=[n(`p`,null,`Сессии`,-1)]])}var s=r(i,[[`render`,o]]);export{s as default};

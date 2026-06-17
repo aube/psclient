@@ -19,21 +19,21 @@ const isDev = process.env.NODE_ENV === 'development'
 
 
 async function getInnerHTMLLayout() {
-  const files = await fs.readdir('./static/inner-space');
+  const files = await fs.readdir('./static/consulting-room');
   const fileName = files.find(name => name.startsWith('index-'));
   if (!fileName) return '';
 
   return `<div id="app"></div>
-  <script type="module" src="/static/inner-space/${fileName}"></script>`;
+  <script type="module" src="/static/consulting-room/${fileName}"></script>`;
 }
 
 
-async function innerSpaceLoad(req, res, site) {
+async function consultingRoomLoad(req, res, site) {
   try {
     const authToken = req.cookies.auth_token;
     const host = req.headers.host;
 
-    logger.debug('innerSpaceLoad', 'url', req.url, 'host', host);
+    logger.debug('consultingRoomLoad', 'url', req.url, 'host', host);
 
     let htmlLayout = await buildLayoutHTML(host, site);
     htmlLayout = injectSiteSettings(htmlLayout, site.settings);
@@ -74,7 +74,7 @@ async function innerSpaceLoad(req, res, site) {
 
 
 
-export const innerSpaceHandler = async (req, res) => {
+export const consultingRoomHandler = async (req, res) => {
   if (res.writableEnded) {
     return
   }
@@ -86,5 +86,5 @@ export const innerSpaceHandler = async (req, res) => {
     res.setHeader('Set-Cookie', cookies);
   }
 
-  innerSpaceLoad(req, res, site)
+  consultingRoomLoad(req, res, site)
 };
