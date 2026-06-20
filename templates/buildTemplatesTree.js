@@ -11,7 +11,7 @@ import {
   renderHandlebarsTemplate,
 } from '../templates/index.js'
 
-export async function buildTemplatesTree(host, page, site) {
+export async function buildTemplatesTree(host, page, site, globalData) {
   let fields = page.fields || []
   let html = page.html || ""
   let data = {}
@@ -30,6 +30,7 @@ export async function buildTemplatesTree(host, page, site) {
       throw new Error("No found Page template:")
     }
     data = {
+      ...globalData,
       ...template.values,
       ...data,
     }
@@ -40,7 +41,7 @@ export async function buildTemplatesTree(host, page, site) {
 
   const templateMarkers = extractTemplateIncludes(html, site.uuid, page.use_html)
   const templatesData = page.data?.templates || {}
-  const nodes = await getEntityRootBranches(host, templateMarkers|| [], templatesData)
+  const nodes = await getEntityRootBranches(host, templateMarkers|| [], templatesData, globalData)
 
   templateMarkers.forEach(marker => {
     if (marker.multiple) {
@@ -69,7 +70,7 @@ export async function buildTemplatesTree(host, page, site) {
   }
 }
 
-async function getEntityRootBranches(host, markers, templatesData) {
+async function getEntityRootBranches(host, markers, templatesData, globalData) {
   const nodes = []
 
   for (const marker of markers) {
@@ -90,7 +91,7 @@ async function getEntityRootBranches(host, markers, templatesData) {
         multiple: true,
       })
     } else {
-      const branch = await getTemplateBranch(host, marker, marker.uid, templatesData)
+      const branch = await getTemplateBranch(host, marker, marker.uid, templatesData, globalData)
       
       nodes.push({
         ...branch,
@@ -102,7 +103,7 @@ async function getEntityRootBranches(host, markers, templatesData) {
   return nodes
 }
 
-async function getTemplateBranch(host, marker, parentId, templatesData) {
+async function getTemplateBranch(host, marker, parentId, templatesData, globalData) {
   const { name, id, changable } = marker
 
   let template
@@ -137,6 +138,7 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
   }
 
   values = {
+    ...globalData,
     ...template.values, // default template values
     ...values,
   }
@@ -165,6 +167,7 @@ async function getTemplateBranch(host, marker, parentId, templatesData) {
         },
         marker.uid,
         templatesData,
+        globalData
       )
 
       // готовим html

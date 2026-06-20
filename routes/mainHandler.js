@@ -35,7 +35,7 @@ async function fullLoad(req, res, site) {
       meta: { ...site.meta},
     }
     
-    let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site)
+    let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site, dynamicData)
     
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
     let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
