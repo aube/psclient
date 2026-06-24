@@ -39,8 +39,8 @@ export async function buildTemplatesTree(host, page, site, globalData) {
     name = page.template;
   }
 
-  const templateMarkers = extractTemplateIncludes(html, site.uuid, page.use_html)
   const templatesData = page.data?.templates || {}
+  const templateMarkers = extractTemplateIncludes(html, templatesData.uuid || site.uuid, page.use_html)
   const nodes = await getEntityRootBranches(host, templateMarkers|| [], templatesData, globalData)
 
   templateMarkers.forEach(marker => {

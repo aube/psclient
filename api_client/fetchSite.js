@@ -35,7 +35,7 @@ export async function fetchSite(host) {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(response.status);
     }
     
     site = await response.json();

@@ -16,7 +16,7 @@ import {
 } from '../templates/index.js'
 
 const isDev = process.env.NODE_ENV === 'development'
-
+const SITE_NOT_FOUND_ADDRESS = process.env.SITE_NOT_FOUND_ADDRESS;
 
 async function fullLoad(req, res, site) {
   try {
@@ -108,7 +108,14 @@ export const mainHandler = async (req, res) => {
   }
 
   const host = req.headers.host;
-  const {site, cookies} = await fetchSite(host);
+  let site, cookies
+  try {
+    ({site, cookies} = await fetchSite(host));
+  } catch(e) {
+    // res.status(404)
+    res.redirect(SITE_NOT_FOUND_ADDRESS)
+    return
+  }
 
   if (cookies) {
     res.setHeader('Set-Cookie', cookies);
@@ -124,4 +131,5 @@ export const mainHandler = async (req, res) => {
   } else {
     fullLoad(req, res, site)
   }
+
 };
