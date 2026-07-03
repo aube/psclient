@@ -5,7 +5,7 @@ import {
   buildLayoutHTML,
   injectSiteSettings,
   injectHTML,
-  renderHandlebarsTemplate,
+  handlebarsRender,
 } from '../templates/index.js';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -31,7 +31,7 @@ async function callLoad(req, res, site) {
 
     let finalHTML = await injectHTML('ENTITY', htmlLayout, getCallContainerHTML(uuid));
 
-    finalHTML = renderHandlebarsTemplate(finalHTML, {
+    finalHTML = handlebarsRender(finalHTML, {
       ...dynamicData,
     });
 

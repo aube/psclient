@@ -1,6 +1,6 @@
 import {
   injectHTML,
-  renderHandlebarsTemplate,
+  handlebarsRender,
   dynamicIncludes2HTMLComments,
 } from './index.js'
 
@@ -29,7 +29,7 @@ export function injectEntityTreeNodes(host, layoutHTML = '', nodes) {
   // for (const [name, snippet] of Object.entries(sections)) {
   //   if (finalHTML.includes(`<!--${name}-->`) || finalHTML.includes(`<!--~${name}-->`)) {
   //     let html = dynamicIncludes2HTMLComments(snippet.html);
-  //     html = renderHandlebarsTemplate(html, {
+  //     html = handlebarsRender(html, {
   //       ...snippet.data,
   //       ...dynamicData
   //     });
@@ -42,7 +42,7 @@ export function injectEntityTreeNodes(host, layoutHTML = '', nodes) {
   // for (const [name, snippet] of Object.entries(blocks)) {
   //   if (finalHTML.includes(`<!--${name}-->`) || finalHTML.includes(`<!--~${name}-->`)) {
   //     let html = dynamicIncludes2HTMLComments(snippet.html);
-  //     html = renderHandlebarsTemplate(html, {
+  //     html = handlebarsRender(html, {
   //       ...snippet.data,
   //       ...dynamicData
   //     });

@@ -8,7 +8,7 @@ import {
 } from './utils.js'
 
 import {
-  renderHandlebarsTemplate,
+  handlebarsRender,
 } from '../templates/index.js'
 
 export async function buildTemplatesTree(host, page, site, globalData) {
@@ -63,7 +63,7 @@ export async function buildTemplatesTree(host, page, site, globalData) {
     name,
     changable: true,
     category: "template",
-    html: renderHandlebarsTemplate(html, data),
+    html: handlebarsRender(html, data),
     fields,
     defaultValues: data,
     nodes,
@@ -91,7 +91,7 @@ async function getEntityRootBranches(host, markers, templatesData, globalData) {
         multiple: true,
       })
     } else {
-      const branch = await getTemplateBranch(host, marker, marker.uid, templatesData, globalData)
+      const branch = await getTemplateBranch(host, marker, marker.uid, templatesData, globalData, 2)
       
       nodes.push({
         ...branch,
@@ -103,7 +103,7 @@ async function getEntityRootBranches(host, markers, templatesData, globalData) {
   return nodes
 }
 
-async function getTemplateBranch(host, marker, parentId, templatesData, globalData) {
+async function getTemplateBranch(host, marker, parentId, templatesData, globalData, level = 1) {
   const { name, id, changable } = marker
 
   let template
@@ -128,8 +128,6 @@ async function getTemplateBranch(host, marker, parentId, templatesData, globalDa
     throw new Error('Template not found: ' + name)
   }
 
-  template.html = dataAttributesInjector(template.html, { uid: marker.uid, cat: template.category })
-
   let values = {}
   for (const [key, value] of Object.entries(tplData?.values || {})) {
     if (value !== '') {
@@ -137,13 +135,15 @@ async function getTemplateBranch(host, marker, parentId, templatesData, globalDa
     }
   }
 
+  template.html = dataAttributesInjector(template.html, { uid: marker.uid, cat: template.category }, values.anchor)
+
   values = {
     ...globalData,
     ...template.values, // default template values
     ...values,
   }
-
-  template.html = renderHandlebarsTemplate(template.html, values)
+  
+  template.html = handlebarsRender(template.html, values, level)
 
   if (template.js) {
     template.html += '<script>(function() {' + template.js + '})()</script>'
@@ -167,7 +167,8 @@ async function getTemplateBranch(host, marker, parentId, templatesData, globalDa
         },
         marker.uid,
         templatesData,
-        globalData
+        globalData,
+        level + Number(Boolean(values.title))
       )
 
       // готовим html

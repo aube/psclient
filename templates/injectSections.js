@@ -1,6 +1,6 @@
 import {
   injectHTML,
-  renderHandlebarsTemplate,
+  handlebarsRender,
   dynamicIncludes2HTMLComments,
 } from './index.js'
 
@@ -17,7 +17,7 @@ export async function injectSections(host, finalHTML, dynamicData) {
   for (const [name, snippet] of Object.entries(sections)) {
     if (finalHTML.includes(`<!--${name}-->`) || finalHTML.includes(`<!--~${name}-->`)) {
       let html = dynamicIncludes2HTMLComments(snippet.html);
-      html = renderHandlebarsTemplate(html, {
+      html = handlebarsRender(html, {
         ...snippet.data,
         ...dynamicData
       });
@@ -30,7 +30,7 @@ export async function injectSections(host, finalHTML, dynamicData) {
   for (const [name, snippet] of Object.entries(blocks)) {
     if (finalHTML.includes(`<!--${name}-->`) || finalHTML.includes(`<!--~${name}-->`)) {
       let html = dynamicIncludes2HTMLComments(snippet.html);
-      html = renderHandlebarsTemplate(html, {
+      html = handlebarsRender(html, {
         ...snippet.data,
         ...dynamicData
       });

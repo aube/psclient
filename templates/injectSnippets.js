@@ -1,6 +1,6 @@
 import {
   injectHTML,
-  renderHandlebarsTemplate,
+  handlebarsRender,
 } from './index.js'
 
 import {
@@ -17,7 +17,7 @@ export async function injectSnippets(host, html, dynamicData, snippets, level = 
   
   for (const [name, snippet] of Object.entries(snippets)) {
     if (html.includes(`<!--${name}-->`) || html.includes(`<!--!${name}-->`)) {
-      const snippetHTML = renderHandlebarsTemplate(snippet.html, {
+      const snippetHTML = handlebarsRender(snippet.html, {
         ...snippet.data,
         ...dynamicData
       });

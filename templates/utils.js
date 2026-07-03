@@ -35,14 +35,14 @@ export function extractTemplateIncludes(html, hashPrefix) {
 }
 
 
-export function dataAttributesInjector(html, values) {
+export function dataAttributesInjector(html, values, anchor = "") {
   const firstTagMatch = html.match(/<[^>]+>/);
   if (!firstTagMatch) return html;
 
   const attributes = Object.entries(values)
     .map(([key, value]) => `data-${key}="${value}"`)
-    .join(' ');
-
+    .join(' ') + (anchor ? ` id="${anchor}"` : "");
+  
   const newTag = firstTagMatch[0].replace(/>$/, ` ${attributes}>`);
 
   return html.replace(firstTagMatch[0], newTag);

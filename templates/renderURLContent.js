@@ -3,7 +3,7 @@ import {
 } from '../static/wrapHbVars.js'
 
 import {
-  renderHandlebarsTemplate,
+  handlebarsRender,
   dynamicIncludes2HTMLComments,
 } from './index.js'
 
@@ -25,7 +25,7 @@ export async function renderURLContent(host, content, dynamicData) {
   html = dynamicIncludes2HTMLComments(html)
   html = wrapHbVars(html)
 
-  content.ENTITY = renderHandlebarsTemplate(html, {
+  content.ENTITY = handlebarsRender(html, {
     ...ENTITY,
     ...dynamicData,
   });

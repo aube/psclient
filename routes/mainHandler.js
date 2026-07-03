@@ -11,7 +11,7 @@ import {
   injectHTML,
   injectScriptsBody,
   injectStylesHead,
-  renderHandlebarsTemplate,
+  handlebarsRender,
   buildTemplatesTree,
 } from '../templates/index.js'
 
@@ -40,7 +40,7 @@ async function fullLoad(req, res, site) {
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
     let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
     
-    finalHTML = renderHandlebarsTemplate(finalHTML, dynamicData);
+    finalHTML = handlebarsRender(finalHTML, dynamicData);
 
     if (isDev) {
       // finalHTML += `<pre>${JSON.stringify(entityTemplatesTree.nodes, null, 2)}</pre>`
@@ -84,7 +84,7 @@ async function partialLoad(req, res, site) {
 
     let finalHTML = await injectEntityTreeNodes(host, entityTemplatesTree.html, entityTemplatesTree.nodes)
     
-    finalHTML = renderHandlebarsTemplate(finalHTML, dynamicData );
+    finalHTML = handlebarsRender(finalHTML, dynamicData );
 
     // TODO: оптимизация - отправлять данные по секциям/блокам,
     // клиент найдёт изменённые секции, блоки и обновит только их

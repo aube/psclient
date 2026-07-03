@@ -11,7 +11,7 @@ import {
   injectHTML,
   injectScriptsBody,
   injectStylesHead,
-  renderHandlebarsTemplate,
+  handlebarsRender,
   buildTemplatesTree,
 } from '../templates/index.js'
 
@@ -45,7 +45,7 @@ async function consultingRoomLoad(req, res, site) {
 
     let finalHTML = await injectHTML('ENTITY', htmlLayout, await getInnerHTMLLayout())
     
-    finalHTML = renderHandlebarsTemplate(finalHTML, {
+    finalHTML = handlebarsRender(finalHTML, {
       ...dynamicData
     });
 
