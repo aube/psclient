@@ -55,6 +55,7 @@ export async function fetchPageEntity(host, url, authToken) {
     return await fetchURL(host, url, authToken);
   } catch (error) {
     const statusCode = error.statusCode || 500;
+
     return {
       ENTITY: {
         id: 2,
@@ -85,6 +86,7 @@ export async function fetchPageEntity(host, url, authToken) {
         updated_at: new Date().toISOString(),
       },
       CHILDREN: [],
+      statusCode,
     };
   }
 }

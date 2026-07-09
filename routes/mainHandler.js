@@ -25,7 +25,7 @@ async function fullLoad(req, res, site) {
 
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
-    const {ENTITY, CHILDREN} = await fetchURL(host, req.url, authToken);
+    const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken);
 
     let htmlLayout = await buildLayoutHTML(host, site);
     htmlLayout = injectSiteSettings(htmlLayout, site.settings);
@@ -54,7 +54,7 @@ async function fullLoad(req, res, site) {
       'htmlLength', finalHTML.length
     );
 
-
+    res.status(statusCode || 200);
     res.setHeader('Content-Type', 'text/html');
     res.send(finalHTML);
 
@@ -88,6 +88,7 @@ async function partialLoad(req, res, site) {
 
     // TODO: оптимизация - отправлять данные по секциям/блокам,
     // клиент найдёт изменённые секции, блоки и обновит только их
+    if (content.statusCode) res.status(content.statusCode);
     res.json({
       ENTITY:finalHTML
     });
