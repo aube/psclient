@@ -20,7 +20,9 @@ export async function fetchURL(host, url, authToken) {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = new Error(`HTTP error! status: ${response.status}`);
+      error.statusCode = response.status;
+      throw error;
     }
     
     const data = await response.json();
@@ -45,5 +47,44 @@ export async function fetchURL(host, url, authToken) {
   } catch (error) {
     logger.error('Error fetching page data:', error.message);
     throw error;
+  }
+}
+
+export async function fetchPageEntity(host, url, authToken) {
+  try {
+    return await fetchURL(host, url, authToken);
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+    return {
+      ENTITY: {
+        id: 2,
+        parent_id: 1,
+        name: 'error',
+        meta: '',
+        title: '',
+        header: 'Произошла ошибка',
+        img: '',
+        menu: '',
+        icon: '',
+        template: 'PAGE_ERROR',
+        html: '',
+        fields: '',
+        data: {
+          error: { [`code${statusCode}`]: true },
+          message: error.message,
+          code: statusCode,
+        },
+        data_preview: '',
+        use_html: false,
+        sort: 2100,
+        pinned: 0,
+        children: 0,
+        show_children: 0,
+        published: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      CHILDREN: [],
+    };
   }
 }

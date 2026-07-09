@@ -1,6 +1,6 @@
 import logger from '../logger.pino.js';
 import { fetchSite } from '../api_client/fetchSite.js';
-import { fetchURL } from '../api_client/fetchURL.js';
+import { fetchPageEntity as fetchURL } from '../api_client/fetchURL.js';
 import { fetchTemplatesLast } from '../api_client/fetchTemplatesLast.js';
 import { addHotReloadScript } from '../templates/addHotReloadScript.js';
 
