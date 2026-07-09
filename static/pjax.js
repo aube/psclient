@@ -145,11 +145,6 @@ export class PJAXClient {
 
       // Fetch the partial content
       const response = await this.fetchContent(url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
       const data = await response.json();
       
       // Update the content
@@ -194,11 +189,6 @@ export class PJAXClient {
         },
         body: method === 'POST' ? formData : undefined
       });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
       const data = await response.json();
       
       // Update the content

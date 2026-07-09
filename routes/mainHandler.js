@@ -86,11 +86,13 @@ async function partialLoad(req, res, site) {
     
     finalHTML = handlebarsRender(finalHTML, dynamicData );
 
+    res.status(content.statusCode || 200);
+
     // TODO: оптимизация - отправлять данные по секциям/блокам,
     // клиент найдёт изменённые секции, блоки и обновит только их
-    if (content.statusCode) res.status(content.statusCode);
     res.json({
-      ENTITY:finalHTML
+      ENTITY: finalHTML,
+      ...(content.statusCode ? { statusCode: content.statusCode } : {}),
     });
 
   } catch (error) {
