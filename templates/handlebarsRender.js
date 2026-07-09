@@ -27,6 +27,15 @@ export function handlebarsRender(templateString, data, headingLevel = 2) {
     return accum;
   });
 
+  Handlebars.registerHelper('split', function(string) {
+    if (typeof string !== 'string') return [];
+    const separator = ',';
+
+    return string.split(separator).map(item => {
+      return item.trim()
+    });
+  });
+
   // Нумерованые списки в циклах
   Handlebars.registerHelper('increment', function(value) {
       return parseInt(value) + 1;
@@ -52,11 +61,6 @@ export function handlebarsRender(templateString, data, headingLevel = 2) {
     headingLevel,
   })
 
-  if (+data.title === 123) {
-    console.log(templateString)
-    console.log(headingLevel)
-  }
-
   logger.debug(
     'Render Handlebars Template',
     'templateString', templateString,
@@ -67,4 +71,3 @@ export function handlebarsRender(templateString, data, headingLevel = 2) {
 
  return result;
 }
-

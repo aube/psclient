@@ -12,6 +12,21 @@ const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 const API_BASE_URL = process.env.API_BASE_URL;
 const REDIS_CACHE_TTL_SECOUNDS = process.env.REDIS_CACHE_TTL_SECOUNDS;
 
+
+function siteSettingsUpgrade(settings) {
+  if (settings.contacts) {
+    if (!Array.isArray(settings.contacts)) {
+      settings.contactsMap = {}
+    } else {
+      settings.contactsMap = settings.contacts.reduce((acc, c) => {
+        acc[c.uid] = c
+        return acc
+      }, {})
+    }
+  }
+  return settings
+}
+
 export async function fetchSite(host) {
   try {
     let site = null
@@ -56,6 +71,9 @@ export async function fetchSite(host) {
       } catch(e) {
         site.settings = {}
       }
+
+      site.settings = siteSettingsUpgrade(site.settings)
+
       try {
         site.theme = JSON.parse(site.theme)
       } catch(e) {
