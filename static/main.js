@@ -30,6 +30,7 @@ function setCookie(name, value, days) {
 
 function showCookieBanner() {
   if (getCookie('cookie_accepted') === 'true') return;
+  if (window.__SITE_SETTINGS.supressCookieBanner) return;
 
   const banner = document.createElement('div');
   banner.className = [
