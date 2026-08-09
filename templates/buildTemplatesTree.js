@@ -29,6 +29,12 @@ export async function buildTemplatesTree(host, page, site, globalData) {
       console.error(page.template)
       throw new Error("No found Page template:")
     }
+
+    globalData = {
+      ...globalData,
+      ...(page.data?.values || {}),
+    }
+
     data = {
       ...globalData,
       ...template.values,

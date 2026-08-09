@@ -72,9 +72,12 @@ export async function fetchPageEntity(host, url, authToken) {
         fields: '',
         data: {
           error: { [`code${statusCode}`]: true },
-          message: error.message,
-          code: statusCode,
+          values: {
+            message: error.message,
+            code: statusCode,
+          }
         },
+
         data_preview: '',
         use_html: false,
         sort: 2100,
