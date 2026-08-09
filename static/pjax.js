@@ -18,7 +18,7 @@ export class PJAXClient {
       containerSelectors: {},
       loadingClass: 'pjax-loading',
       errorClass: 'pjax-error',
-      excludePatterns: [/^javascript:/, /^mailto:/, /^tel:/, /\/#/],
+      excludePatterns: [/^javascript:/, /^mailto:/, /^tel:/, /\/#/, /\.html$/],
       ...options
     };
 
