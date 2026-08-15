@@ -1,4 +1,7 @@
 import { PJAXClient } from "/static/pjax.js"
+import { initAltcha } from "/static/altcha.js"
+
+window.initInvisibleAltchaForm = initAltcha('/api/v1/altcha/challenge');
 
 // Auto-initialize if the script is loaded
 document.addEventListener('DOMContentLoaded', () => {
