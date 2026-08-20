@@ -141,7 +141,16 @@ async function getTemplateBranch(host, marker, parentId, templatesData, globalDa
     }
   }
 
-  template.html = dataAttributesInjector(template.html, { uid: marker.uid, cat: template.category }, values.anchor)
+  const attributes = {
+    uid: marker.uid,
+    cat: template.category
+  }
+
+  if (template.category === 'form') {
+    attributes.form_name = template.name
+  }
+
+  template.html = dataAttributesInjector(template.html, attributes, values.anchor)
 
   values = {
     ...globalData,

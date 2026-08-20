@@ -7,6 +7,7 @@ import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/ho
 import { mainHandler } from './routes/mainHandler.js';
 import { consultingRoomHandler } from './routes/consultingRoomHandler.js';
 import { callHandler } from './routes/callHandler.js';
+import { apiFilesHandler } from './routes/apiFilesHandler.js';
 import { initRedis, flushDb } from './redis/index.js';
 import { fetchTemplatesLast } from './api_client/fetchTemplatesLast.js';
 
@@ -141,6 +142,9 @@ app.get('/health', healthHandler);
 app.get('/consulting-room', consultingRoomHandler);
 
 app.get('/call/:uuid', callHandler);
+
+// Proxy static file paths to the API server
+app.get(['/images/*', '/uploads/*', '/client-files/*'], apiFilesHandler);
 
 // Main request handler
 app.get('*', mainHandler);

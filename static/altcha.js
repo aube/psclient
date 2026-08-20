@@ -89,19 +89,11 @@ const workerBlobCode = `
                     throw new Error('Сбой SubtleCrypto на итерации ' + counter + ': ' + cryptoErr.message);
                 }
 
-                // Вывод первых шагов для визуального контроля корректности хэширования
-                if (counter < 3) {
-                    self.postMessage({ 
-                        status: 'log', 
-                        message: 'Тест хэша #' + counter + ': ' + currentHashHex + ' -> Ожидаем префикс: ' + keyPrefix 
-                    });
-                }
-
                 // Сверяем, начинается ли сгенерированный хэш-ключ с keyPrefix сложности
                 if (keyPrefix && currentHashHex.startsWith(keyPrefix)) {
                     self.postMessage({ 
                         status: 'log', 
-                        message: '✓ Решение найдено досрочно! Итерация (counter): ' + counter + ', хэш-ключ: ' + currentHashHex 
+                        message: '✓ Решение найдено досрочно! Итерация (counter): ' + counter 
                     });
                     self.postMessage({ 
                         status: 'success', 
@@ -153,14 +145,12 @@ async function startBackgroundVerification(challengeUrl) {
     workerStarted = true;
 
     try {
-        console.log('[ALTCHA] Запрос параметров безопасности с сервера...');
         const response = await fetch(challengeUrl);
         if (!response.ok) throw new Error('ALTCHA: Не удалось загрузить задачу с сервера (HTTP ' + response.status + ')');
         
         currentChallengeData = await response.json();
         const params = currentChallengeData.parameters || currentChallengeData;
 
-        console.log('[ALTCHA] Задача получена. Выделение изолированного Web Worker потока...');
         const blob = new Blob([workerBlobCode], { type: 'application/javascript' });
         altchaWorker = new Worker(URL.createObjectURL(blob));
 
@@ -169,7 +159,7 @@ async function startBackgroundVerification(challengeUrl) {
             const { status, solution, message } = e.data;
 
             // Перехват и проброс логов отладки в консоль разработчика
-            if (status === 'log') {
+            if (status === 'log' && location.hostname.endsWith('localhost')) {
                 console.warn('[ALTCHA WORKER TRACE]:', message);
                 return;
             }
@@ -247,7 +237,7 @@ function initInvisibleAltchaForm(form, onPendingSubmit, onResetLoading) {
 
             onWorkerSuccessCallback = (token) => {
                 hiddenInput.value = token;
-                form.submit();
+                form.requestSubmit();
             };
 
             onWorkerFailedCallback = () => {
