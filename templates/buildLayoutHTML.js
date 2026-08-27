@@ -3,7 +3,7 @@ import { wrapHbVars } from '../static/wrapHbVars.js';
 import {
   dynamicIncludes2HTMLComments,
   injectScriptsBody,
-  injectStylesHead,
+  injectHead,
 } from './index.js'
 
 import {
@@ -21,7 +21,9 @@ export async function buildLayoutHTML(host, site) {
     
     htmlLayout = injectScriptsBody(htmlLayout)
 
-    htmlLayout = await injectStylesHead(site.settings.hashes, htmlLayout)
+    htmlLayout = await injectHead(site.settings, htmlLayout)
+
+
     
     await setStringCached(`layouts:${host}`, htmlLayout);
   }

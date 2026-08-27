@@ -32,7 +32,7 @@ The style system is split between two services:
 | `twstyle.css` | TWCSS server | Generated Tailwind utilities |
 | `templates.css` | TWCSS server | Generated component classes |
 
-Hashes for `twstyle.css` and `templates.css` come from `site.settings.hashes`. The injection happens in `templates/injectStyles.js` → `injectStylesHead(hashes, htmlLayout)`.
+Hashes for `twstyle.css` and `templates.css` come from `site.settings.hashes`. The injection happens in `templates/injectStyles.js` → `injectHead(hashes, htmlLayout)`.
 
 CSS generation is cached: the TWCSS server compares hashes before regenerating (`cssTWRegenerate` / `cssTemplatesRegenerate`).
 

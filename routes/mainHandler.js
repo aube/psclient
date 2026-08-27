@@ -9,8 +9,6 @@ import {
   injectSiteSettings,
   injectEntityTreeNodes,
   injectHTML,
-  injectScriptsBody,
-  injectStylesHead,
   handlebarsRender,
   buildTemplatesTree,
 } from '../templates/index.js'

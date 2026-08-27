@@ -7,12 +7,8 @@ import { addHotReloadScript } from '../templates/addHotReloadScript.js';
 import {
   buildLayoutHTML,
   injectSiteSettings,
-  injectEntityTreeNodes,
   injectHTML,
-  injectScriptsBody,
-  injectStylesHead,
   handlebarsRender,
-  buildTemplatesTree,
 } from '../templates/index.js'
 
 const isDev = process.env.NODE_ENV === 'development'
