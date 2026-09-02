@@ -9,6 +9,7 @@ import {
   injectSiteSettings,
   injectEntityTreeNodes,
   injectHTML,
+  injectSnippets,
   handlebarsRender,
   buildTemplatesTree,
 } from '../templates/index.js'
@@ -32,11 +33,14 @@ async function fullLoad(req, res, site) {
       settings: { ...site.settings},
       meta: { ...site.meta},
     }
-    
+
     let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site, dynamicData)
-    
+
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
+
     let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
+
+    finalHTML = await injectSnippets(host, finalHTML, dynamicData)
     
     finalHTML = handlebarsRender(finalHTML, dynamicData);
 
