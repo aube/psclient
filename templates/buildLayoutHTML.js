@@ -23,8 +23,6 @@ export async function buildLayoutHTML(host, site) {
 
     htmlLayout = await injectHead(site.settings, htmlLayout)
 
-
-    
     await setStringCached(`layouts:${host}`, htmlLayout);
   }
 

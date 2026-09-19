@@ -1,6 +1,7 @@
 export function injectScriptsBody(finalHTML) {
   const clientScript = `
     <script src="/static/main.js" type="module"></script>
+    <script src="/static/aos-loader.js" type="module"></script>
     <script type='module'>
     // import {wrapHbVars} from "/static/wrapHbVars.js"
     // console.log(wrapHbVars("<img src='{{qwe}}'/>{{123}}"))
