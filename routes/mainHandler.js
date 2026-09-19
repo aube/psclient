@@ -76,17 +76,20 @@ async function partialLoad(req, res, site) {
 
     const content = await fetchURL(host, req.url, authToken);
 
+    
     const dynamicData = {
-      ...site.settings,
-      ...site.meta,
+      settings: { ...site.settings},
+      meta: { ...site.meta},
       ...content.ENTITY.data,
     }
 
-    let entityTemplatesTree = await buildTemplatesTree(host, content.ENTITY, site)
+    let entityTemplatesTree = await buildTemplatesTree(host, content.ENTITY, site, dynamicData)
 
     let finalHTML = await injectEntityTreeNodes(host, entityTemplatesTree.html, entityTemplatesTree.nodes)
+
+    finalHTML = await injectSnippets(host, finalHTML, dynamicData)
     
-    finalHTML = handlebarsRender(finalHTML, dynamicData );
+    finalHTML = handlebarsRender(finalHTML, dynamicData);
 
     res.status(content.statusCode || 200);
 
