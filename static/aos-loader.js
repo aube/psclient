@@ -29,7 +29,7 @@
     script.onload = function() {
       if (typeof AOS !== 'undefined') {
         AOS.init({
-          duration: 800, // ваши настройки AOS
+          duration: 400,
           once: true     // анимировать только один раз при первом появлении
         });
       }

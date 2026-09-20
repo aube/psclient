@@ -152,17 +152,30 @@ async function getTemplateBranch(host, marker, parentId, templatesData, globalDa
 
   template.html = dataAttributesInjector(template.html, attributes, values.anchor)
 
+  
   values = {
     ...globalData,
     ...template.values, // default template values
     ...values,
   }
-  
-  template.html = handlebarsRender(template.html, values, level)
 
   if (template.js) {
-    template.html += '<script>(function() {' + template.js + '})()</script>'
+    template.html += `
+    <script>
+    (function() {
+
+      ${template.js}
+
+      // Привязываем деструктор к тегу script, если он объявлен
+      if (typeof onDestroy === 'function') {
+        document.currentScript.onDestroy = onDestroy;
+      }
+    })();
+    </script>`;
   }
+
+
+  template.html = handlebarsRender(template.html, values, level)
 
   const nodes = []
   const includes = extractTemplateIncludes(template.html, parentId)

@@ -38,7 +38,7 @@ export function handlebarsRender(templateString, data, headingLevel = 2) {
 
   // Нумерованые списки в циклах
   Handlebars.registerHelper('increment', function(value) {
-      return parseInt(value) + 1;
+    return parseInt(value) + 1;
   });
 
   // Увеличение заголовка в зависимости от родителя и заголовка текущего блока
@@ -55,7 +55,19 @@ export function handlebarsRender(templateString, data, headingLevel = 2) {
     return 'h' + nextNum;
   });
 
+  // Считаем количество переменных, которые существуют и не пусты (для колонок)
+  Handlebars.registerHelper('countTrue', function(...args) {
+    const variables = args.slice(0, -1);
+    return variables.filter(val => !!val).length;
+  });
+
+  // Записываем переменную прямо в текущий контекст
+  Handlebars.registerHelper('assign', function(name, value, options) {
+    options.data.root[name] = value; 
+  });
+
   const template = Handlebars.compile(templateString, {noEscape: true});
+
   const result = template({
     ...data,
     headingLevel,

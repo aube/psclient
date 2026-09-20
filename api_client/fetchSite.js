@@ -24,6 +24,16 @@ function siteSettingsUpgrade(settings) {
       }, {})
     }
   }
+  if (settings.socials) {
+    if (!Array.isArray(settings.socials)) {
+      settings.socialsMap = {}
+    } else {
+      settings.socialsMap = settings.socials.reduce((acc, c) => {
+        acc[c.uid] = c
+        return acc
+      }, {})
+    }
+  }
   return settings
 }
 

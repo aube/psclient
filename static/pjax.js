@@ -156,6 +156,10 @@ export class PJAXClient {
       
       // Reinitialize Petite-Vue in the updated content
       this.reinitializePetiteVue();
+
+      // Сброс анимаций на обновленной странице
+      AOS.refreshHard()
+
       
     } catch (error) {
       console.error('PJAX navigation error:', error);
@@ -244,6 +248,32 @@ export class PJAXClient {
     this.currentUrl = url;
   }
 
+
+  /**
+  * Call script destructor function onDestroy
+  */
+  callDestructors(node) {
+
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+    try {
+
+      if (node.nodeName === "SCRIPT" && typeof node.onDestroy === "function") {
+        node.onDestroy();
+        return;
+      }
+
+      const oldScripts = node.querySelectorAll("script");
+      oldScripts.forEach(script => {
+        if (typeof script.onDestroy === "function") {
+          script.onDestroy();
+        }
+      });
+    } catch(e) {
+      console.error('Error on call onDestroy()', e)
+    }
+  }
+
    /**
     * Update a specific container with new content
     */
@@ -286,6 +316,7 @@ export class PJAXClient {
      // Remove existing content between the comments
      let currentNode = startNode.nextSibling;
      while (currentNode && currentNode !== endNode) {
+       this.callDestructors(currentNode)
        const nextNode = currentNode.nextSibling;
        currentNode.remove();
        currentNode = nextNode;
@@ -294,6 +325,24 @@ export class PJAXClient {
      // Insert new content
      const tempDiv = document.createElement('div');
      tempDiv.innerHTML = htmlContent.trim();
+
+     // При вставке через innerHTML скрипты блокируются брайзером.
+     // Их надо пересоздать через createElement("script")
+     const scripts = tempDiv.querySelectorAll("script");
+     scripts.forEach(oldScript => {
+       const newScript = document.createElement("script");
+       
+       // 1. Копируем код
+       newScript.textContent = oldScript.textContent;
+       
+       // 2. Копируем атрибуты
+       Array.from(oldScript.attributes).forEach(attr => {
+         newScript.setAttribute(attr.name, attr.value);
+       });
+       
+       // 3. Заменяем старый скрипт новым прямо внутри tempDiv
+       oldScript.parentNode.replaceChild(newScript, oldScript);
+     });
 
      // Insert the new content between the comments
      while (tempDiv.firstChild) {
