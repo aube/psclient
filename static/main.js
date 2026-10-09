@@ -4,6 +4,7 @@ import { showCookieBanner } from "/static/cookieBanner.js"
 import { sendInteractionForm } from "/static/sendInteractionForm.js"
 
 window.initInvisibleAltchaForm = initAltcha('/api/v1/altcha/challenge');
+window.sendInteractionForm = sendInteractionForm;
 
 // Auto-initialize if the script is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,11 +24,7 @@ window.addEventListener('beforeunload', () => {
 
 document.addEventListener('DOMContentLoaded', showCookieBanner);
 
-
 // Export for module systems (if applicable)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PJAXClient;
 }
-
-// Отправка данных формы в /interactions
-document.addEventListener('DOMContentLoaded', sendInteractionForm);
