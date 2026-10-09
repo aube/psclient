@@ -1,7 +1,6 @@
 import logger from '../logger.pino.js';
 import { fetchSite } from '../api_client/fetchSite.js';
 import { fetchPageEntity as fetchURL } from '../api_client/fetchURL.js';
-import { fetchTemplatesLast } from '../api_client/fetchTemplatesLast.js';
 import { addHotReloadScript } from '../templates/addHotReloadScript.js';
 
 import {
@@ -9,9 +8,9 @@ import {
   injectSiteSettings,
   injectEntityTreeNodes,
   injectHTML,
-  injectSnippets,
   handlebarsRender,
   buildTemplatesTree,
+  resolveIncludes,
 } from '../templates/index.js'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -25,8 +24,9 @@ async function fullLoad(req, res, site) {
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
     const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken);
-
+  
     let htmlLayout = await buildLayoutHTML(host, site);
+
     htmlLayout = injectSiteSettings(htmlLayout, site.settings);
 
     const dynamicData = {
@@ -34,14 +34,14 @@ async function fullLoad(req, res, site) {
       meta: { ...site.meta},
     }
 
+    htmlLayout = await resolveIncludes(host, htmlLayout, dynamicData)
+
     let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site, dynamicData)
 
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
 
     let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
 
-    finalHTML = await injectSnippets(host, finalHTML, dynamicData)
-    
     finalHTML = handlebarsRender(finalHTML, dynamicData);
 
     if (isDev) {
@@ -87,8 +87,8 @@ async function partialLoad(req, res, site) {
 
     let finalHTML = await injectEntityTreeNodes(host, entityTemplatesTree.html, entityTemplatesTree.nodes)
 
-    finalHTML = await injectSnippets(host, finalHTML, dynamicData)
-    
+    finalHTML = await resolveIncludes(host, finalHTML, dynamicData)
+
     finalHTML = handlebarsRender(finalHTML, dynamicData);
 
     res.status(content.statusCode || 200);
@@ -131,8 +131,6 @@ export const mainHandler = async (req, res) => {
 
   const requestedWith = req.headers['x-requested-with'];
   const isPjax = requestedWith && requestedWith.toLowerCase() === 'partial';
-
-  await fetchTemplatesLast(host);
 
   if (isPjax) {
     partialLoad(req, res, site)

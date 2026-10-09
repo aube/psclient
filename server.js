@@ -8,8 +8,7 @@ import { mainHandler } from './routes/mainHandler.js';
 import { consultingRoomHandler } from './routes/consultingRoomHandler.js';
 import { callHandler } from './routes/callHandler.js';
 import { apiFilesHandler } from './routes/apiFilesHandler.js';
-import { initRedis, flushDb } from './redis/index.js';
-import { fetchTemplatesLast } from './api_client/fetchTemplatesLast.js';
+import { initRedis } from './redis/index.js';
 
 // прочие методы, пока не используются
 // import { otherHandler, postHandler } from './routes/otherHandler.js';
@@ -53,10 +52,6 @@ async function initialize() {
 await initialize().catch(logger.error);
 
 await initRedis();
-
-await flushDb();
-
-await fetchTemplatesLast("SHARED");
 
 const app = express();
 
