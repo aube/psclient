@@ -22,15 +22,9 @@ export async function resolveIncludes(host, html, data = {}, level = 0) {
     return html;
   }
 
-  const apiNames = [...names].filter(name => name !== 'ENTITY');
-  const templates = await getTemplatesByNames(host, apiNames);
+  const templates = await getTemplatesByNames(host, [...names]);
 
   for (const name of names) {
-    if (name === "ENTITY") {
-      html = html.replaceAll(`[{${name}}]`, `<!--ENTITY--><!--/ENTITY-->`);
-      continue;
-    }
-
     const lookupName = name.startsWith('~') ? name.substring(1) : name;
     const template = templates.get(lookupName);
     if (!template) {

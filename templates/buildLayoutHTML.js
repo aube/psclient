@@ -28,5 +28,8 @@ async function getLayout(host, site) {
 
   htmlLayout = wrapHbVars(htmlLayout)
 
+  // %ENTITY% — исключение из [{name}] инклюдов: подставляем PJAX-анкеры
+  htmlLayout = htmlLayout.replaceAll('%ENTITY%', '<!--ENTITY--><!--/ENTITY-->')
+
   return htmlLayout
 } 

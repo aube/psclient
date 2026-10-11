@@ -24,7 +24,7 @@ async function fullLoad(req, res, site) {
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
     const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken);
-  
+
     let htmlLayout = await buildLayoutHTML(host, site);
 
     htmlLayout = injectSiteSettings(htmlLayout, site.settings);
@@ -32,6 +32,7 @@ async function fullLoad(req, res, site) {
     const dynamicData = {
       settings: { ...site.settings},
       meta: { ...site.meta},
+      children: CHILDREN
     }
 
     htmlLayout = await resolveIncludes(host, htmlLayout, dynamicData)
