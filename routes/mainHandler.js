@@ -2,19 +2,43 @@ import logger from '../logger.pino.js';
 import { fetchSite } from '../api_client/fetchSite.js';
 import { fetchPageEntity as fetchURL } from '../api_client/fetchURL.js';
 import { addHotReloadScript } from '../templates/addHotReloadScript.js';
+import { getTemplateByName } from '../redis/index.js';
 
 import {
   buildLayoutHTML,
   injectSiteSettings,
-  injectEntityTreeNodes,
   injectHTML,
   handlebarsRender,
-  buildTemplatesTree,
+  buildChildrenHTML,
+  renderLayoutTree,
   resolveIncludes,
 } from '../templates/index.js'
 
 const isDev = process.env.NODE_ENV === 'development'
 const SITE_NOT_FOUND_ADDRESS = process.env.SITE_NOT_FOUND_ADDRESS;
+
+async function buildEntityHTML(host, ENTITY, dynamicData, CHILDREN) {
+  let layoutHtml = ENTITY.html || ''
+
+  if (!layoutHtml) {
+    const template = await getTemplateByName(host, ENTITY.template)
+    layoutHtml = template?.html || ''
+  }
+
+  let html = await renderLayoutTree(layoutHtml, {
+    getTemplate: (name) => getTemplateByName(host, name),
+    templatesData: ENTITY.data?.template2 || {},
+    globalData: dynamicData,
+  })
+
+  if (html.includes('%CHILDREN%')) {
+    const childrenHTML = await buildChildrenHTML(host, CHILDREN, dynamicData)
+    html = html.replaceAll('%CHILDREN%', childrenHTML)
+  }
+
+  return html
+}
+
 
 async function fullLoad(req, res, site) {
   try {
@@ -32,18 +56,16 @@ async function fullLoad(req, res, site) {
     const dynamicData = {
       settings: { ...site.settings},
       meta: { ...site.meta},
-      children: CHILDREN
+      url: ENTITY.url
     }
 
     htmlLayout = await resolveIncludes(host, htmlLayout, dynamicData)
 
-    let entityTemplatesTree = await buildTemplatesTree(host, ENTITY, site, dynamicData)
+    const entityHTML = await buildEntityHTML(host, ENTITY, dynamicData, CHILDREN)
 
-    htmlLayout = injectHTML('ENTITY', htmlLayout, entityTemplatesTree.html)
+    htmlLayout = injectHTML('ENTITY', htmlLayout, entityHTML)
 
-    let finalHTML = await injectEntityTreeNodes(host, htmlLayout, entityTemplatesTree.nodes)
-
-    finalHTML = handlebarsRender(finalHTML, dynamicData);
+    let finalHTML = handlebarsRender(htmlLayout, dynamicData);
 
     if (isDev) {
       // finalHTML += `<pre>${JSON.stringify(entityTemplatesTree.nodes, null, 2)}</pre>`
@@ -75,30 +97,27 @@ async function partialLoad(req, res, site) {
 
     logger.debug('Processing PJAX request', 'url', req.url, 'host', host);
 
-    const content = await fetchURL(host, req.url, authToken);
+    const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken);
 
     
     const dynamicData = {
       settings: { ...site.settings},
       meta: { ...site.meta},
-      ...content.ENTITY.data,
+      ...ENTITY.data,
+      url: ENTITY.url
     }
 
-    let entityTemplatesTree = await buildTemplatesTree(host, content.ENTITY, site, dynamicData)
-
-    let finalHTML = await injectEntityTreeNodes(host, entityTemplatesTree.html, entityTemplatesTree.nodes)
-
-    finalHTML = await resolveIncludes(host, finalHTML, dynamicData)
+    let finalHTML = await buildEntityHTML(host, ENTITY, dynamicData, CHILDREN)
 
     finalHTML = handlebarsRender(finalHTML, dynamicData);
 
-    res.status(content.statusCode || 200);
+    res.status(statusCode || 200);
 
     // TODO: оптимизация - отправлять данные по секциям/блокам,
     // клиент найдёт изменённые секции, блоки и обновит только их
     res.json({
       ENTITY: finalHTML,
-      ...(content.statusCode ? { statusCode: content.statusCode } : {}),
+      ...(statusCode ? { statusCode: statusCode } : {}),
     });
 
   } catch (error) {
