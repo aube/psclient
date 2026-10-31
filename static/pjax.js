@@ -26,6 +26,9 @@ export class PJAXClient {
     this.isActive = false;
     this.isProcessing = false;
     this.currentUrl = window.location.href;
+    this.abortController = null;
+    this.requestId = 0;
+    this.scrollSaveTimer = null;
 
     this.hbAttrMap = buildHbAttrMap();
     this.hbTextMap = buildHbTextMap();
@@ -34,6 +37,7 @@ export class PJAXClient {
     this.handleLinkClick = this.handleLinkClick.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
 
     // Initialize
     this.init();
@@ -49,15 +53,29 @@ export class PJAXClient {
     }
 
     this.isActive = true;
-    
+
+    // PJAX restores scroll position itself
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     // Attach event listeners
     document.addEventListener('click', this.handleLinkClick);
     document.addEventListener('submit', this.handleFormSubmit);
     window.addEventListener('popstate', this.handlePopState);
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
 
-    // Initial setup
-    this.addHistoryState(window.location.href, document.title);
-    
+    // Mark the initial entry as PJAX-managed without creating a duplicate
+    window.history.replaceState(
+      {
+        url: window.location.href,
+        scrollY: window.scrollY,
+        timestamp: Date.now()
+      },
+      document.title,
+      window.location.href
+    );
+
     console.log('PJAX Client initialized');
   }
 
@@ -87,7 +105,7 @@ export class PJAXClient {
     if (!this.shouldProcessLink(target)) return;
 
     event.preventDefault();
-    this.navigate(target.href);
+    this.navigate(target.href).catch(() => {});
   }
 
   /**
@@ -101,7 +119,7 @@ export class PJAXClient {
     if (!form.matches('[data-pjax]')) return;
 
     event.preventDefault();
-    this.submitForm(form);
+    this.submitForm(form).catch(() => {});
   }
 
   /**
@@ -136,37 +154,68 @@ export class PJAXClient {
   /**
    * Navigate to a new URL using PJAX
    */
-  async navigate(url) {
-    if (this.isProcessing) return;
+  async navigate(url, options = {}) {
+    const { historyMode = 'push', restoreScrollY = null } = options;
+    const targetUrl = new URL(url, window.location.href).href;
+    const isSameUrl = targetUrl === window.location.href;
+
+    // Cancel any in-flight navigation so the latest one wins
+    if (this.abortController) this.abortController.abort();
+    const controller = new AbortController();
+    this.abortController = controller;
+    const requestId = ++this.requestId;
 
     try {
       this.isProcessing = true;
       this.setLoadingState(true);
 
       // Fetch the partial content
-      const response = await this.fetchContent(url);
+      const response = await this.fetchContent(targetUrl, {
+        signal: controller.signal
+      });
       const data = await response.json();
-      
+
+      // A newer navigation has started; discard this response
+      if (requestId !== this.requestId) return;
+
+      // Remember where the user was before leaving the current entry
+      if (historyMode === 'push') {
+        this.saveScrollPosition();
+      }
+
       // Update the content
-      this.updateContent(data, url);
-      window.scrollTo(0, 0);
-      
-      // Update browser history
-      this.addHistoryState(url, data.title || '');
-      
+      this.updateContent(data, targetUrl);
+
+      if (historyMode === 'push') {
+        if (!isSameUrl) {
+          this.pushHistoryState(targetUrl);
+        }
+        window.scrollTo(0, 0);
+      } else {
+        // popstate: the browser already changed the URL
+        this.restoreScrollPosition(restoreScrollY);
+      }
+
       // Reinitialize Petite-Vue in the updated content
       this.reinitializePetiteVue();
 
       // Сброс анимаций на обновленной странице
-      AOS.refreshHard()
-
+      if (window.AOS) {
+        window.AOS.refreshHard();
+      }
       
     } catch (error) {
+      // Aborted or superseded navigation - ignore silently
+      if (error.name === 'AbortError' || requestId !== this.requestId) return;
+
       console.error('PJAX navigation error:', error);
       this.handleError(error.message);
+      throw error;
     } finally {
-      this.isProcessing = false;
-      this.setLoadingState(false);
+      if (requestId === this.requestId) {
+        this.isProcessing = false;
+        this.setLoadingState(false);
+      }
     }
   }
 
@@ -174,7 +223,16 @@ export class PJAXClient {
    * Submit a form using PJAX
    */
   async submitForm(form) {
-    if (this.isProcessing) return;
+    const action = new URL(form.action || window.location.href, window.location.href).href;
+    const method = (form.method || 'GET').toUpperCase();
+    const trackHistory = form.hasAttribute('data-pjax-history');
+    const isSameUrl = action === window.location.href;
+
+    // Cancel any in-flight navigation so the latest one wins
+    if (this.abortController) this.abortController.abort();
+    const controller = new AbortController();
+    this.abortController = controller;
+    const requestId = ++this.requestId;
 
     try {
       this.isProcessing = true;
@@ -182,8 +240,6 @@ export class PJAXClient {
 
       // Prepare form data
       const formData = new FormData(form);
-      const action = form.action || window.location.href;
-      const method = (form.method || 'GET').toUpperCase();
 
       // Fetch the partial content
       const response = await this.fetchContent(action, {
@@ -191,27 +247,43 @@ export class PJAXClient {
         headers: {
           'X-Requested-With': 'partial'
         },
-        body: method === 'POST' ? formData : undefined
+        body: method === 'POST' ? formData : undefined,
+        signal: controller.signal
       });
       const data = await response.json();
-      
+
+      // A newer navigation has started; discard this response
+      if (requestId !== this.requestId) return;
+
+      // Remember where the user was before leaving the current entry
+      if (trackHistory) {
+        this.saveScrollPosition();
+      }
+
       // Update the content
       this.updateContent(data, action);
-      
+
       // Update browser history if the form has a data-pjax-history attribute
-      if (form.hasAttribute('data-pjax-history')) {
-        this.addHistoryState(action, data.title || '');
+      if (trackHistory && !isSameUrl) {
+        this.pushHistoryState(action);
+        window.scrollTo(0, 0);
       }
-      
+
       // Reinitialize Petite-Vue in the updated content
       this.reinitializePetiteVue();
-      
+
     } catch (error) {
+      // Aborted or superseded navigation - ignore silently
+      if (error.name === 'AbortError' || requestId !== this.requestId) return;
+
       console.error('PJAX form submission error:', error);
       this.handleError(error.message);
+      throw error;
     } finally {
-      this.isProcessing = false;
-      this.setLoadingState(false);
+      if (requestId === this.requestId) {
+        this.isProcessing = false;
+        this.setLoadingState(false);
+      }
     }
   }
 
@@ -395,32 +467,81 @@ export class PJAXClient {
   /**
    * Handle browser back/forward buttons
    */
-  handlePopState(event) {
-    if (!this.isActive || this.isProcessing) return;
+  async handlePopState(event) {
+    if (!this.isActive) return;
+
+    // The entry has already changed - do not overwrite the previous
+    // entry's state with the scroll position of the page we are leaving
+    clearTimeout(this.scrollSaveTimer);
+    this.scrollSaveTimer = null;
 
     const state = event.state;
-    if (state && state.url) {
-      // We don't want to make another request for popstate events
-      // since the content should already be in the browser cache
-      // Just update the current URL
-      this.currentUrl = state.url;
+    const url = (state && state.url) || window.location.href;
+    const restoreScrollY = state && typeof state.scrollY === 'number'
+      ? state.scrollY
+      : 0;
 
-      // TODO: Внезапно взяли и захотели делать полноценный апдэйт
-      // чтобы страница обновлялась. Потом можно оптимизировать
-      this.navigate(state.url)
+    try {
+      // Do not push a new history entry: the browser already moved
+      await this.navigate(url, { historyMode: 'none', restoreScrollY });
+    } catch {
+      // Keep URL and content in sync even if the partial request failed
+      window.location.assign(url);
     }
+  }
+
+  /**
+   * Track scroll position so Back/Forward can restore it
+   */
+  handleScroll() {
+    if (!this.isActive) return;
+
+    clearTimeout(this.scrollSaveTimer);
+    this.scrollSaveTimer = setTimeout(() => {
+      this.saveScrollPosition();
+    }, 100);
+  }
+
+  /**
+   * Persist the scroll position of the current history entry
+   */
+  saveScrollPosition() {
+    const state = window.history.state || {};
+
+    window.history.replaceState(
+      {
+        ...state,
+        url: window.location.href,
+        scrollY: window.scrollY,
+        timestamp: state.timestamp || Date.now()
+      },
+      document.title,
+      window.location.href
+    );
+  }
+
+  /**
+   * Restore scroll position after a popstate navigation
+   */
+  restoreScrollPosition(scrollY) {
+    const target = Number.isFinite(scrollY) ? scrollY : 0;
+
+    requestAnimationFrame(() => {
+      window.scrollTo(0, target);
+    });
   }
 
   /**
    * Add a new state to browser history
    */
-  addHistoryState(url, title) {
+  pushHistoryState(url) {
     const state = {
       url: url,
+      scrollY: 0,
       timestamp: Date.now()
     };
-    
-    window.history.pushState(state, title, url);
+
+    window.history.pushState(state, document.title, url);
   }
 
   /**
@@ -460,6 +581,13 @@ export class PJAXClient {
     document.removeEventListener('click', this.handleLinkClick);
     document.removeEventListener('submit', this.handleFormSubmit);
     window.removeEventListener('popstate', this.handlePopState);
+    window.removeEventListener('scroll', this.handleScroll);
+
+    clearTimeout(this.scrollSaveTimer);
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
     
     this.isActive = false;
     this.isProcessing = false;

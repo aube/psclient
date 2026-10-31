@@ -50,7 +50,7 @@ export async function fetchSite(host) {
       }
     }
     
-    const URL = `http://${baseUrl}/site/${host}/html`
+    const URL = `http://${baseUrl}/site/html`
     logger.debug('api_client request', 'URL', URL);
 
     const response = await fetch(URL, {
