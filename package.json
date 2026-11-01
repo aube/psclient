@@ -2,12 +2,12 @@
   "name": "pjax-proxy-server",
   "version": "1.0.0",
   "description": "A proxy server for PJAX requests",
-  "main": "server.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "debug": "node server.js --inspect=0.0.0.0:9229"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "debug": "node src/server.js --inspect=0.0.0.0:9229"
   },
   "dependencies": {
     "dotenv": "^16.3.1",

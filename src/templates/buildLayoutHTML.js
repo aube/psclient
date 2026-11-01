@@ -1,4 +1,4 @@
-import { wrapHbVars } from '../static/wrapHbVars.js';
+import { wrapHbVars } from '../../static/wrapHbVars.js';
 
 import {
   injectScriptsBody,
