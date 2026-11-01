@@ -7,6 +7,7 @@ import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/ho
 import { mainHandler } from './routes/mainHandler.js';
 import { consultingRoomHandler } from './routes/consultingRoomHandler.js';
 import { callHandler } from './routes/callHandler.js';
+import { verifyHandler } from './routes/verifyHandler.js';
 import { apiFilesHandler } from './routes/apiFilesHandler.js';
 import { initRedis } from './redis/index.js';
 
@@ -135,6 +136,8 @@ app.get('/hot-reload', hotReloadHandler);
 app.get('/health', healthHandler);
 
 app.get('/consulting-room', consultingRoomHandler);
+
+app.get('/verify', verifyHandler);
 
 app.get('/call/:uuid', callHandler);
 

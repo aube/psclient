@@ -1,6 +1,5 @@
 import { PJAXClient } from "/static/pjax.js"
 import { initAltcha } from "/static/altcha.js"
-import { showCookieBanner } from "/static/cookieBanner.js"
 import { sendInteractionForm } from "/static/sendInteractionForm.js"
 
 window.initInvisibleAltchaForm = initAltcha('/api/v1/altcha/challenge');
@@ -21,8 +20,6 @@ window.addEventListener('beforeunload', () => {
     window.PJAX.destroy();
   }
 });
-
-document.addEventListener('DOMContentLoaded', showCookieBanner);
 
 // Export for module systems (if applicable)
 if (typeof module !== 'undefined' && module.exports) {

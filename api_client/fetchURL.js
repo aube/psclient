@@ -3,20 +3,26 @@ import logger from '../logger.pino.js';
 const API_SERVER_ADDRESS = process.env.API_SERVER_ADDRESS;
 
 // Function to fetch page data from corresponding backend API endpoint
-export async function fetchURL(host, url, authToken) {
+export async function fetchURL(host, url, authToken, clientToken) {
   logger.debug('Fetching page data from API',
     'url', url,
     'host', host,
-    'hasAuthToken', !!authToken
+    'hasAuthToken', !!authToken,
+    'hasClientToken', !!clientToken
   );
   
   try {
     const baseUrl = API_SERVER_ADDRESS;
+    const headers = {
+      'x-host': host,
+    };
+
+    if (clientToken) {
+      headers.Cookie = `client_token=${clientToken}`;
+    }
     
     const response = await fetch(`http://${baseUrl}${url}`, {
-      headers: {
-        'x-host': host,
-      }
+      headers,
     });
     
     if (!response.ok) {
@@ -50,9 +56,9 @@ export async function fetchURL(host, url, authToken) {
   }
 }
 
-export async function fetchPageEntity(host, url, authToken) {
+export async function fetchPageEntity(host, url, authToken, clientToken) {
   try {
-    return await fetchURL(host, url, authToken);
+    return await fetchURL(host, url, authToken, clientToken);
   } catch (error) {
     const statusCode = error.statusCode || 500;
 

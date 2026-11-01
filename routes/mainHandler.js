@@ -43,11 +43,12 @@ async function buildEntityHTML(host, ENTITY, dynamicData, CHILDREN) {
 async function fullLoad(req, res, site) {
   try {
     const authToken = req.cookies.auth_token;
+    const clientToken = req.cookies.client_token;
     const host = req.headers.host;
 
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
-    const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken);
+    const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken, clientToken);
 
     let htmlLayout = await buildLayoutHTML(host, site);
 
@@ -93,11 +94,12 @@ async function fullLoad(req, res, site) {
 async function partialLoad(req, res, site) {
   try {
     const authToken = req.cookies.auth_token;
+    const clientToken = req.cookies.client_token;
     const host = req.headers.host;
 
     logger.debug('Processing PJAX request', 'url', req.url, 'host', host);
 
-    const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken);
+    const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken, clientToken);
 
     
     const dynamicData = {
