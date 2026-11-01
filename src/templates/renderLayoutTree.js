@@ -84,7 +84,7 @@ function renderMarkers(html, ctx, level, depth) {
       const key = itemKey(item, ctx.parentPath, counts)
       const node = ctx.nodes.get(key)
       if (node) {
-        replacement = renderNode(node, ctx, level, depth)
+        replacement = renderNode(node, ctx, level, depth, Boolean(ctx.forceDeletedNodes))
       }
     }
 
@@ -96,8 +96,8 @@ function renderMarkers(html, ctx, level, depth) {
   return out
 }
 
-function renderNode(node, ctx, level, depth) {
-  if (!node || node.deleted || depth > MAX_DEPTH) {
+function renderNode(node, ctx, level, depth, forceRender = false) {
+  if (!node || (!forceRender && node.deleted) || depth > MAX_DEPTH) {
     return ''
   }
 
@@ -106,7 +106,7 @@ function renderNode(node, ctx, level, depth) {
     ...node.values,
   }
 
-  let html = handlebarsRender(node.html || '', values, level)
+  let html = handlebarsRender(node.html || '', values, level, ctx.domain)
 
   html = injectAttributes(html, node)
 
@@ -114,9 +114,11 @@ function renderNode(node, ctx, level, depth) {
 
   html = renderMarkers(html, {
     globalData: ctx.globalData,
+    domain: ctx.domain,
     regions: node.regions,
     nodes: indexByKey(node.statics),
     parentPath: node.key,
+    forceDeletedNodes: true,
   }, childLevel, depth + 1)
 
   if (node.js) {
@@ -134,6 +136,7 @@ export async function renderLayoutTree(layoutHtml, options = {}) {
 
   return renderMarkers(layoutHtml, {
     globalData: options.globalData || {},
+    domain: options.domain || '',
     regions: tree.regions,
     nodes: indexRegionNodes(tree.regions),
     parentPath: '',

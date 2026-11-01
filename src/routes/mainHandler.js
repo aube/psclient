@@ -11,7 +11,6 @@ import {
   handlebarsRender,
   buildChildrenHTML,
   renderLayoutTree,
-  resolveIncludes,
 } from '../templates/index.js'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -29,6 +28,7 @@ async function buildEntityHTML(host, ENTITY, dynamicData, CHILDREN) {
     getTemplate: (name) => getTemplateByName(host, name),
     templatesData: ENTITY.data?.template2 || {},
     globalData: dynamicData,
+    domain: host,
   })
 
   if (html.includes('%CHILDREN%')) {
@@ -50,7 +50,7 @@ async function fullLoad(req, res, site) {
 
     const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken, clientToken);
 
-    let htmlLayout = await buildLayoutHTML(host, site);
+    let htmlLayout = await buildLayoutHTML(host, site, { url: ENTITY.url });
 
     htmlLayout = injectSiteSettings(htmlLayout, site.settings);
 
@@ -60,13 +60,11 @@ async function fullLoad(req, res, site) {
       url: ENTITY.url
     }
 
-    htmlLayout = await resolveIncludes(host, htmlLayout, dynamicData)
-
     const entityHTML = await buildEntityHTML(host, ENTITY, dynamicData, CHILDREN)
 
     htmlLayout = injectHTML('ENTITY', htmlLayout, entityHTML)
 
-    let finalHTML = handlebarsRender(htmlLayout, dynamicData);
+    let finalHTML = handlebarsRender(htmlLayout, dynamicData, 2, host);
 
     if (isDev) {
       // finalHTML += `<pre>${JSON.stringify(entityTemplatesTree.nodes, null, 2)}</pre>`
@@ -111,7 +109,7 @@ async function partialLoad(req, res, site) {
 
     let finalHTML = await buildEntityHTML(host, ENTITY, dynamicData, CHILDREN)
 
-    finalHTML = handlebarsRender(finalHTML, dynamicData);
+    finalHTML = handlebarsRender(finalHTML, dynamicData, 2, host);
 
     res.status(statusCode || 200);
 

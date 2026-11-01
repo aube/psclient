@@ -88,10 +88,6 @@ function parseMarker(raw, kind) {
     return { type: 'region', name, id, children, raw }
   }
 
-  if (!id) {
-    return { type: 'global', name, changable, isGlobal, deleted, raw }
-  }
-
   return { type: 'node', name, id, changable, isGlobal, deleted, children, raw }
 }
 
@@ -125,15 +121,11 @@ export function parseLayout(html) {
 }
 
 function stringifyItem(item) {
-  if (item.type === 'global') {
-    const global = item.isGlobal ? ' @global' : ''
-    return `[{${item.deleted ? '!' : ''}${item.name}${global}}]`
-  }
-
   if (item.type === 'node') {
+    const id = item.id ? ` #${item.id}` : ''
     const global = item.isGlobal ? ' @global' : ''
     const body = item.children.length ? ` (${stringifyLayout(item.children)})` : ''
-    return `[{${item.deleted ? '!' : ''}${item.name} #${item.id}${global}${body}}]`
+    return `[{${item.deleted ? '!' : ''}${item.name}${id}${global}${body}}]`
   }
 
   const id = item.id ? ` #${item.id}` : ''
@@ -155,6 +147,18 @@ function templateName(name) {
   return name.replace(/^~/, '')
 }
 
+function getLayoutEntry(templatesData, key, item) {
+  if (!templatesData) return undefined
+  if (templatesData[key] !== undefined) return templatesData[key]
+
+  const legacyKey = item.type === 'node' && item.id ? nodeKey(item.name, item.id) : null
+  if (legacyKey && legacyKey !== key && templatesData[legacyKey] !== undefined) {
+    return templatesData[legacyKey]
+  }
+
+  return undefined
+}
+
 function takeSegment(name, counts) {
   const next = (counts.get(name) || 0) + 1
   counts.set(name, next)
@@ -162,29 +166,32 @@ function takeSegment(name, counts) {
 }
 
 export function itemKey(item, parentPath, counts) {
-  if (item.type === 'node' && item.id) return nodeKey(item.name, item.id)
-  const segment = takeSegment(item.name, counts)
+  const segment = item.type === 'node' && item.id
+    ? nodeKey(item.name, item.id)
+    : takeSegment(item.name, counts)
+
   return parentPath ? `${parentPath}::${segment}` : segment
 }
 
-async function buildNode(item, ctx, parentPath, key) {
+async function buildNode(item, ctx, parentPath, key, seen = new Set()) {
   if (item.type === 'region') return null
 
   const isGlobal = Boolean(item.isGlobal)
-  const entry = ctx.templatesData ? ctx.templatesData[key] : undefined
+  const entry = getLayoutEntry(ctx.templatesData, key, item)
   const override = entry && entry.override
   const name = override && override !== item.name ? override : item.name
   const template = await ctx.getTemplate(templateName(name))
   const html = template ? template.html || '' : ''
+  const nextSeen = new Set([...seen, name])
 
   const node = {
     key,
-    id: item.type === 'node' ? item.id : '',
+    id: item.id || '',
     name,
     slot: item.name,
     raw: item.raw,
     title: template ? template.title || '' : '',
-    category: template ? template.category : '',
+    category: template ? template.category || '' : '',
     changable: item.changable,
     global: isGlobal,
     deleted: Boolean(item.deleted),
@@ -197,12 +204,10 @@ async function buildNode(item, ctx, parentPath, key) {
     },
     parentUid: parentPath,
     regions: [],
-    statics: await buildStaticNodes(html, ctx, key, new Set([name])),
+    statics: await buildStaticNodes(html, ctx, key, nextSeen),
   }
 
-  if (item.type !== 'global') {
-    node.regions = await buildRegions(item.children, ctx, key)
-  }
+  node.regions = await buildRegions(item.children, ctx, key, nextSeen)
 
   return node
 }
@@ -216,7 +221,7 @@ async function buildStaticNodes(html, ctx, parentPath, seen) {
 
     const key = itemKey(item, parentPath, counts)
     const isGlobal = Boolean(item.isGlobal)
-    const entry = ctx.templatesData ? ctx.templatesData[key] : undefined
+    const entry = getLayoutEntry(ctx.templatesData, key, item)
     const override = entry && entry.override
     const name = override && override !== item.name ? override : item.name
     if (seen.has(name)) continue
@@ -224,9 +229,13 @@ async function buildStaticNodes(html, ctx, parentPath, seen) {
     const template = await ctx.getTemplate(templateName(name))
     if (!template) continue
 
+    const nextSeen = new Set([...seen, name])
+    const explicitRegions = await buildRegions(item.children, ctx, key, nextSeen)
+    const templateRegions = await buildTemplateRegions(template.html || '', ctx, key, nextSeen)
+
     nodes.push({
       key,
-      id: item.type === 'node' ? item.id : '',
+      id: item.id || '',
       name,
       slot: item.name,
       raw: item.raw,
@@ -243,15 +252,43 @@ async function buildStaticNodes(html, ctx, parentPath, seen) {
         ...(isGlobal || !entry || !entry.values ? {} : entry.values),
       },
       parentUid: parentPath,
-      regions: [],
-      statics: await buildStaticNodes(template.html || '', ctx, key, new Set([...seen, name])),
+      regions: mergeRegions(templateRegions, explicitRegions),
+      statics: await buildStaticNodes(template.html || '', ctx, key, nextSeen),
     })
   }
 
   return nodes
 }
 
-async function buildRegions(items, ctx, parentPath) {
+async function buildTemplateRegions(html, ctx, parentPath, seen) {
+  const regions = []
+
+  for (const item of parseLayout(html)) {
+    if (item.type !== 'region') continue
+    regions.push(...await buildRegions([item], ctx, parentPath, seen))
+  }
+
+  return regions
+}
+
+function mergeRegions(templateRegions, explicitRegions) {
+  const result = [...templateRegions]
+
+  for (const region of explicitRegions) {
+    if (!region.name) continue
+
+    const idx = result.findIndex(r => r.name === region.name)
+    if (idx === -1) {
+      result.push(region)
+    } else {
+      result[idx] = region
+    }
+  }
+
+  return result
+}
+
+async function buildRegions(items, ctx, parentPath, seen = new Set()) {
   const regions = []
   let loose = null
   const counts = new Map()
@@ -262,14 +299,14 @@ async function buildRegions(items, ctx, parentPath) {
 
       const childCounts = new Map()
       const nodes = (await Promise.all(item.children.map(child =>
-        buildNode(child, ctx, parentPath, itemKey(child, parentPath, childCounts)),
+        buildNode(child, ctx, parentPath, itemKey(child, parentPath, childCounts), seen),
       ))).filter(node => node !== null)
 
       regions.push({ kind: 'region', name: item.name, id: item.id, parentUid: parentPath, raw: item.raw, nodes })
       continue
     }
 
-    const node = await buildNode(item, ctx, parentPath, itemKey(item, parentPath, counts))
+    const node = await buildNode(item, ctx, parentPath, itemKey(item, parentPath, counts), seen)
     if (!node) continue
 
     if (!loose) {

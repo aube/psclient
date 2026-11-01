@@ -1,8 +1,42 @@
 import Handlebars from 'handlebars';
+import { cloneDeep } from 'lodash-es';
 import logger from '../logger.pino.js';
 
+function resolveImageUrl(url, domain) {
+  if (typeof url !== 'string' || !url || !domain) return url;
+
+  const trimmed = url.trim();
+  if (!trimmed) return url;
+  if (/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(trimmed)) return url;
+  if (trimmed.startsWith('/')) return url;
+
+  return `//${domain}/${trimmed.replace(/^\.?\//, '')}`;
+}
+
+// Resolve src/srcset of top-level object values only.
+function resolveImages(values, domain) {
+  if (!domain) return values;
+
+  for (const value of Object.values(values)) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+
+    if (typeof value.srcset === 'string') {
+      value.srcset = value.srcset
+        .split(',')
+        .map(part => resolveImageUrl(part.trim(), domain))
+        .join(', ');
+    }
+
+    if (typeof value.src === 'string') {
+      value.src = resolveImageUrl(value.src, domain);
+    }
+  }
+
+  return values;
+}
+
 // Function to render Handlebars templates
-export function handlebarsRender(templateString, data, headingLevel = 2) {
+export function handlebarsRender(templateString, data, headingLevel = 2, domain = '') {
 
   Handlebars.registerHelper('gt', function(a, b) {
     return a > b;
@@ -66,10 +100,11 @@ export function handlebarsRender(templateString, data, headingLevel = 2) {
     options.data.root[name] = value; 
   });
 
-  const template = Handlebars.compile(templateString, {noEscape: true});
+  const prepared = resolveImages(cloneDeep(data || {}), domain);
+  const template = Handlebars.compile(String(templateString ?? ''), {noEscape: true});
 
   const result = template({
-    ...data,
+    ...prepared,
     headingLevel,
   })
 

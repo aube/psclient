@@ -37,7 +37,7 @@ export async function buildChildrenHTML(host, children, globalData = {}) {
       url: globalData.url + '/' + row.name
     }
     
-    html += handlebarsRender(template.html, values)
+    html += handlebarsRender(template.html, values, 2, host)
   }
 
   return html

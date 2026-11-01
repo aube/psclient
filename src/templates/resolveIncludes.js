@@ -35,7 +35,7 @@ export async function resolveIncludes(host, html, data = {}, level = 0) {
     const innerData = { ...values, ...data };
 
     const inner = await resolveIncludes(host, template.html || "", innerData, level + 1);
-    const rendered = handlebarsRender(inner, innerData);
+    const rendered = handlebarsRender(inner, innerData, 2, host);
 
     html = html.replaceAll(`[{${name}}]`, `<!--${name}-->${rendered}<!--/${name}-->`);
   }
