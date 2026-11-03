@@ -178,6 +178,8 @@ export class PJAXClient {
       // A newer navigation has started; discard this response
       if (requestId !== this.requestId) return;
 
+      if (this.handleRedirect(data)) return;
+
       // Remember where the user was before leaving the current entry
       if (historyMode === 'push') {
         this.saveScrollPosition();
@@ -255,6 +257,8 @@ export class PJAXClient {
       // A newer navigation has started; discard this response
       if (requestId !== this.requestId) return;
 
+      if (this.handleRedirect(data)) return;
+
       // Remember where the user was before leaving the current entry
       if (trackHistory) {
         this.saveScrollPosition();
@@ -300,6 +304,14 @@ export class PJAXClient {
     };
 
     return fetch(url, fetchOptions);
+  }
+
+  handleRedirect(data) {
+    if (data && data.redirect) {
+      window.location.assign(data.redirect);
+      return true;
+    }
+    return false;
   }
 
   /**

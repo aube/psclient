@@ -5,7 +5,6 @@ import logger from './logger.pino.js';
 import { healthHandler } from './routes/healthHandler.js';
 import { hotReloadHandler, broadcastReloadEvent, connections } from './routes/hotReloadHandler.js';
 import { mainHandler } from './routes/mainHandler.js';
-import { consultingRoomHandler } from './routes/consultingRoomHandler.js';
 import { callHandler } from './routes/callHandler.js';
 import { verifyHandler } from './routes/verifyHandler.js';
 import { apiFilesHandler } from './routes/apiFilesHandler.js';
@@ -134,8 +133,6 @@ app.get('/hot-reload', hotReloadHandler);
 
 // Health check endpoint
 app.get('/health', healthHandler);
-
-app.get('/consulting-room', consultingRoomHandler);
 
 app.get('/verify', verifyHandler);
 

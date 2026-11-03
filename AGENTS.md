@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Rules
+
+- **Stay inside this directory.** Do not read or modify files outside `/home/aube/seas/psy/client`, including `../api`, `../docker-compose.yml` and other sibling projects. Use only paths inside this repository unless the user explicitly allows otherwise.
+
 ## Project: PJAX proxy server
 
 ESM Node.js Express proxy (`src/server.js`) that renders HTML pages server-side using Handlebar templates stored in Redis. Uses PJAX (partial page loads) for navigation.

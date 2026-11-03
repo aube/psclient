@@ -15,6 +15,12 @@ import {
 
 const isDev = process.env.NODE_ENV === 'development'
 const SITE_NOT_FOUND_ADDRESS = process.env.SITE_NOT_FOUND_ADDRESS;
+const CLIENT_LOGIN_PATH = '/client/login';
+
+function isProtectedClientPath(path) {
+  return (path === '/client' || path.startsWith('/client/'))
+    && path !== CLIENT_LOGIN_PATH;
+}
 
 async function buildEntityHTML(host, ENTITY, dynamicData, CHILDREN) {
   let layoutHtml = ENTITY.html || ''
@@ -49,6 +55,10 @@ async function fullLoad(req, res, site) {
     logger.debug('fullLoad', 'url', req.url, 'host', host);
 
     const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken, clientToken);
+
+    if (statusCode === 403 && isProtectedClientPath(req.path)) {
+      return res.redirect(CLIENT_LOGIN_PATH);
+    }
 
     let htmlLayout = await buildLayoutHTML(host, site, { url: ENTITY.url });
 
@@ -99,7 +109,10 @@ async function partialLoad(req, res, site) {
 
     const {ENTITY, CHILDREN, statusCode} = await fetchURL(host, req.url, authToken, clientToken);
 
-    
+    if (statusCode === 403 && isProtectedClientPath(req.path)) {
+      return res.status(200).json({ redirect: CLIENT_LOGIN_PATH });
+    }
+
     const dynamicData = {
       settings: { ...site.settings},
       meta: { ...site.meta},
