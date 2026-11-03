@@ -98,7 +98,17 @@ Classes used in server-side templates that pass through `@apply` in `TW_BASE_CSS
 
 ## Forms
 
-Call `sendForm(form)` from `static/sendForm.js` (exposed as `window.sendForm`) to submit the form via `POST /api/v1/interactions` as FormData. There is no auto-binding, so bind every form explicitly (including forms inserted by PJAX, in their inline script). The result is reported via `form:success` / `form:error` / `form:invalid` events and `options.onSuccess` / `onError` / `onInvalid` callbacks.
+Call `sendForm(form, options)` from `static/sendForm.js` (exposed as `window.sendForm`) to submit the form. The default request is `POST /api/v1/interactions` with FormData. There is no auto-binding, so bind every form explicitly (including forms inserted by PJAX, in their inline script). The result is reported via `form:success` / `form:error` / `form:invalid` events and `options.onSuccess` / `onError` / `onInvalid` callbacks.
+
+Options:
+- `address` — endpoint URL (default `/api/v1/interactions`)
+- `method` — HTTP method (default `POST`; `GET` is rejected)
+- `json` — `true` to send JSON built by `static/formPayload.js`, or a function `(form) => payload`
+- `headers` — additional request headers
+- `credentials` — fetch credentials (default `same-origin`)
+- `reset` — reset the form after success (default `true`)
+
+JSON mode adds `type` from `data-form_name` and rejects selected file inputs. `formPayload.js` converts numeric/date fields; names ending with `[]` are always arrays.
 
 Typical form structure:
 ```html
