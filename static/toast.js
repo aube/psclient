@@ -21,7 +21,7 @@ const ICONS = {
 
 const DEFAULTS = {
   position: 'top-right',
-  life: 3000,
+  life: 10000,
   max: 0,
 };
 
