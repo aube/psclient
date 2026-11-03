@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 114.99104 114.95181"
+   width="114.99104"
+   height="114.95181"
+   version="1.1"
+   id="svg1145"
+   sodipodi:docname="logo1.mini.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:export-filename="logo1.mini.png"
+   inkscape:export-xdpi="427.44199"
+   inkscape:export-ydpi="427.44199"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1147"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="4"
+     inkscape:cx="28.625"
+     inkscape:cy="36.75"
+     inkscape:window-width="3840"
+     inkscape:window-height="1532"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1145" />
+  <defs
+     id="defs1129">
+    <style
+       id="style1127">
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400&amp;display=swap');
+    </style>
+  </defs>
+  <rect
+     width="114.99104"
+     height="114.95181"
+     fill="#f5f3f0"
+     rx="0"
+     id="rect1131"
+     x="0"
+     y="0"
+     style="stroke-width:0.574858" />
+  <!-- Круг (утолщён) -->
+  <!-- Волна (утолщена, форма чуть упрощена для чёткости) -->
+  <!-- Точка (крупнее) -->
+  <!-- Лёгкая рябь -->
+  <g
+     id="g1479"
+     transform="translate(-0.27174377,0.59868622)">
+    <circle
+       cx="57.767265"
+       cy="56.87722"
+       r="48"
+       fill="none"
+       stroke="#2c3e35"
+       stroke-width="3"
+       opacity="0.85"
+       id="circle1133" />
+    <path
+       d="m 17.767265,74.87722 c 15,-6 23,4 40,-1 17,-5 25,7 40,1"
+       fill="none"
+       stroke="#2c3e35"
+       stroke-width="3"
+       stroke-linecap="round"
+       opacity="0.85"
+       id="path1135" />
+    <circle
+       cx="57.767265"
+       cy="34.87722"
+       r="5.5"
+       fill="#c49a6c"
+       id="circle1137" />
+    <circle
+       cx="57.767265"
+       cy="34.87722"
+       r="2"
+       fill="#c49a6c"
+       opacity="0.3"
+       id="circle1139" />
+    <line
+       x1="27.767265"
+       y1="84.87722"
+       x2="87.767265"
+       y2="84.87722"
+       stroke="#2c3e35"
+       stroke-width="1.2"
+       stroke-linecap="round"
+       opacity="0.2"
+       id="line1141" />
+  </g>
+  <!-- Текст компактно под знаком -->
+</svg>
