@@ -98,7 +98,7 @@ Classes used in server-side templates that pass through `@apply` in `TW_BASE_CSS
 
 ## Forms
 
-Add `class="form"` to the `<form>` element to enable auto-binding in `static/main.js` — the form will submit via `POST /api/v1/interactions` as FormData.
+Call `sendForm(form)` from `static/sendForm.js` (exposed as `window.sendForm`) to submit the form via `POST /api/v1/interactions` as FormData. There is no auto-binding, so bind every form explicitly (including forms inserted by PJAX, in their inline script). The result is reported via `form:success` / `form:error` / `form:invalid` events and `options.onSuccess` / `onError` / `onInvalid` callbacks.
 
 Typical form structure:
 ```html
@@ -114,6 +114,36 @@ Typical form structure:
   </div>
   <button class="btn-submit" type="submit">Send</button>
 </form>
+```
+
+## Toasts
+
+Use the PrimeVue-like toast singleton from `static/toast.js`. It is exposed as `window.toast`, `window.useToast()` and the short `window.showToast()` helper. Toasts are created dynamically, so their styles live in `static/toast.css` and do not require SAFELIST changes.
+
+```js
+toast.add({ severity: 'success', summary: 'Готово', detail: 'Форма отправлена', life: 3000 });
+toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте позже', life: 0 });
+showToast('Готово', 'Форма отправлена', 'success');
+```
+
+API: `add`, `remove`, `removeGroup`, `removeAllGroups`, `clear`, `configure`.
+
+Message fields:
+- `severity`: `success`, `info`, `warn`, `error`, `secondary`, `contrast`
+- `summary`, `detail`: text content (inserted with `textContent`)
+- `life`: milliseconds, `0` disables auto-dismiss
+- `closable`: show the close button (default `true`)
+- `group`: optional group name for `removeGroup` / `removeAllGroups`
+- `position`: `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right`, `center`
+
+Default position is `top-right`, default life is `3000` ms; both can be overridden with `toast.configure()` or `window.__SITE_SETTINGS.toastPosition` / `.toastLife`.
+
+Toast CSS variables (override in site CSS):
+```
+--toast-width --toast-gap --toast-padding --toast-radius
+--toast-bg --toast-text --toast-text-secondary --toast-border --toast-shadow
+--toast-z-index --toast-success --toast-info --toast-warn --toast-error
+--toast-secondary --toast-contrast
 ```
 
 ## Client-side styling (static/main.js)

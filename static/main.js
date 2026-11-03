@@ -1,9 +1,13 @@
 import { PJAXClient } from "/static/pjax.js"
 import { initAltcha } from "/static/altcha.js"
-import { sendInteractionForm } from "/static/sendInteractionForm.js"
+import { sendForm } from "/static/sendForm.js"
+import { toast, showToast, useToast } from "/static/toast.js"
 
 window.initInvisibleAltchaForm = initAltcha('/api/v1/altcha/challenge');
-window.sendInteractionForm = sendInteractionForm;
+window.sendForm = sendForm;
+window.toast = toast;
+window.showToast = showToast;
+window.useToast = useToast;
 
 // Auto-initialize if the script is loaded
 document.addEventListener('DOMContentLoaded', () => {

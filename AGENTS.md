@@ -29,9 +29,9 @@ node src/server.js
 
 ## Key conventions
 
-- **Forms**: Add `class="form"`. Submission is auto-bound in `/static/main.js` via `POST /api/v1/interactions`.
+- **Forms**: Call `sendForm(form)` from `/static/sendForm.js` (exposed as `window.sendForm`); it submits via `POST /api/v1/interactions` as FormData. There is no auto-binding, so PJAX-inserted forms must bind in their inline script. Result is reported via `form:success` / `form:error` / `form:invalid` events and `options.onSuccess` / `onError` / `onInvalid` callbacks.
 - **Styling**: See `STYLES.md` for CSS architecture, component classes, SAFELIST rules, forms, and icons.
-- **Client globals**: `window.__SITE_SETTINGS` (injected in `<head>`), `window.PJAX` (PJAX client instance).
+- **Client globals**: `window.__SITE_SETTINGS` (injected in `<head>`), `window.PJAX` (PJAX client instance), `window.toast` / `window.useToast()` / `window.showToast()` (PrimeVue-like toasts from `static/toast.js`).
 - **Cookie banner**: Built-in in `/static/main.js`. Reads `window.__SITE_SETTINGS.cookieBannerText`, `.cookieBannerBtn`, `.cookieBannerTemplate`. Sets `cookie_accepted`.
 - **Logger**: Custom pino wrapper with key-value pair API: `logger.debug('msg', 'key1', val1, 'key2', val2)`.
 

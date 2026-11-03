@@ -9,6 +9,7 @@ function generateStyles(hashes = {}) {
   // птмчт он также хранится в uploads => тоже имеет updated_at
   let styles = `
   <link rel="stylesheet" href="/static/core.css?h=0">
+  <link rel="stylesheet" href="/static/toast.css?h=0">
   <link rel="stylesheet" href="/style.css?h=0">
   `
 
