@@ -62,6 +62,16 @@ function getContainer(position) {
   return container;
 }
 
+function sanitizeHref(href) {
+  if (typeof href !== 'string') return '';
+  const value = href.trim();
+  if (!value) return '';
+  if ((value.startsWith('/') && !value.startsWith('//')) || value.startsWith('#') || value.startsWith('http://') || value.startsWith('https://')) {
+    return value;
+  }
+  return '';
+}
+
 function normalize(message) {
   const severity = String(message.severity || '').toLowerCase();
   const position = String(message.position || '').toLowerCase();
@@ -76,6 +86,8 @@ function normalize(message) {
     life: Number.isFinite(life) ? life : config.life,
     closable: message.closable !== false,
     group: message.group === undefined ? null : message.group,
+    href: sanitizeHref(message.href),
+    onClick: typeof message.onClick === 'function' ? message.onClick : null,
   };
 }
 
@@ -86,11 +98,17 @@ function buildMessage(entry) {
   element.className = 'toast-message toast-severity-' + message.severity;
   element.dataset.toastId = entry.id;
 
+  const body = document.createElement(message.href ? 'a' : 'div');
+  body.className = 'toast-link';
+  if (message.href) {
+    body.setAttribute('href', message.href);
+  }
+
   const icon = document.createElement('span');
   icon.className = 'icon toast-icon';
   icon.style.setProperty('--icon-url', 'url("' + ICONS[message.severity] + '")');
   icon.setAttribute('aria-hidden', 'true');
-  element.appendChild(icon);
+  body.appendChild(icon);
 
   const content = document.createElement('div');
   content.className = 'toast-content';
@@ -109,7 +127,22 @@ function buildMessage(entry) {
     content.appendChild(detail);
   }
 
-  element.appendChild(content);
+  body.appendChild(content);
+
+  if (message.href) {
+    body.addEventListener('click', () => {
+      if (message.onClick) {
+        try {
+          message.onClick(entry.original, entry.id);
+        } catch (error) {
+          console.error('Toast click handler error:', error);
+        }
+      }
+      remove(entry.id);
+    });
+  }
+
+  element.appendChild(body);
 
   if (message.closable) {
     const close = document.createElement('button');

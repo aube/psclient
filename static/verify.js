@@ -19,19 +19,12 @@ async function verifyEmail() {
   }
 
   try {
-    const response = await fetch('/api/v1/client/verify-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ token }),
-    });
+    const { client } = await import(window.ASSETS.client);
 
-    if (response.ok) {
-      window.location.replace('/profile');
-      return;
-    }
+    await client.verifyEmail(token);
+
+    window.location.replace('/profile');
+    return;
   } catch (error) {
     console.error('Email verification error:', error);
   }

@@ -31,7 +31,8 @@ node src/server.js
 
 - **Forms**: Call `sendForm(form, options)` from `/static/sendForm.js` (exposed as `window.sendForm`); it submits via `POST /api/v1/interactions` as FormData, or as JSON with `options.json`. There is no auto-binding, so PJAX-inserted forms must bind in their inline script. Result is reported via `form:success` / `form:error` / `form:invalid` events and `options.onSuccess` / `onError` / `onInvalid` callbacks.
 - **Styling**: See `STYLES.md` for CSS architecture, component classes, SAFELIST rules, forms, and icons.
-- **Client globals**: `window.__SITE_SETTINGS` (injected in `<head>`), `window.PJAX` (PJAX client instance), `window.toast` / `window.useToast()` / `window.showToast()` (PrimeVue-like toasts from `static/toast.js`).
+- **Client globals**: `window.__SITE_SETTINGS` (injected in `<head>`), `window.ASSETS` (inline map of client module URLs from `src/templates/assets.js`, injected in `<head>` before inline scripts; later replaced by build output), `window.PJAX` (PJAX client instance), `window.toast` / `window.useToast()` / `window.showToast()` (PrimeVue-like toasts from `static/toast.js`).
+- **Client API**: `static/client.js` is the public `/api/v1/client` API; it is not assigned to `window.client`. Import it dynamically where client data is needed: `const { client } = await import(window.ASSETS.client)` (e.g. `await client.getProfile()`).
 - **Cookie banner**: Built-in in `/static/main.js`. Reads `window.__SITE_SETTINGS.cookieBannerText`, `.cookieBannerBtn`, `.cookieBannerTemplate`. Sets `cookie_accepted`.
 - **Logger**: Custom pino wrapper with key-value pair API: `logger.debug('msg', 'key1', val1, 'key2', val2)`.
 

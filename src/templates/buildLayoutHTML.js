@@ -1,6 +1,7 @@
 import { wrapHbVars } from '../../static/wrapHbVars.js';
 
 import {
+  injectAssets,
   injectScriptsBody,
   injectHead,
 } from './index.js'
@@ -25,6 +26,8 @@ export async function buildLayoutHTML(host, site, data = {}) {
   htmlLayout = injectScriptsBody(htmlLayout)
 
   htmlLayout = await injectHead(site.settings, htmlLayout)
+
+  htmlLayout = injectAssets(htmlLayout)
 
   return htmlLayout
 }

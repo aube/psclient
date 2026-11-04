@@ -62,7 +62,11 @@ async function fullLoad(req, res, site) {
 
     let htmlLayout = await buildLayoutHTML(host, site, { url: ENTITY.url });
 
-    htmlLayout = injectSiteSettings(htmlLayout, site.settings);
+    htmlLayout = injectSiteSettings(htmlLayout, {
+      ...site.settings,
+      siteUuid: site.uuid,
+      chatClientEnabled: Boolean(clientToken),
+    });
 
     const dynamicData = {
       settings: { ...site.settings},

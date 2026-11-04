@@ -1,5 +1,6 @@
 export * from './buildLayoutHTML.js'
 export * from './buildChildrenHTML.js'
+export * from './injectAssets.js'
 export * from './injectHTML.js'
 export * from './injectScripts.js'
 export * from './injectSiteSettings.js'
