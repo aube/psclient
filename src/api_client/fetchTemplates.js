@@ -32,7 +32,7 @@ function normalizeTemplate(template) {
 
 async function requestTemplates(path, names, headers = {}) {
   if (!names.length) {
-    return { rows: [], notFound: [] };
+    return { rows: [], notFound: [], failed: false };
   }
 
   try {
@@ -50,16 +50,16 @@ async function requestTemplates(path, names, headers = {}) {
     });
 
     if (!response.ok) {
-      return { rows: [], notFound: [...names] };
+      return { rows: [], notFound: [...names], failed: true };
     }
 
     const data = await response.json();
     const rows = (data.rows || []).map(normalizeTemplate);
 
-    return { rows, notFound: parseNotFound(data.not_found) };
+    return { rows, notFound: parseNotFound(data.not_found), failed: false };
   } catch (error) {
     logger.error('Error fetching templates', 'path', path, 'error', error.message);
-    return { rows: [], notFound: [...names] };
+    return { rows: [], notFound: [...names], failed: true };
   }
 }
 

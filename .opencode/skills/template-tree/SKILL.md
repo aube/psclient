@@ -1,6 +1,6 @@
 ---
 name: template-tree
-description: Алгоритмы парсинга page.html и построения дерева нод psadmin: AST, UID/path, регионы, static includes, loose-регионы, materialize и структурные действия. Use when porting or debugging parseLayout, buildLayoutTree, key generation, materialize or layout mutations.
+description: Алгоритмы парсинга эффективного page HTML и построения дерева нод psadmin: AST, UID/path, регионы, static includes, loose-регионы, materialize и структурные действия. Use when porting or debugging parseLayout, buildLayoutTree, key generation, materialize or layout mutations.
 ---
 
 # Дерево нод: алгоритмы
@@ -11,7 +11,7 @@ description: Алгоритмы парсинга page.html и построени
 
 ```text
 Вход:
-  html: string                 // page.html или Template.html
+  html: string                 // эффективный page HTML (после materialize/applyPageRegions) или Template.html
   ctx.getTemplate(name) -> Template | null
   ctx.getTemplatesData() -> Record<uid, { override?, values? }>
 
@@ -25,6 +25,8 @@ description: Алгоритмы парсинга page.html и построени
 ```
 
 `getTemplate` получает имя **без** ведущего `~`; `getTemplatesData` — данные `page.data.template2`.
+
+Для страницы `html` — это `page.template`, уже прогнанный через `materializeLayout` и `applyPageRegions` (см. `template-render`). Исходный `page.html` в новом pipeline не участвует; он нужен только для одноразовой миграции регионов.
 
 ## Структуры данных
 
@@ -467,7 +469,7 @@ function mergeRegions(templateRegions, explicitRegions):
 Правила:
 
 - Порядок — сначала регионы из `Template.html`, затем явные регионы, которых нет в шаблоне.
-- Явный регион с тем же именем **заменяет** шаблонный (приоритет `page.html`).
+- Явный регион с тем же именем **заменяет** шаблонный (приоритет эффективного page HTML).
 - Loose-регионы явных children отбрасываются при merge; их содержимое не попадает в итоговые регионы. Поэтому для показа детей используйте `getLayoutNodeRegions` (см. ниже), а не только `regions`.
 
 ---
@@ -536,7 +538,7 @@ function getLayoutNodeChildren(node):
 
 ## Шаг 5. Materialize
 
-Materialize добавляет в `page.html` отсутствующие регионы, объявленные в `Template.html`. Он **не** разворачивает static includes и **не** трогает `@global`.
+Materialize добавляет в эффективный page HTML (из `page.template`) отсутствующие регионы, объявленные в `Template.html`. Он применяется до `applyPageRegions` и `buildLayoutTree`. Он **не** разворачивает static includes и **не** трогает `@global`.
 
 ```text
 function materializeLayout(html, ctx):
@@ -595,7 +597,7 @@ function withMissingRegions(children, templateHtml):
 - Существующий регион с тем же именем не дублируется; при повторах в шаблоне добавляются позиционные копии.
 - Материализация рекурсивна по странице: узлы внутри регионов и явных children тоже обрабатываются.
 - `@global` и его явные children не материализуются.
-- Static includes внутри `Template.html` не попадают в `page.html`: они остаются в шаблоне и разворачиваются при рендере.
+- Static includes внутри `Template.html` не попадают в эффективный page HTML: они остаются в шаблоне и разворачиваются при рендере.
 - Если шаблон не найден или `html` пуст — добавлять нечего, но рекурсия по existing children выполняется.
 - `replaceLayoutMarkers` + `stringifyLayout` сохраняют статическую разметку; пробелы внутри маркеров нормализуются.
 
@@ -694,7 +696,7 @@ function findInList(items, parentUid, uid):
 ```
 
 - Ключи no-id узлов адресуются по path (`PARENT::NAME`), поэтому действия над ними работают.
-- После `insertItem` с `createMissingRegion`/изменением структуры имеет смысл вызвать `materializeLayout`, иначе дочерние регионы шаблона не появятся в `page.html`.
+- После `insertItem` с `createMissingRegion`/изменением структуры имеет смысл вызвать `materializeLayout`, иначе дочерние регионы шаблона не появятся в эффективном page HTML.
 - При удалении узла UI должен удалить и новый, и legacy-ключ из `template2`.
 
 ---
@@ -713,7 +715,7 @@ function findInList(items, parentUid, uid):
 - Legacy-ключ читается только как fallback; запись — всегда новый ключ.
 - `seen` защищает только static-рекурсию; цикл через page-маркеры теоретически возможен при ручном редактировании HTML.
 - Шаблон может отсутствовать: узел остаётся в дереве с пустым `html`.
-- `deleted` узел остаётся в дереве и в `page.html`; рендер его пропускает.
+- `deleted` узел остаётся в дереве и в эффективном page HTML; рендер его пропускает.
 - `deleted` static include рендерится эталонной реализацией (проверяется только у детей регионов).
 - Одноимённые регионы сопоставляются позиционно; ключи их детей могут совпасть.
 
@@ -844,10 +846,17 @@ copyItem(section) -> копия секции с новым id, дети с пр�
 | `src/lib/templates/layoutParser.js` | vanilla-парсер для бэкенда (те же ключи) |
 | `src/lib/templates/__tests__/layout*.test.ts` | эталонные тест-векторы |
 
+Клиент-прокси (`/home/aube/seas/psy/client`):
+
+| Файл | Что смотреть |
+|---|---|
+| `src/templates/layoutParser.js` | `parseLayout`, `stringifyLayout`, `itemKey`, `materializeLayout`, `buildLayoutTree` |
+| `src/templates/renderLayoutTree.js` | рендер дерева, статические include, позиционные регионы |
+| `src/templates/pageRegions.js` | page-level регионы (`page.data.regions`) |
+| `src/templates/buildPageHTML.js` | точка входа: шаблон → materialize → applyPageRegions |
+
 Проверка:
 
 ```bash
-pnpm exec vitest run src/lib/templates/__tests__
-pnpm exec vue-tsc --noEmit
-pnpm exec eslint src/
+npx eslint src/
 ```

@@ -1,17 +1,95 @@
 ---
 name: template-render
-description: Алгоритмы сборки результирующего HTML psadmin: приоритет values, Handlebars, подстановка регионов и static includes, режимы render, inline-edit аннотации, preview и sanitize. Use when porting or debugging renderLayoutTree, Handlebars output, data-edit annotations or template preview.
+description: Алгоритмы сборки результирующего HTML psadmin: page.template + page.data.regions, приоритет values, Handlebars, подстановка регионов и static includes, режимы render, inline-edit аннотации, preview и sanitize. Use when porting or debugging page HTML assembly, renderLayoutTree, Handlebars output, data-edit annotations or template preview.
 ---
 
 # Рендер HTML: алгоритмы
 
-Навык для переписывания/портирования сборки HTML. Модель — в `template-system`, построение дерева — в `template-tree`. Здесь: контекст значений, Handlebars, подстановка маркеров, режимы, inline-edit, preview, sanitize.
+Навык для переписывания/портирования сборки HTML. Модель — в `template-system`, построение дерева — в `template-tree`. Здесь: сборка page HTML из шаблона и `page.data.regions`, контекст значений, Handlebars, подстановка маркеров, режимы, inline-edit, preview, sanitize.
+
+`page.html` и `page.use_html` — legacy-поля: админка их не использует. Базовая разметка страницы всегда берётся из выбранного `page.template`, динамические секции — из `page.data.regions`. В клиенте-прокси это `ENTITY.template`, `ENTITY.data.regions` и `ENTITY.data.template2`; legacy — `ENTITY.html`.
+
+## Сборка HTML страницы
+
+До построения дерева бэкенд должен собрать эффективный HTML страницы:
+
+```text
+1. template = getTemplate(page.template)
+2. baseHtml = materializeLayout(template.html, ctx)
+3. pageHtml = applyPageRegions(baseHtml, page.data.regions)
+4. tree = buildLayoutTree(pageHtml, ctx)
+5. html = renderLayoutTree(tree, ctx)
+```
+
+`page.data.regions` — карта содержимого root-регионов шаблона:
+
+```json
+{
+  "SECTIONS": "[{~SECTION_MONO #s1 ([[BLOCKS ([{BLOCK_ONE #b1}])]])}]",
+  "SIDEBAR": "",
+  "SECTIONS№2": "[{...}]"
+}
+```
+
+Правила:
+
+- ключ — имя региона (`NAME`); повторные упоминания получают суффикс `№2`, `№3`, …;
+- значение — содержимое региона в marker-формате «как есть»;
+- регионы сопоставляются по имени и позиции среди одноимённых, не по `#id`;
+- если ключа нет — используется содержимое региона из шаблона;
+- `""` — явная очистка региона;
+- ключи без соответствующего региона в текущем шаблоне не удаляются: они сохраняются и снова применятся, если регион вернётся при смене шаблона;
+- вложенные регионы отдельно не хранятся — они остаются внутри marker-строки секции.
+
+```text
+function applyPageRegions(templateHtml, regions):
+  counts = {}
+  return replaceLayoutMarkers(templateHtml, (item, raw) => {
+    if item.type != 'region': return raw
+
+    occurrence = (counts[item.name] or 0) + 1
+    counts[item.name] = occurrence
+    key = occurrence > 1 ? `${item.name}№${occurrence}` : item.name
+
+    if key not in regions: return raw
+
+    return stringifyLayout([{
+      ...item,
+      children: parseLayout(regions[key] || '')
+    }])
+  })
+```
+
+`replaceLayoutMarkers` обходит только root-элементы: вложенные регионы внутри node-маркеров не попадают в replacer, поэтому подстановка затрагивает именно регионы страницы.
+
+Обратные операции:
+
+```text
+extractPageRegions(layoutHtml, templateHtml, previous):
+  сравнить root-регионы собранного HTML и шаблона
+  сохранять только отличающиеся
+  "" сохранять как явную очистку
+  previous-ключи без региона в шаблоне сохранять
+
+migratePageRegions(legacyPageHtml, templateHtml):
+  одноразово извлечь root-регионы из старого page.html
+  по тем же правилам имён/позиций
+```
+
+Миграция выполняется на чтении страницы, если `regions` ещё нет (в клиенте-прокси — из `ENTITY.html`). После этого `page.html` не используется.
+
+`layoutParser.js` не меняет грамматику маркеров: бэкенду нужно лишь подать в него HTML после `applyPageRegions`. Если `page.data.regions` отсутствует, сначала выполнить миграцию из старого `page.html`.
 
 ## Входы и выходы
 
 ```text
 Вход:
-  LayoutTree / TreeNode   // результат buildLayoutTree
+  Page {
+    template: string
+    data.regions: Record<regionKey, markerHtml>
+    data.template2: Record<uid, { override?, values? }>
+  }
+  Template(name)
   ctx.siteSettings: Record<string, any>
   ctx.getTemplatesData() -> Record<uid, { override?, values? }>
   ctx.getTemplate(name) -> Template | null
@@ -21,7 +99,7 @@ description: Алгоритмы сборки результирующего HTML
   строка HTML
 ```
 
-Рендер — строковая подстановка, а не DOM-сборка: `replaceLayoutMarkers` заменяет маркеры в уже отрендеренном Handlebars-шаблоне.
+Рендер — строковая подстановка, а не DOM-сборка: `replaceLayoutMarkers` заменяет маркеры в уже отрендеренном Handlebars-шаблоне. `applyPageRegions` — отдельный, более ранний этап: он готовит HTML страницы до `buildLayoutTree`.
 
 ## Приоритет значений
 
@@ -113,14 +191,23 @@ Template.html
 - Static рендерится рекурсивно со своими регионами и statics.
 - `deleted` у static include эталонный рендер **не** проверяет (проверяются только дети регионов).
 
-### Подстановка регионов
+### Подстановка регионов: два уровня
 
-- Регион ищется по имени: `first regions where name == marker.name`.
-- Если регион не найден — `''`.
-- Дети рендерятся по порядку; `deleted` пропускается.
-- Дети соединяются без разделителей; обёртки `data-flat-*` только при `wrapChildren=true`.
+1. **Page-level** — `page.data.regions`:
+   - применяется к `materializeLayout(template.html)` до `buildLayoutTree`;
+   - заменяет только содержимое root-регионов шаблона;
+   - ключи и сопоставление — по имени/позиции (`NAME`, `NAME№N`);
+   - реализация — `applyPageRegions` (см. раздел «Сборка HTML страницы»).
+2. **Node-level** — `node.regions`:
+   - применяется внутри `renderBuiltNode` к маркерам `[[...]]` из `Template.html`;
+   - регион ищется по имени и позиции среди одноимённых;
+   - если регион не найден — `''`;
+   - дети рендерятся по порядку; `deleted` пропускается;
+   - дети соединяются без разделителей; обёртки `data-flat-*` только при `wrapChildren=true`.
 
-Известное ограничение: при нескольких регионах с одинаковым именем эталонный рендер всегда берёт первый. Для `SECTION_DOUBLE.html = '<div>[[BLOCKS]][[BLOCKS]]</div>'` оба маркера отрендерят детей первого региона. Редактор (`getLayoutNodeRegions`) сопоставляет регионы позиционно — при порте можно сделать позиционное сопоставление и в рендере.
+Эти уровни не пересекаются: `page.data.regions` формирует эффективный HTML страницы, а `renderBuiltNode` уже работает с регионами конкретных шаблонов.
+
+Известное ограничение node-level в эталонной админке: при нескольких регионах с одинаковым именем берётся первый. В клиенте-прокси `renderMarkers` сопоставляет регионы позиционно по счётчику имён, поэтому `SECTION_DOUBLE.html = '<div>[[BLOCKS]][[BLOCKS]]</div>'` корректно использует первый и второй регионы.
 
 ## Режимы рендера
 
@@ -461,8 +548,15 @@ renderTemplatePreviewHtml(template, ctx):
 - `settings` мержится первым; поле шаблона `settings` может его перекрыть.
 - Значения страницы не применяются к `@global`; для них нужны live-значения шаблона.
 - `defaultValues` — дефолты шаблона; не путать с `entry.values`.
+- Базовая разметка страницы берётся из `page.template`; `page.html` и `page.use_html` — legacy и не используются.
+- `page.data.regions` — отдельный уровень хранения структуры, не часть `template2`. В `template2` остаются только `override` и `values`.
+- Page-level регионы сопоставляются по имени и позиции (`NAME`, `NAME№N`), а не по `#id`.
+- `page.data.regions` применяется до `buildLayoutTree`; node-level регионы внутри `Template.html` обрабатываются позже, в `renderBuiltNode`.
+- Ключи `regions`, для которых нет региона в текущем шаблоне, не удаляются.
+- `""` в `regions[key]` — явная очистка региона, а не отсутствие override.
+- Вложенные регионы не хранятся отдельными ключами: они остаются внутри marker-строки секции.
 - Static ищется по `slot` (с `~`), а не по разрешённому `name`.
-- Регион ищется по имени; при дублях эталонный рендер берёт первый.
+- Регион ищется по имени и позиции; в клиенте-прокси дубли сопоставляются позиционно.
 - `deleted` пропускается у детей регионов, но не у static include.
 - `injectNodeAttributes` вызывается до Handlebars; если Handlebars-выражение формирует первый тег, атрибут может уйти не туда.
 - `annotateEditableTemplate` не размечает `{{#if}}`-контекст и `settings.*`.
@@ -553,27 +647,93 @@ field icon пустой         -> DEFAULT_PREVIEW_ICON
 field image пустой        -> placeholder по теме
 ```
 
+9. **Подстановка page-региона по имени**
+
+```text
+templateHtml = '<main>[[SECTIONS]]</main>'
+regions = { SECTIONS: '[{SECTION_DEFAULT #s1}]' }
+applyPageRegions -> '<main>[[SECTIONS ([{SECTION_DEFAULT #s1}])]]</main>'
+```
+
+10. **Отсутствие ключа оставляет шаблон**
+
+```text
+templateHtml = '<main>[[SECTIONS ([{SECTION_DEFAULT #s1}])]]</main>'
+regions = {}
+applyPageRegions -> без изменений
+```
+
+11. **Пустая строка очищает регион**
+
+```text
+templateHtml = '<main>[[SECTIONS ([{SECTION_DEFAULT #s1}])]]</main>'
+regions = { SECTIONS: '' }
+applyPageRegions -> '<main>[[SECTIONS]]</main>'
+```
+
+12. **Повторные регионы**
+
+```text
+templateHtml = '<main>[[SECTIONS]][[SECTIONS]]</main>'
+regions = {
+  SECTIONS: '[{BLOCK_ONE #b1}]',
+  'SECTIONS№2': '[{BLOCK_TWO #b2}]'
+}
+-> первый регион получает BLOCK_ONE, второй — BLOCK_TWO
+```
+
+13. **Вложенные регионы остаются в строке секции**
+
+```text
+regions = {
+  SECTIONS: '[{SECTION_DEFAULT #s1 ([[BLOCKS ([{BLOCK_ONE #b1}])]])}]'
+}
+applyPageRegions -> сохраняет [[BLOCKS]] внутри SECTION_DEFAULT
+```
+
+14. **Смена шаблона переиспользует регион по имени**
+
+```text
+newTemplateHtml = '<div class="new">[[SECTIONS]]</div>'
+regions = { SECTIONS: '[{~SECTION_MONO #s1}]' }
+applyPageRegions -> '<div class="new">[[SECTIONS ([{~SECTION_MONO #s1}])]]</div>'
+```
+
+15. **Несопоставленный ключ сохраняется**
+
+```text
+templateHtml = '<main>[[SECTIONS]]</main>'
+previous = { SIDEBAR: '[{WIDGET_CALENDAR #w1}]' }
+extractPageRegions -> SIDEBAR остаётся в результате
+```
+
+16. **Миграция старого page.html**
+
+```text
+legacyPageHtml = '<main>[[SECTIONS ([{SECTION_DEFAULT #s1}])]]</main>'
+templateHtml = '<main>[[SECTIONS]]</main>'
+migratePageRegions -> { SECTIONS: '[{SECTION_DEFAULT #s1}]' }
+```
+
 ## Приложение: reference-реализация
+
+Клиент-прокси (`/home/aube/seas/psy/client`):
 
 | Файл | Что смотреть |
 |---|---|
-| `src/lib/templates/layoutRender.ts` | `renderLayoutTree`, `renderLayoutTreeFlat`, `renderLayoutNode*`, приоритет values, flat-обёртки |
-| `src/lib/templates/handlebarsRender.ts` | `handlebarsRender`, helpers, resolve картинок, `/static/icons` |
-| `src/lib/templates/handlebarsParser.ts` | `extractTokens`, `buildTokensTree` |
-| `src/lib/templates/controlsTree.ts` | `controlsTree` |
-| `src/lib/templates/fieldFilters.ts` | `isDataField`, `isEditableTypeField`, исключаемые имена |
-| `src/lib/templates/annotateEditableTemplate.ts` | inline-разметка `data-edit-*` |
-| `src/lib/templates/dataAttributesInjector.ts` | `data-uid`/`data-cat` |
-| `src/lib/templates/previewValues.ts` | `buildPreviewValues`, заглушки |
-| `src/lib/templates/templatePreview.ts` | `renderTemplatePreviewHtml` |
-| `src/lib/templates/sanitizeShadowHtml.ts` | sanitize для shadow DOM |
-| `src/lib/templates/globalTemplateSave.ts` | сохранение `@global` значений |
-| `src/lib/templates/__tests__/layoutRender.test.ts`, `annotateEditableTemplate.test.ts`, `handlebarsRender.test.ts`, `templatePreview.test.ts` | эталонные тест-векторы |
+| `src/templates/pageRegions.js` | `applyPageRegions`, `extractPageRegions`, `migratePageRegions`, `normalizePageRegions` |
+| `src/templates/buildPageHTML.js` | сборка page HTML: шаблон → materialize → regions, legacy-миграция |
+| `src/templates/layoutParser.js` | `parseLayout`, `stringifyLayout`, `itemKey`, `materializeLayout`, `buildLayoutTree` |
+| `src/templates/renderLayoutTree.js` | `renderLayoutTree`, `renderMarkers`, позиционное сопоставление регионов, статические include |
+| `src/templates/handlebarsRender.js` | `handlebarsRender`, helpers, resolve картинок, `/static/icons` |
+| `src/templates/buildLayoutHTML.js` | сборка обвязки сайта (`HTML`) и `%ENTITY%` |
+| `src/routes/mainHandler.js` | `buildEntityHTML`: сборка page HTML и рендер сущности |
+
+Эталонная админка дополнительно содержит editor/preview/sanitize-реализацию (`annotateEditableTemplate`, `previewValues`, `sanitizeShadowHtml`); в клиенте-прокси этих этапов нет.
 
 Проверка:
 
 ```bash
-pnpm exec vitest run src/lib/templates/__tests__
-pnpm exec vue-tsc --noEmit
-pnpm exec eslint src/
+npx eslint src/
+node /tmp/opencode/page-regions-smoke.mjs
 ```

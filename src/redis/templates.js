@@ -33,11 +33,78 @@ function stripTilde(name) {
   return name.startsWith('~') ? name.substring(1) : name;
 }
 
-async function readTemplateFromRedis(client, host, name) {
+function templateKey(host, name) {
+  return `templates:${host}:${stripTilde(name)}`;
+}
+
+function missKey(host, name) {
+  return `templates:miss:${host}:${stripTilde(name)}`;
+}
+
+function deserializeTemplate(value) {
+  let template = value;
+
+  if (typeof template === 'string') {
+    try {
+      template = JSON.parse(template);
+    } catch (error) {
+      logger.error('Error parsing template JSON', 'error', error.message);
+      return undefined;
+    }
+  }
+
+  if (!template || typeof template !== 'object') {
+    return undefined;
+  }
+
+  return normalizeTemplate(template);
+}
+
+async function ensureTemplateTtl(client, key) {
   try {
-    const value = await client.json.get(`templates:${host}:${name}`);
-    return value ? normalizeTemplate(value) : undefined;
+    await client.expire(key, REDIS_DEFAULT_EXPIRE_TIME, 'NX');
+  } catch {
+    try {
+      const ttl = await client.ttl(key);
+      if (ttl === -1) {
+        await client.expire(key, REDIS_DEFAULT_EXPIRE_TIME);
+      }
+    } catch (fallbackError) {
+      logger.error('Error setting template TTL', 'key', key, 'error', fallbackError.message);
+    }
+  }
+}
+
+async function readTemplateFromRedis(client, host, name) {
+  const key = templateKey(host, name);
+
+  try {
+    const raw = await client.get(key);
+    if (raw == null) {
+      return undefined;
+    }
+
+    await ensureTemplateTtl(client, key);
+
+    const template = deserializeTemplate(raw);
+    if (!template) {
+      logger.error('Invalid template in Redis, removing', 'host', host, 'name', name);
+      await client.del(key);
+    }
+
+    return template;
   } catch (error) {
+    if (error?.message?.includes('WRONGTYPE')) {
+      try {
+        await client.del(key);
+        logger.warn('Legacy template key removed', 'host', host, 'name', name);
+      } catch (deleteError) {
+        logger.error('Error removing legacy template key', 'key', key, 'error', deleteError.message);
+      }
+
+      return undefined;
+    }
+
     logger.error('Error reading template from Redis', 'host', host, 'name', name, 'error', error.message);
     return undefined;
   }
@@ -45,7 +112,7 @@ async function readTemplateFromRedis(client, host, name) {
 
 async function isNegativeCached(client, host, name) {
   try {
-    return (await client.get(`templates:miss:${host}:${name}`)) !== null;
+    return (await client.get(missKey(host, name))) !== null;
   } catch (error) {
     logger.error('Error reading negative cache', 'error', error.message);
     return false;
@@ -55,7 +122,7 @@ async function isNegativeCached(client, host, name) {
 async function setNegativeCache(client, host, names) {
   try {
     await Promise.all(names.map(name =>
-      client.set(`templates:miss:${host}:${name}`, '1', { EX: REDIS_MISS_EXPIRE_TIME })
+      client.set(missKey(host, name), '1', { EX: REDIS_MISS_EXPIRE_TIME })
     ));
   } catch (error) {
     logger.error('Error writing negative cache', 'host', host, 'error', error.message);
@@ -65,9 +132,18 @@ async function setNegativeCache(client, host, names) {
 async function cacheTemplates(client, host, rows) {
   try {
     await Promise.all(rows.map(async (template) => {
-      const key = `templates:${host}:${template.name}`;
-      await client.json.set(key, "$", template);
-      await client.expire(key, REDIS_DEFAULT_EXPIRE_TIME);
+      if (!template || typeof template.name !== 'string') {
+        return;
+      }
+
+      const name = stripTilde(template.name);
+      const key = templateKey(host, name);
+
+      await client.set(key, JSON.stringify(template), {
+        NX: true,
+        EX: REDIS_DEFAULT_EXPIRE_TIME,
+      });
+      await client.del(missKey(host, name));
     }));
   } catch (error) {
     logger.error('Error writing templates to Redis', 'host', host, 'error', error.message);
@@ -98,7 +174,7 @@ export async function getTemplatesByNames(host, names = []) {
 
   // 2. host API
   if (hostNeedApi.length) {
-    const { rows } = await fetchTemplates(host, hostNeedApi);
+    const { rows, failed } = await fetchTemplates(host, hostNeedApi);
     await cacheTemplates(client, host, rows);
 
     const returned = new Set(rows.map(t => stripTilde(t.name)));
@@ -107,7 +183,7 @@ export async function getTemplatesByNames(host, names = []) {
     }
 
     const notFound = hostNeedApi.filter(name => !returned.has(name));
-    if (notFound.length) {
+    if (!failed && notFound.length) {
       await setNegativeCache(client, host, notFound);
     }
   }
@@ -129,7 +205,7 @@ export async function getTemplatesByNames(host, names = []) {
 
   // 4. shared API
   if (sharedNeedApi.length) {
-    const { rows } = await fetchSharedTemplates(sharedNeedApi);
+    const { rows, failed } = await fetchSharedTemplates(sharedNeedApi);
     await cacheTemplates(client, 'SHARED', rows);
 
     const returned = new Set(rows.map(t => stripTilde(t.name)));
@@ -138,7 +214,7 @@ export async function getTemplatesByNames(host, names = []) {
     }
 
     const notFound = sharedNeedApi.filter(name => !returned.has(name));
-    if (notFound.length) {
+    if (!failed && notFound.length) {
       await setNegativeCache(client, 'SHARED', notFound);
     }
   }

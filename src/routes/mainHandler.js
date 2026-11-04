@@ -6,6 +6,7 @@ import { getTemplateByName } from '../redis/index.js';
 
 import {
   buildLayoutHTML,
+  buildPageHTML,
   injectSiteSettings,
   injectHTML,
   handlebarsRender,
@@ -23,12 +24,7 @@ function isProtectedClientPath(path) {
 }
 
 async function buildEntityHTML(host, ENTITY, dynamicData, CHILDREN) {
-  let layoutHtml = ENTITY.html || ''
-
-  if (!layoutHtml) {
-    const template = await getTemplateByName(host, ENTITY.template)
-    layoutHtml = template?.html || ''
-  }
+  const layoutHtml = await buildPageHTML(host, ENTITY)
 
   let html = await renderLayoutTree(layoutHtml, {
     getTemplate: (name) => getTemplateByName(host, name),

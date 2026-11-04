@@ -1,6 +1,6 @@
 ---
 name: template-system
-description: Устройство шаблонной системы psadmin: уровни и категории, модель Template, грамматика маркеров, UID/template2, регионы, @global, Handlebars и pipeline. Use when explaining the template model or deciding where a change belongs; алгоритмы дерева — template-tree, рендера — template-render.
+description: Устройство шаблонной системы psadmin: уровни и категории, модель Template, page.template + page.data.regions, грамматика маркеров, UID/template2, регионы, @global, Handlebars и pipeline. Use when explaining the template model or deciding where a change belongs; алгоритмы дерева — template-tree, рендера — template-render.
 ---
 
 # Шаблонная система psadmin
@@ -9,7 +9,7 @@ description: Устройство шаблонной системы psadmin: у�
 
 | Навык | Когда нужен | Что внутри |
 |---|---|---|
-| `template-system` | понять устройство, выбрать место изменения, объяснить `@global`/регионы/категории | модель, грамматика, UID/template2, pipeline |
+| `template-system` | понять устройство, выбрать место изменения, объяснить `@global`/регионы/категории | модель, хранение `page.data.regions`, грамматика, UID/template2, pipeline |
 | `template-tree` | парсинг, построение дерева, UID/path, regions/statics, materialize, структурные действия | псевдокод алгоритмов + тест-векторы |
 | `template-render` | сборка HTML, приоритет values, Handlebars, inline-edit, preview | псевдокод рендера + тест-векторы |
 
@@ -18,10 +18,31 @@ description: Устройство шаблонной системы psadmin: у�
 - `Template` — запись в БД/API: `name`, `html`, `category`, `title`, `description`, `fields`, `values`.
 - `Template.html` может содержать вложенные маркеры: `[{...}]`, `[[...]]`.
 - Общие шаблоны (`site_id = 0`) и шаблоны конкретного сайта (`site_id > 0`) различаются только владельцем; для рендера это не важно.
-- `page.html` — HTML страницы с маркерами.
+- `page.template` — имя выбранного шаблона страницы; это единственный источник базовой разметки страницы.
+- `page.data.regions` — содержимое root-регионов страницы: `Record<regionKey, markerHtml>`.
 - `page.data.template2` — данные инстансов страницы: `override` и `values`.
-- `page.use_html` — признак использования собранного HTML-лейаута; новые страницы в админке создаются с `use_html: true`.
-- На фронтенде `page.data.template2` — объект; API-модуль сериализует `data` в JSON при сохранении.
+- `page.html` и `page.use_html` — legacy-поля; админка их больше не использует и не записывает.
+- На фронтенде `page.data` — объект; API-модуль сериализует его в JSON при сохранении.
+- В клиенте-прокси страница приходит как `ENTITY`: `ENTITY.template`, `ENTITY.data.regions`, `ENTITY.data.template2`, legacy `ENTITY.html`.
+
+`page.data.regions`:
+
+```json
+{
+  "SECTIONS": "[{~SECTION_MONO #s1 ([[BLOCKS ([{BLOCK_ONE #b1}])]])}]",
+  "SIDEBAR": "",
+  "SECTIONS№2": "[{...}]"
+}
+```
+
+- Ключ — имя региона (`NAME`); повторные упоминания получают суффикс `№2`, `№3`, …
+- Значение — содержимое региона в marker-формате «как есть».
+- Сопоставление при сборке страницы — по имени и позиции среди одноимённых регионов, не по `#id`.
+- Регионы переиспользуются в другом шаблоне, если совпадают имена.
+- Отсутствующий ключ — используется содержимое региона из шаблона; `""` — явная очистка.
+- Ключи без соответствующего региона в текущем шаблоне сохраняются и могут примениться позже.
+- Вложенные регионы отдельно не хранятся: они остаются внутри marker-строки секции.
+- `regions` не часть `template2`; значения и override по-прежнему живут в `template2`.
 
 ## Уровни и категории
 
@@ -91,7 +112,7 @@ region ::= "[[" NAME [" #" ID] [" (" children ")"] "]]"
 
 ## Виды маркеров
 
-| Маркер | UID | Values | `(children)` в `page.html` |
+| Маркер | UID | Values | `(children)` |
 |---|---|---|---|
 | `[{NAME #id}]` | `NAME#id` / `PARENT::NAME#id` | страница | да |
 | `[{NAME #id @global}]` | `NAME#id` / `PARENT::NAME#id` | шаблон, страница только `override` | да |
@@ -100,6 +121,8 @@ region ::= "[[" NAME [" #" ID] [" (" children ")"] "]]"
 | `[[NAME (…)]]` | — | — | регион |
 
 `#id`, `@global`, `~` и `!` — независимые признаки. В модели нет `type: 'global'`: любой `[{...}]` — это node.
+
+Для страницы содержимое root-регионов фактически берётся из `page.data.regions`: перед `buildLayoutTree` шаблон прогоняется через `applyPageRegions`. Node-level `(children)` внутри `Template.html` при этом обрабатываются как раньше.
 
 ## Идентичность и UID
 
@@ -133,15 +156,21 @@ template2[uid] = {
 ## Регионы
 
 - Регион — контейнер дочерних узлов: `[[BLOCKS ([{BLOCK_ONE #b1}])]]`.
-- Регионы не хранятся в `template2`; они наполняются из `page.html` и `Template.html`.
+- Page-level регионы хранятся не в `template2`, а в `page.data.regions` в виде marker-строк.
+- Перед `buildLayoutTree` базовая разметка `page.template` прогоняется через `materializeLayout` и `applyPageRegions`; только после этого строится дерево.
+- `applyPageRegions` заменяет содержимое root-регионов шаблона по ключам `NAME` / `NAME№N`, сохраняя статическую разметку и node-маркеры.
+- Если ключа нет — используется содержимое региона из шаблона; `""` — явная очистка.
+- Ключи без соответствующего региона в текущем шаблоне сохраняются и могут примениться при возврате региона.
 - `Template.html` может содержать регионы при любой форме подключения; `#id` на это не влияет.
-- Page-узлы: регионы наполняются из `page.html`; `materializeLayout` добавляет отсутствующие регионы шаблона как пустые.
+- Node-level регионы наполняются из эффективного HTML (после `applyPageRegions`) и `Template.html`.
+- `materializeLayout` добавляет отсутствующие регионы шаблона как пустые.
 - Явные `(children)` маркера имеют приоритет над одноимённым регионом шаблона.
 - `@global` не материализуется, но его регионы присутствуют в дереве и рендере.
 - Сопоставление регионов — по имени; повторные одноимённые регионы сопоставляются позиционно.
+- Вложенные регионы не хранятся отдельными ключами: они остаются внутри marker-строки родительской секции.
 - Лишние static/region-элементы складываются в loose-регион (`loose: true`, `name: ''`).
 
-Алгоритмы построения, merge и materialize — в `template-tree`.
+Алгоритмы сборки page HTML из `page.data.regions` — в `template-render` (`applyPageRegions`, `extractPageRegions`, `migratePageRegions`). Алгоритмы построения, merge и materialize — в `template-tree`.
 
 ## `@global`
 
@@ -198,12 +227,17 @@ Helpers: `gt`, `or`, `ifElse`, `loop`, `split`, `increment`, `incrementHeading`,
 ## Pipeline
 
 ```text
-parseLayout(html)
-  -> buildLayoutTree(html, ctx)        // AST, UID, шаблоны, override, statics, regions
-  -> materializeLayout(html, ctx)      // добавить отсутствующие регионы (кроме @global)
+page.template
+  -> Template.html
+  -> materializeLayout(template.html, ctx)          // статическая база + отсутствующие регионы
+  -> applyPageRegions(baseHtml, page.data.regions)  // page-level содержимое регионов
+  -> buildLayoutTree(pageHtml, ctx)                 // AST, UID, шаблоны, override, statics, regions
   -> renderLayoutTree / renderLayoutNodeEditable / renderLayoutNodeFlat / renderLayoutNodeShell
 ```
 
+- Точка входа для страницы — `page.template`, а не `page.html`. В клиенте-прокси это `ENTITY.template`.
+- `page.data.regions` применяется до `buildLayoutTree`; `page.html`/`use_html` не участвуют.
+- Если `page.data.regions` отсутствует, выполняется одноразовая миграция из старого `page.html` (`migratePageRegions`).
 - `buildLayoutTree` возвращает `LayoutTree`: loose-регионы + именованные регионы с `LayoutTreeNode`.
 - `LayoutTreeNode`: `uid`, `name` (с учётом `override`), `slot` (исходное имя маркера), `global`, `changable`, `deleted`, `html`, `fields`, `defaultValues`, `regions`, `statics`.
 - `renderLayoutTree` рендерит дерево по маркерам, пропускает `deleted`, подставляет static includes и `@global`.
@@ -223,11 +257,16 @@ parseLayout(html)
 - Менять `template2` для static include по имени вместо path-ключа.
 - Считать, что `region#id` участвует в поиске: регионы сопоставляются по имени.
 - Забывать, что `~` входит в ключ `template2`, но срезается при поиске шаблона.
+- Хранить динамические секции в `page.html` или использовать `page.use_html`.
+- Считать `page.data.regions` частью `template2`.
+- Искать page-level регионы по `#id` вместо имени и порядка (`NAME`, `NAME№N`).
+- Удалять ключи `regions`, для которых нет региона в текущем шаблоне.
+- Считать, что вложенные регионы хранятся отдельными ключами: они остаются внутри marker-строки секции.
+- Забывать применить `page.data.regions` до `buildLayoutTree`.
 
 ## Проверка
 
 ```bash
-pnpm exec vitest run src/lib/templates/__tests__
-pnpm exec vue-tsc --noEmit
-pnpm exec eslint src/
+npx eslint src/
+node --input-type=module /tmp/opencode/page-regions-smoke.mjs
 ```

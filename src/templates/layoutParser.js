@@ -319,6 +319,98 @@ async function buildRegions(items, ctx, parentPath, seen = new Set()) {
   return regions
 }
 
+function withMissingRegions(children, templateHtml) {
+  const existing = children.filter(child => child.type === 'region')
+  const used = new Set()
+  const result = [...children]
+
+  for (const item of parseLayout(templateHtml || '')) {
+    if (item.type !== 'region') continue
+
+    const same = existing.find(region => region.name === item.name && !used.has(region))
+    if (same) {
+      used.add(same)
+      continue
+    }
+
+    result.push({ type: 'region', name: item.name, id: item.id, children: [] })
+  }
+
+  return result
+}
+
+async function materializeItem(item, ctx, parentPath, key) {
+  if (item.type === 'region') {
+    return {
+      ...item,
+      children: await materializeList(item.children, ctx, parentPath),
+    }
+  }
+
+  if (item.isGlobal) {
+    return item
+  }
+
+  const children = await materializeList(item.children, ctx, key)
+  const entry = getLayoutEntry(ctx.templatesData, key, item)
+  const override = entry && entry.override
+  const name = override && override !== item.name ? override : item.name
+  const template = await ctx.getTemplate(templateName(name))
+
+  if (!template || !template.html) {
+    return { ...item, children }
+  }
+
+  return { ...item, children: withMissingRegions(children, template.html) }
+}
+
+async function materializeList(items, ctx, parentPath) {
+  const counts = new Map()
+  const result = []
+
+  for (const item of items) {
+    if (item.type === 'region') {
+      result.push(await materializeItem(item, ctx, parentPath, ''))
+      continue
+    }
+
+    const key = itemKey(item, parentPath, counts)
+    result.push(await materializeItem(item, ctx, parentPath, key))
+  }
+
+  return result
+}
+
+// Adds missing regions declared in Template.html to non-global nodes.
+// It does not expand static includes and does not touch @global nodes.
+export async function materializeLayout(html, options = {}) {
+  const source = html || ''
+  const items = parseLayout(source)
+
+  if (!items.length) {
+    return source
+  }
+
+  const ctx = {
+    getTemplate: options.getTemplate,
+    templatesData: options.templatesData || {},
+  }
+
+  const out = await materializeList(items, ctx, LAYOUT_ROOT)
+  let result = ''
+  let pos = 0
+
+  for (let i = 0; i < items.length; i++) {
+    result += source.slice(pos, items[i].start)
+    result += stringifyLayout([out[i]])
+    pos = items[i].end
+  }
+
+  result += source.slice(pos)
+
+  return result
+}
+
 export async function buildLayoutTree(html, options) {
   const ctx = {
     getTemplate: options.getTemplate,

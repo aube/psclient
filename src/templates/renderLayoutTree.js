@@ -5,8 +5,16 @@ import { dataAttributesInjector } from './utils.js'
 const MAX_DEPTH = 12
 const ROOT_LEVEL = 2
 
-function findRegion(regions, name) {
-  return (regions || []).find(region => region.name === name)
+function findRegion(regions, name, occurrence = 0) {
+  let seen = 0
+
+  for (const region of regions || []) {
+    if (region.name !== name) continue
+    if (seen === occurrence) return region
+    seen++
+  }
+
+  return undefined
 }
 
 function indexByKey(nodes) {
@@ -65,6 +73,7 @@ function renderMarkers(html, ctx, level, depth) {
   }
 
   const counts = new Map()
+  const regionCounts = new Map()
   let out = ''
   let pos = 0
 
@@ -74,7 +83,10 @@ function renderMarkers(html, ctx, level, depth) {
     let replacement = ''
 
     if (item.type === 'region') {
-      const region = findRegion(ctx.regions, item.name)
+      const occurrence = regionCounts.get(item.name) || 0
+      regionCounts.set(item.name, occurrence + 1)
+
+      const region = findRegion(ctx.regions, item.name, occurrence)
       if (region) {
         replacement = (region.nodes || [])
           .map(node => renderNode(node, ctx, level, depth))
